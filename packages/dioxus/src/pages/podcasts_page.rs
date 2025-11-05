@@ -52,7 +52,7 @@ pub async fn get_podcasts() -> Result<Vec<Podcast>, ServerFnError> {
     let services = ServiceProvider::create()
         .await
         .expect("ServiceProvider should not fail");
-    let command = ListCommand::new(services.paths, services.http, services.metadata);
+    let command = ListCommand::new(services.paths, services.metadata);
     command
         .execute()
         .await

@@ -1,23 +1,14 @@
 use crate::prelude::*;
-use std::ffi::OsStr;
-
-const CONCURRENCY: usize = 8;
-const IMAGE_SIZE: u32 = 720;
 
 pub struct ListCommand {
     paths: PathProvider,
-    http: HttpClient,
     metadata: MetadataStore,
 }
 
 impl ListCommand {
     #[must_use]
-    pub fn new(paths: PathProvider, http: HttpClient, metadata: MetadataStore) -> Self {
-        Self {
-            paths,
-            http,
-            metadata,
-        }
+    pub fn new(paths: PathProvider, metadata: MetadataStore) -> Self {
+        Self { paths, metadata }
     }
 
     pub async fn execute(&self) -> Result<Vec<Podcast>, Report<ListError>> {
@@ -63,7 +54,7 @@ mod tests {
         let services = ServiceProvider::create()
             .await
             .expect("ServiceProvider should not fail");
-        let command = ListCommand::new(services.paths, services.http, services.metadata);
+        let command = ListCommand::new(services.paths, services.metadata);
 
         // Act
         let result = command.execute().await;

@@ -40,6 +40,7 @@ impl IpInfoProvider {
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 struct IpInfo {
     ip: String,
     hostname: Option<String>,

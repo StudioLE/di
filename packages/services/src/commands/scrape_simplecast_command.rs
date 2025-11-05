@@ -1,6 +1,7 @@
 use crate::prelude::*;
 use error_stack::{FutureExt, ResultExt};
 
+#[allow(dead_code)]
 const CONCURRENCY: usize = 8;
 
 impl ScrapeCommand {
@@ -68,6 +69,7 @@ impl ScrapeCommand {
             .attach_with(|| format!("Podcast ID: {}", episode.podcast.id))
     }
 
+    #[allow(dead_code)]
     async fn get_playlist(
         &self,
         episode: &SimplecastEpisode,
@@ -96,6 +98,7 @@ impl ScrapeCommand {
         Ok(episodes)
     }
 
+    #[allow(dead_code)]
     async fn get_episodes(
         &self,
         playlist: &[SimplecastPlaylistEpisode],
@@ -140,6 +143,7 @@ fn get_element_attr(html: &Html, selector: &str, attr: &str) -> Vec<String> {
         .collect()
 }
 
+#[allow(dead_code)]
 fn convert(
     podcast_id: &str,
     podcast: SimplecastPodcast,

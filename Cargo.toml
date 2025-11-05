@@ -42,7 +42,6 @@ url = { version = "2.5.7" }
 
 [workspace.lints.rust]
 unused_imports = "allow"
-dead_code = "allow"
 
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -1 }

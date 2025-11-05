@@ -4,7 +4,7 @@ pub use reqwest::Client as ReqwestClient;
 pub use reqwest::Response;
 pub use scraper::{Html, Selector};
 pub use std::collections::HashMap;
-pub use std::ffi::OsString;
+pub use std::ffi::{OsStr, OsString};
 pub use std::fs::File;
 pub use std::io::{BufReader, BufWriter};
 pub use std::mem::take;
