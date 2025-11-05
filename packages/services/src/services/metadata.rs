@@ -117,6 +117,10 @@ mod tests {
             ..FilterOptions::default()
         });
 
+        // Preview
+        info!("Episode count: {}", podcast.episodes.len());
+        trace!("Podcast:\n{}", serde_yaml::to_string(&podcast).expect("should be able to serialize podcast"));
+
         // Assert
         assert!(podcast.episodes.len() >= 60);
         assert_eq!(y2019.episodes.len(), 13);
