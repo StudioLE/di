@@ -1,5 +1,5 @@
 pub use alnwick_core::prelude::*;
-pub use futures::{StreamExt, stream};
+pub use futures::{StreamExt, TryStreamExt, stream};
 pub use reqwest::Client as ReqwestClient;
 pub use reqwest::Response;
 pub use scraper::{Html, Selector};

@@ -119,7 +119,10 @@ mod tests {
 
         // Preview
         info!("Episode count: {}", podcast.episodes.len());
-        trace!("Podcast:\n{}", serde_yaml::to_string(&podcast).expect("should be able to serialize podcast"));
+        trace!(
+            "Podcast:\n{}",
+            serde_yaml::to_string(&podcast).expect("should be able to serialize podcast")
+        );
 
         // Assert
         assert!(podcast.episodes.len() >= 60);

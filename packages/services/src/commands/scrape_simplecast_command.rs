@@ -17,11 +17,7 @@ impl ScrapeCommand {
             playlist.len(),
             episode.podcast.title
         );
-        let episodes = self.get_episodes(&playlist).await;
-        let diff = playlist.len() - episodes.len();
-        if diff > 0 {
-            warn!("Skipped {} episodes due to failures", diff);
-        }
+        let episodes = self.get_episodes(&playlist).await?;
         Ok(convert(&options.podcast_id, podcast, episodes))
     }
 
@@ -99,28 +95,18 @@ impl ScrapeCommand {
         Ok(episodes)
     }
 
-    async fn get_episodes(&self, playlist: &[SimplecastPlaylistEpisode]) -> Vec<SimplecastEpisode> {
+    async fn get_episodes(
+        &self,
+        playlist: &[SimplecastPlaylistEpisode],
+    ) -> Result<Vec<SimplecastEpisode>, Report<ScrapeSimplecastError>> {
         debug!("Fetching metadata for {} episodes", playlist.len());
-
         stream::iter(playlist.iter().map(|episode| {
             let this = self;
-            async move {
-                match this.get_episode(&episode.id).await {
-                    Ok(ep) => Some(ep),
-                    Err(e) => {
-                        warn!(id = episode.id, "Failed to get episode");
-                        debug!("{e}");
-                        None
-                    }
-                }
-            }
+            async move { this.get_episode(&episode.id).await }
         }))
         .buffer_unordered(CONCURRENCY)
-        .collect::<Vec<_>>()
+        .try_collect::<Vec<_>>()
         .await
-        .into_iter()
-        .flatten()
-        .collect()
     }
 }
 
