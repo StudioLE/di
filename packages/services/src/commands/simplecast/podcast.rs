@@ -16,6 +16,8 @@ pub struct SimplecastPodcast {
     pub published_at: DateTime<FixedOffset>,
     pub created_at: NaiveDateTime,
     pub is_explicit: bool,
+    pub feed_url: Option<Url>,
+    pub external_feed_url: Option<Url>,
 }
 
 impl From<SimplecastPodcast> for Podcast {

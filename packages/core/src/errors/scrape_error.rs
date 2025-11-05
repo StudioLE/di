@@ -36,4 +36,6 @@ pub enum ScrapeSimplecastError {
     GetPodcast,
     #[error("Unable to get playlist")]
     GetPlaylist,
+    #[error("Simplecast podcast does not have a feed")]
+    NoFeed,
 }

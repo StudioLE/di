@@ -17,16 +17,20 @@ impl ScrapeCommand {
             .head(&options.url)
             .await
             .change_context(ScrapeError::Head)?;
-        let podcast = match content_type.as_str() {
-            "application/xml" => self
-                .execute_rss(&options)
-                .await
-                .change_context(ScrapeError::Rss)?,
-            _ => self
-                .execute_simplecast(&options)
-                .await
-                .change_context(ScrapeError::Simplecast)?,
-        };
+        let mut options = options.clone();
+        match content_type.as_str() {
+            "application/xml" | "text/xml" => {}
+            _ => {
+                options.url = self
+                    .get_simplecast_rss(&options)
+                    .await
+                    .change_context(ScrapeError::Simplecast)?;
+            }
+        }
+        let podcast = self
+            .execute_rss(&options)
+            .await
+            .change_context(ScrapeError::Rss)?;
         info!("Fetched {} episodes", podcast.episodes.len());
         self.metadata
             .put(&podcast)

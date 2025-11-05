@@ -4,21 +4,22 @@ use error_stack::{FutureExt, ResultExt};
 const CONCURRENCY: usize = 8;
 
 impl ScrapeCommand {
-    pub(super) async fn execute_simplecast(
+    pub(super) async fn get_simplecast_rss(
         &self,
         options: &ScrapeOptions,
-    ) -> Result<Podcast, Report<ScrapeSimplecastError>> {
+    ) -> Result<Url, Report<ScrapeSimplecastError>> {
         let player_id = self.get_player_id(&options.url).await?;
         let episode = self.get_episode(&player_id).await?;
         let podcast = self.get_podcast(&episode).await?;
-        let playlist = self.get_playlist(&episode).await?;
-        info!(
-            "Found {} episodes of {}",
-            playlist.len(),
-            episode.podcast.title
-        );
-        let episodes = self.get_episodes(&playlist).await?;
-        Ok(convert(&options.podcast_id, podcast, episodes))
+        if let Some(url) = podcast.feed_url {
+            return Ok(url);
+        }
+        if let Some(url) = podcast.external_feed_url {
+            return Ok(url);
+        }
+        let report = Report::new(ScrapeSimplecastError::NoFeed)
+            .attach(format!("Podcast ID: {}", podcast.id));
+        Err(report)
     }
 
     async fn get_player_id(&self, url: &Url) -> Result<String, Report<ScrapeSimplecastError>> {

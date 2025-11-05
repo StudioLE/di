@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-#[derive(Debug, Args)]
+#[derive(Clone, Debug, Args)]
 pub struct ScrapeOptions {
     /// ID of the downloaded podcast
     ///
