@@ -47,3 +47,8 @@
 .image img {
   border-radius: .5rem;
 }
+
+code, pre {
+  font-family: inherit;
+  white-space: pre-wrap;
+}

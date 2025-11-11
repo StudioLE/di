@@ -7,6 +7,11 @@ pub enum Route {
     Index,
     #[route("/podcasts/:id")]
     Podcast { id: String },
+    #[route("/podcasts/:podcast_id/:episode_id")]
+    Episode {
+        podcast_id: String,
+        episode_id: String,
+    },
     #[route("/settings")]
     Settings,
     #[route("/settings/player")]
@@ -30,6 +35,21 @@ impl Route {
                 icon: "fa-user".to_owned(),
                 breadcrumbs: vec![Route::Index, Route::Podcast { id: id.clone() }],
                 path: format!("/podcasts/{id}"),
+            },
+            Route::Episode {
+                podcast_id,
+                episode_id,
+            } => RouteInfo {
+                title: "Episode".to_owned(),
+                icon: "fa-user".to_owned(),
+                breadcrumbs: vec![
+                    Route::Index,
+                    Route::Episode {
+                        podcast_id: podcast_id.clone(),
+                        episode_id: episode_id.clone(),
+                    },
+                ],
+                path: format!("/podcasts/{podcast_id}/{episode_id}"),
             },
             Route::Settings => RouteInfo {
                 title: "Settings".to_owned(),
@@ -61,6 +81,14 @@ fn Index() -> Element {
 #[component]
 fn Podcast(id: String) -> Element {
     PodcastPage(PodcastPageProps { id })
+}
+
+#[component]
+fn Episode(podcast_id: String, episode_id: String) -> Element {
+    EpisodePage(EpisodePageProps {
+        podcast_id,
+        episode_id,
+    })
 }
 
 #[component]
