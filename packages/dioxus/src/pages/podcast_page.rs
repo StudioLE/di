@@ -14,6 +14,25 @@ pub fn PodcastPage(id: String) -> Element {
         };
     };
     rsx! {
+        header { class: "media",
+            figure { class: "media-left",
+                p { class: "image is-128x128",
+                    if let Some(url) = &podcast.image_url {
+                        img { src: "{url}" }
+                    }
+                }
+            }
+            div {
+                class: "media-content",
+                style: "align-self: center;",
+                p { class: "title",
+                    "{podcast.title} "
+                }
+                p { class: "subtitle",
+                    "{podcast.episodes.len()} episodes · {podcast.id}"
+                }
+            }
+        }
         for episode in podcast.episodes.iter() {
             div { class: "block",
                 Link {
