@@ -9,11 +9,16 @@ pub struct SettingsContext {
 
 impl SettingsContext {
     /// Creates a new instance of the context.
-    #[must_use]
-    pub fn new() -> Self {
-        Self {
+    ///
+    /// This should be called at the top of the `App` component.
+    ///
+    /// The `use_signal` hook must be called outside the `use_context_provider` closure. 
+    /// - <https://dioxuslabs.com/learn/0.7/essentials/basics/hooks#no-hooks-in-closures>
+    pub fn create() {
+        let context = Self {
             skip_forward: use_signal(|| None),
             skip_back: use_signal(|| None),
-        }
+        };
+        use_context_provider(|| context);
     }
 }

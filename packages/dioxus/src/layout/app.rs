@@ -2,7 +2,7 @@ use crate::prelude::*;
 
 #[component]
 pub fn App() -> Element {
-    init_contexts();
+    SettingsContext::create();
     rsx! {
         Router::<Route> {}
     }
@@ -28,9 +28,4 @@ pub fn Layout() -> Element {
             }
         }
     }
-}
-
-fn init_contexts() {
-    let settings = SettingsContext::new();
-    use_context_provider(|| settings);
 }
