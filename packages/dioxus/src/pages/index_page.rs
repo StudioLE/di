@@ -16,7 +16,7 @@ pub fn IndexPage() -> Element {
     }
     rsx! {
         for podcast in podcasts.values() {
-            div { class: "block",
+            div { class: "block item",
                 Link {
                     to: Route::Podcast { id: podcast.id.clone() },
                     article { class: "media",

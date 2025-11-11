@@ -52,3 +52,17 @@ code, pre {
   font-family: inherit;
   white-space: pre-wrap;
 }
+
+.block.item a {
+  border-radius: .5rem;
+  display: block;
+  background-color: hsl(var(--bulma-scheme-h),var(--bulma-scheme-s),calc(var(--bulma-scheme-main-l) + var(--item-l-delta)));
+}
+
+.block.item a:hover {
+  --item-l-delta: 5%;
+}
+
+.block.item a:active {
+  --item-l-delta: 10%;
+}

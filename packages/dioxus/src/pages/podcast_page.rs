@@ -34,7 +34,7 @@ pub fn PodcastPage(id: String) -> Element {
             }
         }
         for episode in podcast.episodes.iter() {
-            div { class: "block",
+            div { class: "block item",
                 Link {
                     to: Route::Episode { podcast_id: podcast.id.clone(), episode_id: episode.id.clone() },
                     article { class: "media",
