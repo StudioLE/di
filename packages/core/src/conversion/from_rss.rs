@@ -10,7 +10,7 @@ impl PodcastFromRss {
         let items = take(&mut channel.items);
         let podcast = podcast_from_rss(channel, id)?;
         let mut episodes = Vec::new();
-        let mut reports = Vec::new();
+        let mut report: Option<Report<[EpisodeFromRssError]>> = None;
         for item in items {
             let name = item
                 .title
@@ -19,17 +19,17 @@ impl PodcastFromRss {
             match episode_from_rss(item) {
                 Ok(episode) => episodes.push(episode),
                 Err(error) => {
-                    let report = error.attach(format!("Episode: {name}",));
-                    reports.push(report);
+                    let error = error.attach(format!("Episode: {name}",));
+                    if let Some(report) = report.as_mut() {
+                        report.push(error);
+                    } else {
+                        report = Some(error.expand());
+                    }
                 }
             }
         }
-        if !reports.is_empty() {
-            let report = reports.into_iter().fold(
-                Report::new(PodcastFromRssError::ParseEpisodes),
-                |report, error| report.attach(error),
-            );
-            return Err(report);
+        if let Some(report) = report {
+            return Err(report.change_context(PodcastFromRssError::ParseEpisodes));
         }
         let feed = PodcastFeed { podcast, episodes };
         Ok(feed)
@@ -150,7 +150,7 @@ fn try_parse<T: FromStr, E: Error + Send + Sync + 'static>(
 ) -> Result<T, Report<E>> {
     match value.parse::<T>() {
         Ok(parsed) => Ok(parsed),
-        Err(_) => Err(Report::new(error)),
+        Err(_) => Err(Report::new(error).attach(format!("Value: {value}"))),
     }
 }
 
