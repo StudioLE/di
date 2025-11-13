@@ -41,7 +41,12 @@ COPY --from=planner /usr/local/bin/cargo-chef /usr/local/bin/cargo-chef
 COPY --from=planner /app/recipe.json recipe.json
 # Build only the dependencies
 RUN cargo chef cook --release --recipe-path recipe.json
-COPY --from=npm /app/node_modules /app/packages/dioxus/node_modules
+COPY --from=npm \
+    /app/node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.ttf \
+    /app/node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2 \
+    /app/node_modules/@fontsource/source-sans-pro/files/source-sans-pro-latin-400-normal.woff \
+    /app/node_modules/@fontsource/source-sans-pro/files/source-sans-pro-latin-400-normal.woff2 \
+    /app/packages/dioxus/public/assets/fonts/
 COPY . /app
 RUN dx build --package alnwick_dioxus
 EXPOSE 8080
