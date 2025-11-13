@@ -19,7 +19,9 @@ pub struct EpisodeInfo {
     /// Mime type of source media file
     pub source_content_type: String,
     /// GUID
-    pub id: String,
+    ///
+    /// Matches `source_id` if it's a GUID otherwise it's derived deterministically.
+    pub id: Uuid,
     /// GUID or Apple Podcasts Episode ID
     pub source_id: String,
 
@@ -47,6 +49,8 @@ pub struct EpisodeInfo {
     /// Episode type
     pub kind: Option<EpisodeKind>,
 }
+
+impl EpisodeInfo {}
 
 impl EpisodeInfo {
     #[must_use]
@@ -99,6 +103,16 @@ impl EpisodeInfo {
         Sanitizer::execute(&self.title).trim().to_owned()
     }
 
+    /// Determine a UUID from `source_id`.
+    ///
+    /// Matches `source_id` if it's a GUID otherwise it's derived deterministically.
+    #[must_use]
+    pub fn determine_uuid(source_id: &str) -> Uuid {
+        const UUID_NAMESPACE: Uuid = uuid!("a2c7f853-abb1-4ac5-86fa-10b6de5a8386");
+        Uuid::try_parse(source_id)
+            .unwrap_or_else(|_| Uuid::new_v5(&UUID_NAMESPACE, source_id.as_bytes()))
+    }
+
     #[must_use]
     pub fn example() -> Self {
         Self {
@@ -106,7 +120,7 @@ impl EpisodeInfo {
             source_url: Url::parse("https://example.com/season-1/episode-1.mp3").expect("URL should be valid"),
             source_file_size: 1024,
             source_content_type: "audio/mpeg".to_owned(),
-            id: "550e8400-e29b-41d4-a716-446655440000".to_owned(),
+            id: uuid!("550e8400-e29b-41d4-a716-446655440000"),
             source_id: "550e8400-e29b-41d4-a716-446655440000".to_owned(),
             published_at: DateTime::default(),
             description: Some("Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna.".to_owned()),

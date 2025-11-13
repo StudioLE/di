@@ -67,8 +67,8 @@ impl Display for SimplecastEpisode {
 impl From<SimplecastEpisode> for EpisodeInfo {
     fn from(episode: SimplecastEpisode) -> Self {
         EpisodeInfo {
-            source_id: episode.id.clone(),
-            id: episode.id,
+            id: EpisodeInfo::determine_uuid(&episode.id),
+            source_id: episode.id,
             title: episode.title,
             description: Some(episode.description),
             image: episode.image_url,

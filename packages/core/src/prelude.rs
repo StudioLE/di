@@ -27,3 +27,4 @@ pub use strum_macros::{AsRefStr, Display};
 pub use thiserror::Error;
 pub use tracing::{debug, error, info, trace, warn};
 pub use url::Url;
+pub use uuid::{Uuid, uuid};

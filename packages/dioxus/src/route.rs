@@ -10,7 +10,7 @@ pub enum Route {
     #[route("/podcasts/:podcast_id/:episode_id")]
     Episode {
         podcast_id: String,
-        episode_id: String,
+        episode_id: Uuid,
     },
     #[route("/settings")]
     Settings,
@@ -46,7 +46,7 @@ impl Route {
                     Route::Index,
                     Route::Episode {
                         podcast_id: podcast_id.clone(),
-                        episode_id: episode_id.clone(),
+                        episode_id: *episode_id,
                     },
                 ],
                 path: format!("/podcasts/{podcast_id}/{episode_id}"),
@@ -84,7 +84,7 @@ fn Podcast(id: String) -> Element {
 }
 
 #[component]
-fn Episode(podcast_id: String, episode_id: String) -> Element {
+fn Episode(podcast_id: String, episode_id: Uuid) -> Element {
     EpisodePage(EpisodePageProps {
         podcast_id,
         episode_id,

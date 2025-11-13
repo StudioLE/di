@@ -61,7 +61,7 @@ fn episode_to_rss(episode: EpisodeInfo) -> RssItem {
             mime_type: episode.source_content_type.clone(),
         }),
         guid: Some(RssGuid {
-            value: episode.id.clone(),
+            value: episode.id.to_string(),
             permalink: false,
         }),
         pub_date: Some(episode.published_at.to_rfc2822()),

@@ -81,8 +81,6 @@ fn episode_from_rss(item: RssItem) -> Result<EpisodeInfo, Report<EpisodeFromRssE
     let itunes = item.itunes_ext.ok_or(EpisodeFromRssError::NoItunes)?;
     let enclosure = item.enclosure.ok_or(EpisodeFromRssError::NoEnclosure)?;
     let source_id = item.guid.ok_or(EpisodeFromRssError::NoGuid)?.value;
-    // TODO: Create a deterministic GUID if source_id is not a GUID
-    let id = source_id.clone();
     let pub_date = &item.pub_date.ok_or(EpisodeFromRssError::NoPublishedAt)?;
     let published_at = DateTime::parse_from_rfc2822(pub_date)
         .change_context(EpisodeFromRssError::ParsePublishedAt)?;
@@ -91,7 +89,7 @@ fn episode_from_rss(item: RssItem) -> Result<EpisodeInfo, Report<EpisodeFromRssE
         source_url: try_parse_url(&enclosure.url, EpisodeFromRssError::ParseUrl)?,
         source_file_size: try_parse(&enclosure.length, EpisodeFromRssError::ParseFileSize)?,
         source_content_type: enclosure.mime_type,
-        id,
+        id: EpisodeInfo::determine_uuid(&source_id),
         source_id,
         published_at,
         description: item.description,

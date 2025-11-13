@@ -74,7 +74,7 @@ impl EmulateCommand {
         let episode = feed
             .episodes
             .iter()
-            .find(|episode| episode.id == guid.value)?;
+            .find(|episode| episode.id == EpisodeInfo::determine_uuid(&guid.value))?;
         let enclosure = item.enclosure.as_mut()?;
         enclosure.url = self
             .paths
