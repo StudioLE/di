@@ -19,7 +19,7 @@ pub enum EpisodeKind {
 }
 
 impl TryFrom<&String> for EpisodeKind {
-    type Error = Report<EpisodeFromRssError>;
+    type Error = Report<EpisodeKindError>;
 
     fn try_from(value: &String) -> Result<Self, Self::Error> {
         let lower = value.to_lowercase();
@@ -27,8 +27,12 @@ impl TryFrom<&String> for EpisodeKind {
             "full" => Ok(EpisodeKind::Full),
             "trailer" => Ok(EpisodeKind::Trailer),
             "bonus" => Ok(EpisodeKind::Bonus),
-            _ => Err(Report::new(EpisodeFromRssError::ParseKind)
+            _ => Err(Report::new(EpisodeKindError)
                 .attach(format!("Invalid type: {value}"))),
         }
     }
 }
+
+#[derive(Debug, Error)]
+#[error("Unable to parse episode type")]
+pub struct EpisodeKindError;

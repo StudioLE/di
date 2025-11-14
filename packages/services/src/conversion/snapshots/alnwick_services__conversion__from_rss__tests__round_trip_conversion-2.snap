@@ -1,5 +1,5 @@
 ---
-source: packages/core/src/conversion/from_rss.rs
+source: packages/services/src/conversion/from_rss.rs
 expression: feed
 ---
 podcast:

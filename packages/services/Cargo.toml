@@ -16,6 +16,7 @@ futures = { workspace = true }
 image = { workspace = true }
 lofty = { workspace = true }
 reqwest = { workspace = true }
+rss = { workspace = true }
 scraper = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -27,6 +28,7 @@ urlencoding = { workspace = true }
 uuid = { workspace = true }
 
 [dev-dependencies]
+insta = { workspace = true }
 tracing-test = { workspace = true }
 
 [lints]

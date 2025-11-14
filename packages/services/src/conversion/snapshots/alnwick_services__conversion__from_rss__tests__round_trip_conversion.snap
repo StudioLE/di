@@ -1,5 +1,5 @@
 ---
-source: packages/core/src/conversion/from_rss.rs
+source: packages/services/src/conversion/from_rss.rs
 expression: xml
 ---
 <?xml version="1.0" encoding="utf-8"?><rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"><channel><title>Podcast Title</title><link>https://example.com/</link><description>Sed ac volutpat tortor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse placerat leo augue, id elementum orci venenatis eu.</description><language>en-us</language><itunes:explicit>false</itunes:explicit><itunes:type>Episodic</itunes:type><item><title>Lorem ipsum dolor sit amet</title><description><![CDATA[Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna.]]></description><enclosure url="https://example.com/season-1/episode-1.mp3" length="1024" type="audio/mpeg"/><guid isPermaLink="false">550e8400-e29b-41d4-a716-446655440000</guid><pubDate>Thu, 1 Jan 1970 00:00:00 +0000</pubDate><itunes:image href="https://example.com/image.jpg"></itunes:image><itunes:episode>3</itunes:episode><itunes:season>2</itunes:season><itunes:episodeType>Full</itunes:episodeType></item></channel></rss>

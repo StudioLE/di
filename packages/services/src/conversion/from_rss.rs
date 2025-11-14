@@ -66,7 +66,7 @@ fn podcast_from_rss(
             PodcastFromRssError::ParseLink,
         )?),
         kind: if let Some(kind) = &itunes.r#type {
-            Some(PodcastKind::try_from(kind)?)
+            Some(PodcastKind::try_from(kind).change_context(PodcastFromRssError::ParseKind)?)
         } else {
             None
         },
@@ -116,7 +116,7 @@ fn episode_from_rss(item: RssItem) -> Result<EpisodeInfo, Report<EpisodeFromRssE
             None
         },
         kind: if let Some(kind) = &itunes.episode_type {
-            Some(EpisodeKind::try_from(kind)?)
+            Some(EpisodeKind::try_from(kind).change_context(EpisodeFromRssError::ParseKind)?)
         } else {
             None
         },
