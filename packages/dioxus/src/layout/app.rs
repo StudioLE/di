@@ -17,7 +17,14 @@ pub fn Layout() -> Element {
             routes: vec![Route::AddPodcast]
         }
         div { style: "display: flex; height: 100vh;",
-            DrawerComponent {},
+            Drawer {
+                lists: vec![
+                    MenuListProps {
+                        label: "Menu".to_owned(),
+                        routes: vec![Route::Index, Route::AddPodcast, Route::Settings]
+                    }
+                ]
+            },
             main { style: "flex: 1;",
                 div { class: "container is-max-tablet",
                     HeaderComponent {}
