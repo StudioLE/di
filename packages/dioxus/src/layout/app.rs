@@ -23,10 +23,14 @@ pub fn Layout() -> Element {
                         }
                     ]
                 },
-                div { style: "flex: 1; display: flex; position: relative;",
+                div { style: "flex: 1; display: flex; flex-direction: column; position: relative;",
+                    div { style: "flex: 0 0;",
+                        div { class: "container is-max-tablet",
+                            Bar {}
+                        }
+                    }
                     div { style: "flex: 1; overflow-y: auto;",
                         main { class: "container is-max-tablet",
-                            HeaderComponent {}
                             Outlet::<Route> {}
                         }
                     }
