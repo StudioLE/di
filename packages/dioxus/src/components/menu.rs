@@ -1,27 +1,53 @@
 use crate::prelude::*;
 use Route::*;
 
+/// Properties for [`Menu`]
+#[derive(Clone, Debug, PartialEq, Props)]
+pub struct MenuProps {
+    lists: Vec<MenuListProps>,
+}
+
+/// A simple menu, for any type of vertical navigation.
+///
+/// An implementation of the [Bulma menu component](https://bulma.io/documentation/components/menu/).
+///
+/// The design is similar to the [Material Design 3 navigation drawer](https://m3.material.io/components/navigation-drawer/overview).
 #[component]
-pub fn Menu(children: Element) -> Element {
+pub fn Menu(props: MenuProps) -> Element {
     rsx! {
         aside { class: "menu",
-            {children}
+            for list in props.lists {
+                MenuList {
+                    label: list.label,
+                    routes: list.routes
+                }
+            }
         }
     }
 }
 
+/// A list of menu items with a label.
+#[derive(Clone, Debug, PartialEq, Props)]
+pub struct MenuListProps {
+    pub label: String,
+    pub routes: Vec<Route>,
+}
+
+/// A list of [`MenuItem`]s
 #[component]
-pub fn MenuList(label: String, children: Element) -> Element {
+fn MenuList(props: MenuListProps) -> Element {
     rsx! {
-        p { class: "menu-label", "{label}" }
+        p { class: "menu-label", "{props.label}" }
         ul { class: "menu-list",
-            {children}
+            for route in props.routes {
+                MenuItem { route }
+            }
         }
     }
 }
 
 #[component]
-pub fn MenuItem(route: Route) -> Element {
+fn MenuItem(route: Route) -> Element {
     let current: Route = use_route();
     let is_active = current.get_info().breadcrumbs.contains(&route);
     let info = route.get_info();

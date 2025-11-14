@@ -1,19 +1,20 @@
 use crate::prelude::*;
-use Route::*;
 
 #[component]
 pub fn SettingsPage() -> Element {
     rsx! {
         section { class: "section",
             Menu {
-                MenuList { label: "General",
-                    MenuItem { route: PlayerSettings },
-                },
-                MenuList { label: "Player",
-                    MenuItem { route: PlayerSettings },
-                    MenuItem { route: PlayerSettings },
-                    MenuItem { route: PlayerSettings },
-                }
+                lists: vec![
+                    MenuListProps {
+                        label: "General".to_owned(),
+                        routes: vec![Route::PlayerSettings]
+                    },
+                    MenuListProps {
+                        label: "Player".to_owned(),
+                        routes: vec![Route::PlayerSettings, Route::PlayerSettings, Route::PlayerSettings]
+                    }
+                ]
             }
         }
     }

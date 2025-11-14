@@ -7,11 +7,12 @@ pub fn DrawerComponent() -> Element {
     rsx! {
         aside { style: "width: 250px; padding: 1.375em 1.5em;",
             Menu {
-                MenuList { label: "Menu",
-                    MenuItem { route: Route::Index },
-                    MenuItem { route: Route::AddPodcast },
-                    MenuItem { route: Route::Settings },
-                }
+                lists: vec![
+                    MenuListProps {
+                        label: "Menu".to_owned(),
+                        routes: vec![Route::Index, Route::AddPodcast, Route::Settings]
+                    }
+                ]
             }
         }
     }
