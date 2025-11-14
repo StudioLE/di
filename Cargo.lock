@@ -94,7 +94,6 @@ dependencies = [
  "tracing",
  "tracing-test",
  "urlencoding",
- "uuid",
 ]
 
 [[package]]
