@@ -13,11 +13,8 @@ pub fn App() -> Element {
 pub fn Layout() -> Element {
     rsx! {
         HeadComponent {}
-        FloatingActions {
-            routes: vec![Route::AddPodcast]
-        }
-        div { style: "display: flex; flex-direction: column; height: 100vh;",
-            div { style: "flex-grow: 1;",
+        div { style: " height: 100vh; display: flex; flex-direction: column;",
+            div { style: "flex: 1; min-height: 0; display: flex;",
                 Drawer {
                     lists: vec![
                         MenuListProps {
@@ -26,14 +23,21 @@ pub fn Layout() -> Element {
                         }
                     ]
                 },
-                main { style: "flex: 1;",
-                    div { class: "container is-max-tablet",
-                        HeaderComponent {}
-                        Outlet::<Route> {}
+                div { style: "flex: 1; display: flex; position: relative;",
+                    div { style: "flex: 1; overflow-y: auto;",
+                        main { class: "container is-max-tablet",
+                            HeaderComponent {}
+                            Outlet::<Route> {}
+                        }
+                    }
+                    div { style: "position: absolute; bottom: 0; right: 0;",
+                        FloatingActions {
+                            routes: vec![Route::AddPodcast]
+                        }
                     }
                 }
             }
-            footer {
+            footer { style: "flex-shrink: 0;",
                 Tabs {
                     routes: vec![Route::Index, Route::AddPodcast, Route::Settings]
                 }

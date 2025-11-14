@@ -4,13 +4,17 @@ use crate::prelude::*;
 #[component]
 pub fn FloatingActions(routes: Vec<Route>) -> Element {
     rsx! {
-        div { class: "fullscreen",
-            div { class: "buttons",
-                for (index, route) in routes.iter().enumerate() {
-                    FloatingAction {
-                        route: route.clone(),
-                        is_large: index == 0
-                    }
+        div { style: "
+display: flex;
+margin: 1rem;
+flex-direction: column-reverse;
+align-items: center;
+flex: 0;
+gap: 1rem;",
+            for (index, route) in routes.iter().enumerate() {
+                FloatingAction {
+                    route: route.clone(),
+                    is_large: index == 0
                 }
             }
         }
@@ -22,7 +26,7 @@ pub fn FloatingActions(routes: Vec<Route>) -> Element {
 pub fn FloatingAction(route: Route, is_large: bool) -> Element {
     let info = route.get_info();
     rsx! {
-        Link {
+        Link { style: "width: fit-content;",
             to: route,
             class: get_button_classes(is_large),
             span {
