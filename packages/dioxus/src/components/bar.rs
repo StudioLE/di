@@ -21,8 +21,10 @@ pub fn AppBar(title: String, subtitle: Option<String>) -> Element {
                 gap: 1rem;",
                 if let Some(previous) = previous {
                     div {
-                        Link {
-                            to: previous.clone(),
+                        Button {
+                            route: previous.clone(),
+                            color: ButtonColor::Text,
+                            style: "text-decoration: none;",
                             Icon {
                                 class: "fa-arrow-left",
                                 container_size: IconContainerSize::Medium,
