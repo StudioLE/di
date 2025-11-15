@@ -25,18 +25,6 @@ pub fn Layout() -> Element {
         FloatingActions {
             routes: vec![Route::AddPodcast]
         }
-        footer { style: "
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: var(--bulma-body-background-color);",
-            Tabs {
-                routes: vec![Route::Index, Route::AddPodcast, Route::Settings],
-                link_style: "display: flex; flex-direction: column;".to_owned(),
-                icon_size: IconSize::ExtraLarge,
-                icon_container_size: IconContainerSize::Large,
-            }
-        }
+        NavigationBar {}
     }
 }

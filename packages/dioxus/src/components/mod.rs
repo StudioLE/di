@@ -1,5 +1,5 @@
 pub use actions::*;
-pub use bar::*;
+pub use appbar::*;
 pub use breadcrumbs::*;
 pub use button::*;
 pub use drawer::*;
@@ -9,10 +9,11 @@ pub use image::*;
 pub use main::*;
 pub use media_object::*;
 pub use menu::*;
+pub use navbar::*;
 pub use tabs::*;
 
 mod actions;
-mod bar;
+mod appbar;
 mod breadcrumbs;
 mod button;
 mod drawer;
@@ -22,4 +23,5 @@ mod image;
 mod main;
 mod media_object;
 mod menu;
+mod navbar;
 mod tabs;
