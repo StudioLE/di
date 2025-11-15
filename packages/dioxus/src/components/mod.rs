@@ -1,6 +1,7 @@
 pub use actions::*;
 pub use bar::*;
 pub use breadcrumbs::*;
+pub use button::*;
 pub use drawer::*;
 pub use field::*;
 pub use icon::*;
@@ -13,6 +14,7 @@ pub use tabs::*;
 mod actions;
 mod bar;
 mod breadcrumbs;
+mod button;
 mod drawer;
 mod field;
 mod icon;
