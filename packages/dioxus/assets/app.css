@@ -12,9 +12,8 @@
 :root {
   --overlay-bg: var(--bulma-scheme-main-bis);
   --main-bg: var(--bulma-scheme-main);
-}
-
-:root {
+  --app-bar-height: 89px;
+  --nav-bar-height: 65px;
   --invert-dark: 1;
 }
 
