@@ -9,7 +9,8 @@ pub fn NavigationBar() -> Element {
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: var(--bulma-body-background-color);",
+            z-index: 3;
+            background-color: var(--overlay-bg);",
             Tabs {
                 routes: vec![Route::Index, Route::AddPodcast, Route::Settings],
                 link_style: "display: flex; flex-direction: column;".to_owned(),

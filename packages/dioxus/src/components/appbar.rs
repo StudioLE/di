@@ -12,13 +12,13 @@ pub fn AppBar(title: String, subtitle: Option<String>) -> Element {
             right: 0;
             top: 0;
             z-index: 1;
-            background-color: var(--bulma-body-background-color)",
-            class: "container is-max-tablet",
+            background-color: var(--overlay-bg);",
             div { style: "
-                margin: var(--bulma-block-spacing) 0;
+                margin: var(--bulma-block-spacing) auto;
                 display: flex;
                 align-items: center;
                 gap: 1rem;",
+                class: "container is-max-tablet",
                 if let Some(previous) = previous {
                     div {
                         Button {

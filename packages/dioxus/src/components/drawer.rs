@@ -10,7 +10,17 @@ pub struct DrawerProps {
 #[component]
 pub fn Drawer(props: DrawerProps) -> Element {
     rsx! {
-        aside { style: "position: fixed; left: 0; top: 0; bottom: 0; padding: 1.375em 1.5em; width: 250px; ",
+        aside { class: "drawer",
+            style: "
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 2;
+        padding: 1.375em 1.5em;
+        width: 250px;
+        background-color: var(--overlay-bg);
+        ",
             Menu {
                 lists: props.lists
             }
