@@ -32,7 +32,10 @@ pub fn Layout() -> Element {
             bottom: 0;
             background-color: var(--bulma-body-background-color);",
             Tabs {
-                routes: vec![Route::Index, Route::AddPodcast, Route::Settings]
+                routes: vec![Route::Index, Route::AddPodcast, Route::Settings],
+                link_style: "display: flex; flex-direction: column;".to_owned(),
+                icon_size: IconSize::ExtraLarge,
+                icon_container_size: IconContainerSize::Large,
             }
         }
     }
