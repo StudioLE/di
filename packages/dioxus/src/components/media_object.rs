@@ -11,7 +11,7 @@ pub fn MediaObject(
     image_src: Option<Url>,
 ) -> Element {
     rsx! {
-        header { class: "media",
+        div { class: "media",
             figure { class: "media-left",
                 p { class: "image {image_size.get_class()}",
                     if let Some(src) = image_src {
