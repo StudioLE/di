@@ -51,7 +51,7 @@ pub fn IndexPage() -> Element {
                         MediaObject {
                             title: feed.podcast.title.clone(),
                             subtitle: "{feed.episodes.len()} episodes · {feed.podcast.id}",
-                            image_src: feed.podcast.image.clone(),
+                            image_src: feed.podcast.get_image_url(),
                             image_size: ImageSize::_64,
                             icon: "fa-image",
                         }

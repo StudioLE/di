@@ -45,7 +45,7 @@ fn podcast_from_rss(
         id: id.to_owned(),
         title: channel.title,
         description: channel.description,
-        image: if let Some(url) = &itunes.image {
+        image: if let Some(url) = itunes.image {
             Some(try_parse_url(url, PodcastFromRssError::ParseImage)?)
         } else {
             None
@@ -61,10 +61,7 @@ fn podcast_from_rss(
             .collect(),
         explicit: false,
         author: itunes.author,
-        link: Some(try_parse_url(
-            &channel.link,
-            PodcastFromRssError::ParseLink,
-        )?),
+        link: Some(try_parse_url(channel.link, PodcastFromRssError::ParseLink)?),
         kind: if let Some(kind) = &itunes.r#type {
             Some(PodcastKind::try_from(kind).change_context(PodcastFromRssError::ParseKind)?)
         } else {
@@ -86,7 +83,7 @@ fn episode_from_rss(item: RssItem) -> Result<EpisodeInfo, Report<EpisodeFromRssE
         .change_context(EpisodeFromRssError::ParsePublishedAt)?;
     let episode = EpisodeInfo {
         title: item.title.ok_or(EpisodeFromRssError::NoTitle)?,
-        source_url: try_parse_url(&enclosure.url, EpisodeFromRssError::ParseUrl)?,
+        source_url: try_parse_url(enclosure.url, EpisodeFromRssError::ParseUrl)?,
         source_file_size: try_parse(&enclosure.length, EpisodeFromRssError::ParseFileSize)?,
         source_content_type: enclosure.mime_type,
         id: EpisodeInfo::determine_uuid(&source_id),
@@ -98,7 +95,7 @@ fn episode_from_rss(item: RssItem) -> Result<EpisodeInfo, Report<EpisodeFromRssE
         } else {
             None
         },
-        image: if let Some(url) = &itunes.image {
+        image: if let Some(url) = itunes.image {
             Some(try_parse_url(url, EpisodeFromRssError::ParseImage)?)
         } else {
             None
@@ -156,12 +153,13 @@ fn parse_explicit(option: Option<String>) -> Option<bool> {
 }
 
 fn try_parse_url<E: Error + Send + Sync + 'static>(
-    url: &String,
+    url: String,
     error: E,
-) -> Result<Url, Report<E>> {
-    Url::parse(url)
+) -> Result<String, Report<E>> {
+    Url::parse(&url)
         .change_context(error)
-        .attach_with(|| format!("URL: {url}"))
+        .attach_with(|| format!("URL: {url}"))?;
+    Ok(url)
 }
 
 fn try_parse<T: FromStr, E: Error + Send + Sync + 'static>(

@@ -25,7 +25,7 @@ impl CoverCommand {
             .metadata
             .get(&options.podcast_id)
             .change_context(CoverError::GetPodcast)?;
-        let url = feed.podcast.image.ok_or(CoverError::NoImage)?;
+        let url = feed.podcast.get_image_url().ok_or(CoverError::NoImage)?;
         let src = self
             .http
             .get(&url, None)

@@ -59,7 +59,9 @@ pub fn EpisodePage(podcast_id: String, episode_id: Uuid) -> Element {
     };
     let description = episode.get_description();
     let subtitle = episode.get_subtitle();
-    let image = episode.image.clone().or_else(|| feed.podcast.image.clone());
+    let image = episode
+        .get_image_url()
+        .or_else(|| feed.podcast.get_image_url());
     rsx! {
         Page {
             title: episode.title.clone(),

@@ -17,7 +17,7 @@ pub struct PodcastInfo {
     /// URL of JPEG or PNG artwork
     /// - Min: 1400 x 1400 px
     /// - Max: 3000 x 3000 px
-    pub image: Option<Url>,
+    pub image: Option<String>,
     /// ISO 639-2 code for language
     ///
     /// <https://www.loc.gov/standards/iso639-2/php/code_list.php>
@@ -33,7 +33,7 @@ pub struct PodcastInfo {
     /// Group responsible for creating the show
     pub author: Option<String>,
     /// Website associated with the podcast
-    pub link: Option<Url>,
+    pub link: Option<String>,
 
     // Situational
     /// Episodic or Serial
@@ -50,6 +50,17 @@ pub struct PodcastInfo {
 
 impl PodcastInfo {
     #[must_use]
+    pub fn get_image_url(&self) -> Option<Url> {
+        self.image.clone().and_then(|url| {
+            Url::parse(&url)
+                .map_err(|error| {
+                    warn!(podcast = self.id, %url, %error, "Failed to parse podcast image URL");
+                })
+                .ok()
+        })
+    }
+
+    #[must_use]
     pub fn example() -> Self {
         Self {
             id: "test".to_owned(),
@@ -60,7 +71,7 @@ impl PodcastInfo {
             categories: Vec::new(),
             explicit: false,
             author: None,
-            link: Some(Url::parse("https://example.com/").expect("URL should be valid")),
+            link: Some("https://example.com/".to_owned()),
             kind: Some(PodcastKind::default()),
             copyright: None,
             new_feed_url: None,

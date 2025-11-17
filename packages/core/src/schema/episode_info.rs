@@ -13,7 +13,7 @@ pub struct EpisodeInfo {
     pub title: String,
     /// URL of source media file including a file extension
     /// - Supported file formats include M4A, MP3, MOV, MP4, M4V, and PDF
-    pub source_url: Url,
+    pub source_url: String,
     /// Size of source media file in bytes
     pub source_file_size: u64,
     /// Mime type of source media file
@@ -35,7 +35,7 @@ pub struct EpisodeInfo {
     /// URL of JPEG or PNG artwork
     /// - Min: 1400 x 1400 px
     /// - Max: 3000 x 3000 px
-    pub image: Option<Url>,
+    pub image: Option<String>,
     /// Parental advisory information
     pub explicit: Option<bool>,
 
@@ -54,15 +54,32 @@ impl EpisodeInfo {}
 
 impl EpisodeInfo {
     #[must_use]
+    pub fn get_source_url(&self) -> Url {
+        Url::parse(&self.source_url)
+            .map_err(|error| {
+                warn!(episode = %self, url = %self.source_url, %error, "Failed to parse episode source URL");
+            })
+            .expect("Should be able to parse episode source URL")
+    }
+
+    #[must_use]
+    pub fn get_image_url(&self) -> Option<Url> {
+        self.image.clone().and_then(|url| {
+            Url::parse(&url)
+                .map_err(|error| {
+                    warn!(episode = %self, %url, %error, "Failed to parse episode image URL");
+                })
+                .ok()
+        })
+    }
+    #[must_use]
     pub fn get_filename(&self) -> String {
         let file_stem = self.get_file_stem();
-        let extension = self
-            .source_url
-            .get_extension()
-            .unwrap_or(MP3_EXTENSION.to_owned());
+        let extension = self.get_extension().unwrap_or(MP3_EXTENSION.to_owned());
         format!("{file_stem}.{extension}")
     }
 
+    #[must_use]
     pub fn get_file_stem(&self) -> String {
         let mut output = self.get_formatted_date();
         if let Some(number) = self.episode {
@@ -83,6 +100,11 @@ impl EpisodeInfo {
         output.push(' ');
         output.push_str(&self.get_sanitized_title());
         output
+    }
+
+    #[must_use]
+    pub fn get_extension(&self) -> Option<String> {
+        self.get_source_url().get_extension()
     }
 
     #[must_use]
@@ -117,7 +139,7 @@ impl EpisodeInfo {
     pub fn example() -> Self {
         Self {
             title: "Lorem ipsum dolor sit amet".to_owned(),
-            source_url: Url::parse("https://example.com/season-1/episode-1.mp3").expect("URL should be valid"),
+            source_url: "https://example.com/season-1/episode-1.mp3".to_owned(),
             source_file_size: 1024,
             source_content_type: "audio/mpeg".to_owned(),
             id: uuid!("550e8400-e29b-41d4-a716-446655440000"),
@@ -125,7 +147,7 @@ impl EpisodeInfo {
             published_at: DateTime::default(),
             description: Some("Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna.".to_owned()),
             source_duration: None,
-            image: Some(Url::parse("https://example.com/image.jpg").expect("URL should be valid")),
+            image: Some("https://example.com/image.jpg".to_owned()),
             explicit: None,
             itunes_title: None,
             episode: Some(3),

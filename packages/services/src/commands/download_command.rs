@@ -103,7 +103,7 @@ impl DownloadCommand {
         episode: &EpisodeInfo,
     ) -> Result<PathBuf, Report<ProcessError>> {
         self.http
-            .get(&episode.source_url, Some(MP3_EXTENSION))
+            .get(&episode.get_source_url(), Some(MP3_EXTENSION))
             .await
             .change_context(ProcessError::DownloadAudio)
     }
@@ -141,7 +141,7 @@ impl DownloadCommand {
         &self,
         episode: &EpisodeInfo,
     ) -> Result<Option<Picture>, Report<ProcessError>> {
-        let Some(url) = &episode.image else {
+        let Some(url) = &episode.get_image_url() else {
             return Ok(None);
         };
         trace!(%episode, "Downloading image");

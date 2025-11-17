@@ -46,7 +46,7 @@ pub fn PodcastPage(id: String) -> Element {
             MediaObject {
                 title: feed.podcast.title.clone(),
                 subtitle: subtitle,
-                image_src: feed.podcast.image.clone(),
+                image_src: feed.podcast.get_image_url(),
                 image_size: ImageSize::_128,
                 icon: "fa-image",
             }
@@ -57,7 +57,7 @@ pub fn PodcastPage(id: String) -> Element {
                         MediaObject {
                             title: episode.title.clone(),
                             subtitle: episode.get_subtitle(),
-                            image_src: episode.image.clone().or_else(|| feed.podcast.image.clone()),
+                            image_src: episode.get_image_url().or_else(|| feed.podcast.get_image_url()),
                             image_size: ImageSize::_64,
                             icon: "fa-image",
                         }
