@@ -48,6 +48,5 @@ COPY --from=npm \
     /app/node_modules/@fontsource/source-sans-pro/files/source-sans-pro-latin-400-normal.woff2 \
     /app/packages/dioxus/public/assets/fonts/
 COPY . /app
-RUN dx build --package alnwick_dioxus
 EXPOSE 8080
 CMD ["dx", "serve", "--package", "alnwick_dioxus"]

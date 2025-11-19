@@ -7,6 +7,7 @@ services:
       context: ../../
       dockerfile: docker/dioxus/Dockerfile
     volumes:
+    - ./target:/app/target
     - ../../packages:/app/packages
     - ../../Cargo.toml:/app/Cargo.toml
     - ~/.cache/alnwick:/root/.cache/alnwick
