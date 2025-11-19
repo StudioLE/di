@@ -4,6 +4,7 @@ use crate::prelude::*;
 #[derive(Clone, Copy, Debug)]
 pub struct PodcastsContext {
     pub loading: Signal<bool>,
+    pub error: Signal<Option<String>>,
     pub podcasts: Signal<HashMap<String, PodcastFeed>>,
 }
 
@@ -15,6 +16,7 @@ impl PodcastsContext {
         let context = Self {
             loading: use_signal(|| true),
             podcasts: use_signal(HashMap::new),
+            error: use_signal(|| None),
         };
         let mut context = use_context_provider(|| context);
         context.update();
@@ -30,8 +32,15 @@ impl PodcastsContext {
     pub fn update(&mut self) {
         let mut context = *self;
         spawn(async move {
-            let podcasts = get_podcasts().await.expect("Failed to get podcasts");
-            context.podcasts.set(podcasts);
+            match get_podcasts().await {
+                Ok(podcasts) => {
+                    context.podcasts.set(podcasts);
+                }
+                Err(error) => {
+                    error!("{error:?}");
+                    context.error.set(Some(error.to_string()));
+                }
+            }
             context.loading.set(false);
         });
     }
@@ -43,8 +52,11 @@ async fn get_podcasts() -> Result<HashMap<String, PodcastFeed>, ServerFnError> {
         .await
         .expect("ServiceProvider should not fail");
     let command = ListCommand::new(services.paths, services.metadata);
-    command
-        .execute()
-        .await
-        .map_err(|e| ServerFnError::new(e.to_string()))
+    match command.execute().await {
+        Ok(podcasts) => Ok(podcasts),
+        Err(error) => {
+            error!("{error:?}");
+            Err(ServerFnError::new(error.to_string()))
+        }
+    }
 }
