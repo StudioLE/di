@@ -38,7 +38,7 @@ pub fn PodcastPage(id: String) -> Element {
             }
         };
     };
-    let subtitle = format!("{} episodes · {}", feed.episodes.len(), feed.podcast.id);
+    let subtitle = format!("{} episodes · {}", feed.episodes.len(), feed.podcast.slug);
     rsx! {
         Page {
             title: feed.podcast.title.clone(),
@@ -53,7 +53,7 @@ pub fn PodcastPage(id: String) -> Element {
             for episode in feed.episodes.iter() {
                 div { class: "block item",
                     Link {
-                        to: Route::Episode { podcast_id: feed.podcast.id.clone(), episode_id: episode.id },
+                        to: Route::Episode { podcast_slug: feed.podcast.slug.clone(), episode_key: episode.primary_key },
                         MediaObject {
                             title: episode.title.clone(),
                             subtitle: episode.get_subtitle(),

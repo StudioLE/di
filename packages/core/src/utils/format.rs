@@ -1,12 +1,12 @@
 #[allow(dead_code)]
 #[must_use]
-pub fn format_duration_fixed(duration: u64) -> String {
+pub fn format_duration_fixed(duration: u32) -> String {
     let (hours, minutes, seconds) = duration_to_separate(duration);
     format!("{hours:02}:{minutes:02}:{seconds:02}")
 }
 
 #[must_use]
-pub fn format_duration_human(duration: u64) -> String {
+pub fn format_duration_human(duration: u32) -> String {
     let mut segments = Vec::new();
     let (hours, minutes, seconds) = duration_to_separate(duration);
     if hours > 0 {
@@ -22,7 +22,7 @@ pub fn format_duration_human(duration: u64) -> String {
 }
 
 #[allow(clippy::integer_division)]
-fn duration_to_separate(duration: u64) -> (u64, u64, u64) {
+fn duration_to_separate(duration: u32) -> (u32, u32, u32) {
     let hours = duration / (60 * 60);
     let minutes = (duration % (60 * 60)) / 60;
     let seconds = duration % 60;
@@ -36,10 +36,7 @@ mod tests {
     #[test]
     fn _duration_to_separate() {
         assert_eq!(duration_to_separate(3665), (1, 1, 5));
-        assert_eq!(
-            duration_to_separate(u64::MAX),
-            (5_124_095_576_030_431, 0, 15)
-        );
+        assert_eq!(duration_to_separate(u32::MAX), (1_193_046, 28, 15));
         assert_eq!(duration_to_separate(0), (0, 0, 0));
         assert_eq!(duration_to_separate(1), (0, 0, 1));
         assert_eq!(duration_to_separate(60), (0, 1, 0));

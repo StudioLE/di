@@ -1,7 +1,10 @@
 use crate::prelude::*;
 
 /// Episodic or Serial
-#[derive(Clone, Debug, Default, Deserialize, Display, PartialEq, Serialize)]
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, Display, PartialEq, Serialize, DeriveValueType,
+)]
+#[sea_orm(value_type = "String")]
 pub enum PodcastKind {
     /// Specify episodic when episodes are intended to be consumed without any specific order.
     /// Apple Podcasts will present newest episodes first and display the publish date (required)
@@ -16,10 +19,10 @@ pub enum PodcastKind {
     Serial,
 }
 
-impl TryFrom<&String> for PodcastKind {
-    type Error = Report<PodcastKindError>;
+impl FromStr for PodcastKind {
+    type Err = Report<PodcastKindError>;
 
-    fn try_from(value: &String) -> Result<Self, Self::Error> {
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         let lower = value.to_lowercase();
         match lower.as_str() {
             "episodic" => Ok(PodcastKind::Episodic),

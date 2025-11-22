@@ -41,8 +41,18 @@ fn podcast_from_rss(
     id: &str,
 ) -> Result<PodcastInfo, Report<PodcastFromRssError>> {
     let itunes = channel.itunes_ext.ok_or(PodcastFromRssError::NoItunes)?;
+    let categories = itunes
+        .categories
+        .into_iter()
+        .map(|category| PodcastCategory {
+            category: category.text,
+            sub_category: category.subcategory.map(|sub_category| sub_category.text),
+        })
+        .collect();
+    let categories = PodcastCategories(categories);
     let podcast = PodcastInfo {
-        id: id.to_owned(),
+        primary_key: u32::default(),
+        slug: id.to_owned(),
         title: channel.title,
         description: channel.description,
         image: if let Some(url) = itunes.image {
@@ -51,19 +61,12 @@ fn podcast_from_rss(
             None
         },
         language: channel.language,
-        categories: itunes
-            .categories
-            .into_iter()
-            .map(|category| PodcastCategory {
-                category: category.text,
-                sub_category: category.subcategory.map(|sub_category| sub_category.text),
-            })
-            .collect(),
+        categories,
         explicit: false,
         author: itunes.author,
         link: Some(try_parse_url(channel.link, PodcastFromRssError::ParseLink)?),
         kind: if let Some(kind) = &itunes.r#type {
-            Some(PodcastKind::try_from(kind).change_context(PodcastFromRssError::ParseKind)?)
+            Some(PodcastKind::from_str(kind).change_context(PodcastFromRssError::ParseKind)?)
         } else {
             None
         },
@@ -82,11 +85,12 @@ fn episode_from_rss(item: RssItem) -> Result<EpisodeInfo, Report<EpisodeFromRssE
     let published_at = DateTime::parse_from_rfc2822(pub_date)
         .change_context(EpisodeFromRssError::ParsePublishedAt)?;
     let episode = EpisodeInfo {
+        primary_key: u32::default(),
+        podcast_key: None,
         title: item.title.ok_or(EpisodeFromRssError::NoTitle)?,
         source_url: try_parse_url(enclosure.url, EpisodeFromRssError::ParseUrl)?,
         source_file_size: try_parse(&enclosure.length, EpisodeFromRssError::ParseFileSize)?,
         source_content_type: enclosure.mime_type,
-        id: EpisodeInfo::determine_uuid(&source_id),
         source_id,
         published_at,
         description: item.description,
@@ -113,7 +117,7 @@ fn episode_from_rss(item: RssItem) -> Result<EpisodeInfo, Report<EpisodeFromRssE
             None
         },
         kind: if let Some(kind) = &itunes.episode_type {
-            Some(EpisodeKind::try_from(kind).change_context(EpisodeFromRssError::ParseKind)?)
+            Some(EpisodeKind::from_str(kind).change_context(EpisodeFromRssError::ParseKind)?)
         } else {
             None
         },
@@ -122,19 +126,19 @@ fn episode_from_rss(item: RssItem) -> Result<EpisodeInfo, Report<EpisodeFromRssE
 }
 
 #[allow(clippy::indexing_slicing)]
-fn try_parse_duration(duration: &str) -> Result<u64, Report<EpisodeFromRssError>> {
+fn try_parse_duration(duration: &str) -> Result<u32, Report<EpisodeFromRssError>> {
     let parts: Vec<&str> = duration.split(':').collect();
     match parts.len() {
         1 => try_parse(parts[0], EpisodeFromRssError::ParseDuration),
         2 => {
-            let minutes: u64 = try_parse(parts[0], EpisodeFromRssError::ParseDuration)?;
-            let seconds: u64 = try_parse(parts[1], EpisodeFromRssError::ParseDuration)?;
+            let minutes: u32 = try_parse(parts[0], EpisodeFromRssError::ParseDuration)?;
+            let seconds: u32 = try_parse(parts[1], EpisodeFromRssError::ParseDuration)?;
             Ok(minutes * 60 + seconds)
         }
         3 => {
-            let hours: u64 = try_parse(parts[0], EpisodeFromRssError::ParseDuration)?;
-            let minutes: u64 = try_parse(parts[1], EpisodeFromRssError::ParseDuration)?;
-            let seconds: u64 = try_parse(parts[2], EpisodeFromRssError::ParseDuration)?;
+            let hours: u32 = try_parse(parts[0], EpisodeFromRssError::ParseDuration)?;
+            let minutes: u32 = try_parse(parts[1], EpisodeFromRssError::ParseDuration)?;
+            let seconds: u32 = try_parse(parts[2], EpisodeFromRssError::ParseDuration)?;
             Ok(hours * 60 * 60 + minutes * 60 + seconds)
         }
         count => {

@@ -8,12 +8,12 @@ const IMAGE_SIZE: u32 = 720;
 pub struct DownloadCommand {
     paths: PathProvider,
     http: HttpClient,
-    metadata: MetadataStore,
+    metadata: MetadataRepository,
 }
 
 impl DownloadCommand {
     #[must_use]
-    pub fn new(paths: PathProvider, http: HttpClient, metadata: MetadataStore) -> Self {
+    pub fn new(paths: PathProvider, http: HttpClient, metadata: MetadataRepository) -> Self {
         Self {
             paths,
             http,
@@ -22,11 +22,12 @@ impl DownloadCommand {
     }
 
     pub async fn execute(&self, options: DownloadOptions) -> Result<(), Report<DownloadError>> {
-        let mut feed = self
+        let feed = self
             .metadata
-            .get(&options.podcast_id)
-            .change_context(DownloadError::GetPodcast)?;
-        feed.filter(&options.filter);
+            .get_feed_by_slug(&options.podcast_slug, Some(options.filter))
+            .await
+            .change_context(DownloadError::Repository)?
+            .ok_or(DownloadError::NoPodcast)?;
         let results = self.process_episodes(feed).await;
         let mut episodes = Vec::new();
         let mut errors = Vec::new();
@@ -54,7 +55,7 @@ impl DownloadCommand {
             .filter(|episode| {
                 let exists = self
                     .paths
-                    .get_audio_path(&feed.podcast.id, episode)
+                    .get_audio_path(&feed.podcast.slug, episode)
                     .exists();
                 if exists {
                     trace!(%episode, "Skipping existing");
@@ -89,7 +90,7 @@ impl DownloadCommand {
         episode: EpisodeInfo,
     ) -> Result<EpisodeInfo, Report<ProcessError>> {
         let path = self.download_episode(&episode).await?;
-        let audio_path = self.copy_episode(&podcast.id, &episode, &path).await?;
+        let audio_path = self.copy_episode(&podcast.slug, &episode, &path).await?;
         let cover = self.download_image(&episode).await?;
         trace!(%episode, "Setting tags");
         Tag::execute(podcast, &episode, cover, &audio_path)
@@ -110,11 +111,11 @@ impl DownloadCommand {
 
     async fn copy_episode(
         &self,
-        podcast_id: &str,
+        podcast_slug: &str,
         episode: &EpisodeInfo,
         source_path: &PathBuf,
     ) -> Result<PathBuf, Report<ProcessError>> {
-        let destination_path = self.paths.get_audio_path(podcast_id, episode);
+        let destination_path = self.paths.get_audio_path(podcast_slug, episode);
         create_parent_dir_if_not_exist(&destination_path)
             .await
             .change_context(ProcessError::CreateDirectory)?;
@@ -168,7 +169,9 @@ impl DownloadCommand {
 #[derive(Clone, Debug, Error)]
 pub enum DownloadError {
     #[error("Unable to get podcast")]
-    GetPodcast,
+    Repository,
+    #[error("Podcast does not exist")]
+    NoPodcast,
 }
 
 #[derive(Clone, Debug, Error)]
@@ -202,7 +205,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let command = DownloadCommand::new(services.paths, services.http, services.metadata);
         let options = DownloadOptions {
-            podcast_id: "irl".to_owned(),
+            podcast_slug: "irl".to_owned(),
             filter: FilterOptions {
                 from_year: Some(2019),
                 to_year: Some(2019),
@@ -224,7 +227,12 @@ mod tests {
         let services = ServiceProvider::create()
             .await
             .expect("ServiceProvider should not fail");
-        let feed = services.metadata.get("irl").expect("podcast should exist");
+        let feed = services
+            .metadata
+            .get_feed_by_slug("irl", None)
+            .await
+            .expect("repository query should not fail")
+            .expect("podcast should exist");
         let command = DownloadCommand::new(services.paths, services.http, services.metadata);
         let episode = feed
             .episodes

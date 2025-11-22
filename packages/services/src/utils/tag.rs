@@ -31,11 +31,11 @@ impl Tag {
         if let Some(season) = episode.season {
             tag.set_album(format!("Season {season}"));
         }
-        tag.set_disk(episode.season.unwrap_or_default() as u32);
+        tag.set_disk(episode.season.unwrap_or_default());
         let year = episode.published_at.year() as u32;
         tag.set_year(year);
         if let Some(number) = episode.episode {
-            tag.set_track(number as u32);
+            tag.set_track(number);
         }
         if let Some(description) = &episode.description {
             tag.set_comment(description.clone());

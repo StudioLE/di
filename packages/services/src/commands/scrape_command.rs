@@ -2,12 +2,12 @@ use crate::prelude::*;
 
 pub struct ScrapeCommand {
     pub(super) http: HttpClient,
-    pub(super) metadata: MetadataStore,
+    pub(super) metadata: MetadataRepository,
 }
 
 impl ScrapeCommand {
     #[must_use]
-    pub fn new(http: HttpClient, metadata: MetadataStore) -> Self {
+    pub fn new(http: HttpClient, metadata: MetadataRepository) -> Self {
         Self { http, metadata }
     }
 
@@ -30,15 +30,17 @@ impl ScrapeCommand {
                     .change_context(ScrapeError::Simplecast)?;
             }
         }
-        let podcast = self
+        let feed = self
             .execute_rss(&options)
             .await
             .change_context(ScrapeError::Rss)?;
-        info!("Fetched {} episodes", podcast.episodes.len());
-        self.metadata
-            .put(&podcast)
+        info!("Fetched {} episodes", feed.episodes.len());
+        let feed = self
+            .metadata
+            .save_feed(feed)
+            .await
             .change_context(ScrapeError::Save)?;
-        Ok(podcast)
+        Ok(feed)
     }
 
     pub(super) async fn execute_rss(
@@ -55,7 +57,7 @@ impl ScrapeCommand {
             .attach_path(path)?;
         let reader = BufReader::new(file);
         let channel = RssChannel::read_from(reader).change_context(ScrapeRssError::Parse)?;
-        PodcastFromRss::execute(channel, &options.podcast_id)
+        PodcastFromRss::execute(channel, &options.podcast_slug)
             .change_context(ScrapeRssError::Convert)
     }
 }
@@ -66,6 +68,7 @@ mod tests {
 
     #[tokio::test]
     #[traced_test]
+    #[serial]
     pub async fn scrape_command_simplecast() {
         // Arrange
         let services = ServiceProvider::create()
@@ -73,7 +76,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let command = ScrapeCommand::new(services.http, services.metadata);
         let options = ScrapeOptions {
-            podcast_id: "irl".to_owned(),
+            podcast_slug: "irl".to_owned(),
             url: Url::parse("https://irlpodcast.org").expect("URL should parse"),
         };
 
@@ -87,6 +90,7 @@ mod tests {
 
     #[tokio::test]
     #[traced_test]
+    #[serial]
     pub async fn scrape_command_rss() {
         // Arrange
         let services = ServiceProvider::create()
@@ -94,7 +98,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let command = ScrapeCommand::new(services.http, services.metadata);
         let options = ScrapeOptions {
-            podcast_id: "irl-rss".to_owned(),
+            podcast_slug: "irl-rss".to_owned(),
             url: Url::parse("https://feeds.simplecast.com/lP7owBq8").expect("URL should parse"),
         };
 

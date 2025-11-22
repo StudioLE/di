@@ -2,7 +2,7 @@ use crate::prelude::*;
 use html2text::config::plain;
 
 #[component]
-pub fn EpisodePage(podcast_id: String, episode_id: Uuid) -> Element {
+pub fn EpisodePage(podcast_slug: String, episode_key: u32) -> Element {
     let context = PodcastsContext::consume();
     if *context.loading.read() {
         return rsx! {
@@ -25,14 +25,14 @@ pub fn EpisodePage(podcast_id: String, episode_id: Uuid) -> Element {
             }
         };
     }
-    let Some(feed) = context.podcasts.get(&podcast_id) else {
+    let Some(feed) = context.podcasts.get(&podcast_slug) else {
         return rsx! {
             Page {
                 title: "Podcast not found",
                 subtitle: "404",
                 MediaObject {
                     title: "Unable to find podcast",
-                    subtitle: "{podcast_id}",
+                    subtitle: "{podcast_slug}",
                     image_size: ImageSize::_128,
                     icon: "fa-triangle-exclamation",
                 }
@@ -42,7 +42,7 @@ pub fn EpisodePage(podcast_id: String, episode_id: Uuid) -> Element {
     let Some(episode) = feed
         .episodes
         .iter()
-        .find(|episode| episode.id == episode_id)
+        .find(|episode| episode.primary_key == episode_key)
     else {
         return rsx! {
             Page {
@@ -50,7 +50,7 @@ pub fn EpisodePage(podcast_id: String, episode_id: Uuid) -> Element {
                 subtitle: "404",
                 MediaObject {
                     title: "Unable to find episode",
-                    subtitle: "{podcast_id} · {episode_id}",
+                    subtitle: "{podcast_slug} · {episode_key}",
                     image_size: ImageSize::_128,
                     icon: "fa-triangle-exclamation",
                 }

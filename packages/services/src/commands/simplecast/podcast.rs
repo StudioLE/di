@@ -23,16 +23,17 @@ pub struct SimplecastPodcast {
 impl From<SimplecastPodcast> for PodcastInfo {
     fn from(podcast: SimplecastPodcast) -> Self {
         PodcastInfo {
-            id: podcast.id,
+            primary_key: u32::default(),
+            slug: podcast.id,
             title: podcast.title,
             description: podcast.description,
             image: podcast.image_url.map(|url| url.to_string()),
             language: Some(podcast.language),
-            categories: Vec::new(),
+            categories: PodcastCategories::default(),
             explicit: podcast.is_explicit,
             author: podcast.authors.collection.first().map(|a| a.name.clone()),
             link: Some(podcast.site.external_website.to_string()),
-            kind: (&podcast.podcast_type).try_into().ok(),
+            kind: PodcastKind::from_str(&podcast.podcast_type).ok(),
             copyright: podcast.copyright,
             new_feed_url: None,
             generator: None,

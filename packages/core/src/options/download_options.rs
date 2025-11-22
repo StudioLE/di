@@ -6,7 +6,7 @@ pub struct DownloadOptions {
     ///
     /// Must be alphanumeric and hyphenated
     #[arg(value_parser = Validator::validate_id)]
-    pub podcast_id: String,
+    pub podcast_slug: String,
     #[command(flatten)]
     pub filter: FilterOptions,
 }

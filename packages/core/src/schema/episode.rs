@@ -5,25 +5,41 @@ use std::fmt::Write as _;
 ///
 /// - <https://help.apple.com/itc/podcasts_connect/#/itcb54353390>
 /// - <https://github.com/Podcastindex-org/podcast-namespace>
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+pub type EpisodeInfo = Model;
+
+/// `SeaORM` Entity for [`EpisodeInfo`]
 #[allow(clippy::struct_field_names)]
-pub struct EpisodeInfo {
+#[sea_orm::model]
+#[derive(Clone, Debug, DeriveEntityModel, Deserialize, PartialEq, Serialize)]
+#[sea_orm(table_name = "episodes")]
+pub struct Model {
+    // Database
+    /// Primary key
+    ///
+    /// This is auto-incremented by the database
+    #[sea_orm(primary_key)]
+    pub primary_key: u32,
+
+    pub podcast_key: Option<u32>,
+
+    #[sea_orm(belongs_to, from = "podcast_key", to = "primary_key")]
+    pub podcast: HasOne<podcast::Entity>,
+
     // Required
+    /// GUID or Apple Podcasts Episode ID
+    pub source_id: String,
     /// Title
     pub title: String,
     /// URL of source media file including a file extension
     /// - Supported file formats include M4A, MP3, MOV, MP4, M4V, and PDF
     pub source_url: String,
     /// Size of source media file in bytes
-    pub source_file_size: u64,
-    /// Mime type of source media file
-    pub source_content_type: String,
-    /// GUID
     ///
-    /// Matches `source_id` if it's a GUID otherwise it's derived deterministically.
-    pub id: Uuid,
-    /// GUID or Apple Podcasts Episode ID
-    pub source_id: String,
+    /// Note: `SQLx` does not support `u64` so `i64` is necessary even though values will never be negative.
+    pub source_file_size: i64,
+    /// Mime type of source media file
+    #[sea_orm(abbb)]
+    pub source_content_type: String,
 
     // Recommended
     /// Date and time episode was released
@@ -31,7 +47,7 @@ pub struct EpisodeInfo {
     /// HTML formatted description
     pub description: Option<String>,
     /// Duration in seconds
-    pub source_duration: Option<u64>,
+    pub source_duration: Option<u32>,
     /// URL of JPEG or PNG artwork
     /// - Min: 1400 x 1400 px
     /// - Max: 3000 x 3000 px
@@ -43,14 +59,12 @@ pub struct EpisodeInfo {
     /// Apple Podcasts specific title
     pub itunes_title: Option<String>,
     /// Episode number
-    pub episode: Option<usize>,
+    pub episode: Option<u32>,
     /// Season number
-    pub season: Option<usize>,
+    pub season: Option<u32>,
     /// Episode type
     pub kind: Option<EpisodeKind>,
 }
-
-impl EpisodeInfo {}
 
 impl EpisodeInfo {
     #[must_use]
@@ -113,7 +127,7 @@ impl EpisodeInfo {
     }
 
     #[must_use]
-    pub fn format_season(season: Option<usize>) -> String {
+    pub fn format_season(season: Option<u32>) -> String {
         format!("S{:02}", season.unwrap_or(0))
     }
 
@@ -125,24 +139,15 @@ impl EpisodeInfo {
         Sanitizer::execute(&self.title).trim().to_owned()
     }
 
-    /// Determine a UUID from `source_id`.
-    ///
-    /// Matches `source_id` if it's a GUID otherwise it's derived deterministically.
-    #[must_use]
-    pub fn determine_uuid(source_id: &str) -> Uuid {
-        const UUID_NAMESPACE: Uuid = uuid!("a2c7f853-abb1-4ac5-86fa-10b6de5a8386");
-        Uuid::try_parse(source_id)
-            .unwrap_or_else(|_| Uuid::new_v5(&UUID_NAMESPACE, source_id.as_bytes()))
-    }
-
     #[must_use]
     pub fn example() -> Self {
         Self {
+            primary_key: u32::default(),
+            podcast_key: None,
             title: "Lorem ipsum dolor sit amet".to_owned(),
             source_url: "https://example.com/season-1/episode-1.mp3".to_owned(),
             source_file_size: 1024,
             source_content_type: "audio/mpeg".to_owned(),
-            id: uuid!("550e8400-e29b-41d4-a716-446655440000"),
             source_id: "550e8400-e29b-41d4-a716-446655440000".to_owned(),
             published_at: DateTime::default(),
             description: Some("Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna.".to_owned()),
@@ -162,3 +167,5 @@ impl Display for EpisodeInfo {
         write!(f, "{}", self.get_file_stem())
     }
 }
+
+impl ActiveModelBehavior for ActiveModel {}

@@ -145,12 +145,12 @@ fn get_element_attr(html: &Html, selector: &str, attr: &str) -> Vec<String> {
 
 #[allow(dead_code)]
 fn convert(
-    podcast_id: &str,
+    podcast_slug: &str,
     podcast: SimplecastPodcast,
     episodes: Vec<SimplecastEpisode>,
 ) -> PodcastFeed {
     let mut podcast: PodcastInfo = podcast.into();
-    podcast_id.clone_into(&mut podcast.id);
+    podcast_slug.clone_into(&mut podcast.slug);
     let episodes = episodes.into_iter().map(Into::into).collect();
     PodcastFeed { podcast, episodes }
 }

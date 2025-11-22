@@ -3,12 +3,12 @@ use dirs::{cache_dir, data_dir};
 use std::fs::create_dir;
 
 const HTTP_DIR: &str = "http";
-const METADATA_DIR: &str = "metadata";
 const PODCASTS_DIR: &str = "podcasts";
 const TORRENT_DIR: &str = "torrent";
 const TORRENT_CONTENT_DIR: &str = "content";
 const TORRENT_FILES_DIR: &str = "files";
 const RSS_FILE_NAME: &str = "feed.rss";
+const METADATA_DB: &str = "metadata.db";
 const BANNER_FILE_NAME: &str = "banner.jpg";
 const COVER_FILE_NAME: &str = "cover.jpg";
 
@@ -55,12 +55,12 @@ impl PathProvider {
         self.get_cache_dir().join(HTTP_DIR)
     }
 
-    /// Directory for storing podcast metadata.
+    /// Sqlite database for storing podcast metadata.
     ///
-    /// Default: `$HOME/.local/share/alnwick/metadata` (or equivalent)
+    /// Default: `$HOME/.local/share/alnwick/metadata.db` (or equivalent)
     #[must_use]
-    pub fn get_metadata_dir(&self) -> PathBuf {
-        self.get_data_dir().join(METADATA_DIR)
+    pub fn get_metadata_db_path(&self) -> PathBuf {
+        self.get_data_dir().join(METADATA_DB)
     }
 
     /// Directory for storing podcast episodes and feeds.
@@ -97,9 +97,9 @@ impl PathProvider {
     ///
     /// Example: `$HOME/.local/share/alnwick/podcasts/irl/S00/1970/1970-01-01 001 Hello World.mp3`
     #[must_use]
-    pub fn get_audio_path(&self, podcast_id: &str, episode: &EpisodeInfo) -> PathBuf {
+    pub fn get_audio_path(&self, podcast_slug: &str, episode: &EpisodeInfo) -> PathBuf {
         self.get_podcasts_dir()
-            .join(get_sub_path_for_audio(podcast_id, episode))
+            .join(get_sub_path_for_audio(podcast_slug, episode))
     }
 
     /// URL of the episode audio file.
@@ -110,12 +110,12 @@ impl PathProvider {
     /// - `https://example.com/irl/S00/1970/1970-01-01 001 Hello World.mp3`
     /// - `file://$HOME/.local/share/alnwick/podcasts/irl/S00/1970/1970-01-01 001 Hello World.mp3`
     #[must_use]
-    pub fn get_audio_url(&self, podcast_id: &str, episode: &EpisodeInfo) -> Option<Url> {
+    pub fn get_audio_url(&self, podcast_slug: &str, episode: &EpisodeInfo) -> Option<Url> {
         if let Some(base) = &self.options.server_base {
-            let path = get_sub_path_for_audio(podcast_id, episode);
+            let path = get_sub_path_for_audio(podcast_slug, episode);
             base.join(path.to_string_lossy().as_ref()).ok()
         } else {
-            let path = self.get_audio_path(podcast_id, episode);
+            let path = self.get_audio_path(podcast_slug, episode);
             Url::from_file_path(path).ok()
         }
     }
@@ -129,12 +129,12 @@ impl PathProvider {
     #[must_use]
     pub fn get_rss_path(
         &self,
-        podcast_id: &str,
-        season: Option<usize>,
+        podcast_slug: &str,
+        season: Option<u32>,
         year: Option<i32>,
     ) -> PathBuf {
-        assert!(!podcast_id.is_empty(), "podcast id should not be empty");
-        let path = self.get_podcasts_dir().join(podcast_id);
+        assert!(!podcast_slug.is_empty(), "podcast id should not be empty");
+        let path = self.get_podcasts_dir().join(podcast_slug);
         if season.is_none() && year.is_none() {
             return path.join(RSS_FILE_NAME);
         }
@@ -169,9 +169,9 @@ impl PathProvider {
     ///
     /// Example: `$HOME/.local/share/alnwick/podcasts/irl/cover.jpg`
     #[must_use]
-    pub fn get_cover_path(&self, podcast_id: &str) -> PathBuf {
+    pub fn get_cover_path(&self, podcast_slug: &str) -> PathBuf {
         self.get_podcasts_dir()
-            .join(podcast_id)
+            .join(podcast_slug)
             .join(COVER_FILE_NAME)
     }
 
@@ -179,9 +179,9 @@ impl PathProvider {
     ///
     /// Example: `$HOME/.local/share/alnwick/podcasts/irl/banner.jpg`
     #[must_use]
-    pub fn get_banner_path(&self, podcast_id: &str) -> PathBuf {
+    pub fn get_banner_path(&self, podcast_slug: &str) -> PathBuf {
         self.get_podcasts_dir()
-            .join(podcast_id)
+            .join(podcast_slug)
             .join(BANNER_FILE_NAME)
     }
 
@@ -193,7 +193,6 @@ impl PathProvider {
             ("Cache directory", cache_dir),
             ("Data directory", data_dir),
             ("HTTP cache directory", self.get_http_dir()),
-            ("Metadata directory", self.get_metadata_dir()),
             ("Podcasts directory", self.get_podcasts_dir()),
             ("Torrent directory", self.get_torrent_dir()),
             ("Torrent content directory", self.get_torrent_content_dir()),
@@ -213,12 +212,12 @@ impl PathProvider {
 /// Sub path for an episodes's audio file.
 ///
 /// Example: `irl/S00/1970/1970-01-01 001 Hello World.mp3`
-fn get_sub_path_for_audio(podcast_id: &str, episode: &EpisodeInfo) -> PathBuf {
+fn get_sub_path_for_audio(podcast_slug: &str, episode: &EpisodeInfo) -> PathBuf {
     let season = episode.get_formatted_season();
     let year = episode.published_at.year().to_string();
     let filename = episode.get_filename();
     PathBuf::new()
-        .join(podcast_id)
+        .join(podcast_slug)
         .join(season)
         .join(year)
         .join(filename)

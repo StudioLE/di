@@ -3,7 +3,9 @@ use crate::prelude::*;
 #[derive(Debug, Error)]
 pub enum CoverError {
     #[error("Unable to get podcast")]
-    GetPodcast,
+    Repository,
+    #[error("Podcast does not exist")]
+    NoPodcast,
     #[error("Podcast does not have an image")]
     NoImage,
     #[error("Unable to get image")]

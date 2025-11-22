@@ -23,6 +23,7 @@ fn podcast_to_rss(podcast: PodcastInfo) -> RssChannel {
             author: podcast.author,
             categories: podcast
                 .categories
+                .0
                 .into_iter()
                 .map(|category| ITunesCategory {
                     text: category.category,
@@ -58,7 +59,7 @@ fn episode_to_rss(episode: EpisodeInfo) -> RssItem {
             mime_type: episode.source_content_type.clone(),
         }),
         guid: Some(RssGuid {
-            value: episode.id.to_string(),
+            value: episode.source_id,
             permalink: false,
         }),
         pub_date: Some(episode.published_at.to_rfc2822()),

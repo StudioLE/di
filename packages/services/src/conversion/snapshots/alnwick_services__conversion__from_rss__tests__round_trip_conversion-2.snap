@@ -3,7 +3,8 @@ source: packages/services/src/conversion/from_rss.rs
 expression: feed
 ---
 podcast:
-  id: test
+  primary_key: 0
+  slug: test
   title: Podcast Title
   description: "Sed ac volutpat tortor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse placerat leo augue, id elementum orci venenatis eu."
   image: ~
@@ -17,12 +18,13 @@ podcast:
   new_feed_url: ~
   generator: ~
 episodes:
-  - title: Lorem ipsum dolor sit amet
+  - primary_key: 0
+    podcast_key: ~
+    source_id: 550e8400-e29b-41d4-a716-446655440000
+    title: Lorem ipsum dolor sit amet
     source_url: "https://example.com/season-1/episode-1.mp3"
     source_file_size: 1024
     source_content_type: audio/mpeg
-    id: 550e8400-e29b-41d4-a716-446655440000
-    source_id: 550e8400-e29b-41d4-a716-446655440000
     published_at: "1970-01-01T00:00:00Z"
     description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
     source_duration: ~

@@ -1,19 +1,19 @@
 use crate::prelude::*;
 
-#[derive(Args, Debug, Default, Serialize)]
+#[derive(Args, Clone, Debug, Default, Serialize)]
 pub struct FilterOptions {
     /// Only include episodes with the specified season
     #[arg(long)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub season: Option<usize>,
+    pub season: Option<u32>,
     /// Exclude episodes before the specified season
     #[arg(long)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub from_season: Option<usize>,
+    pub from_season: Option<u32>,
     /// Exclude episodes after the specified season
     #[arg(long)]
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub to_season: Option<usize>,
+    pub to_season: Option<u32>,
     /// Only include episodes with the specified year
     #[arg(long)]
     #[serde(skip_serializing_if = "Option::is_none")]

@@ -16,6 +16,7 @@ pub fn init_logger() {
         .with_target("lofty", LevelFilter::INFO)
         .with_target("reqwest", LevelFilter::INFO)
         .with_target("selectors", LevelFilter::INFO)
+        .with_target("sqlx", LevelFilter::WARN)
         .with_default(DEFAULT_LOG_LEVEL);
     let layer = layer()
         .compact()

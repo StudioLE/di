@@ -4,12 +4,31 @@ use crate::prelude::*;
 ///
 /// - <https://help.apple.com/itc/podcasts_connect/#/itcb54353390>
 /// - <https://github.com/Podcastindex-org/podcast-namespace>
+pub type PodcastInfo = Model;
+
+/// `SeaORM` Entity for [`PodcastInfo`]
 #[allow(clippy::struct_field_names)]
-#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
-pub struct PodcastInfo {
+#[sea_orm::model]
+#[derive(Clone, Debug, DeriveEntityModel, Deserialize, PartialEq, Serialize)]
+#[sea_orm(table_name = "podcasts")]
+pub struct Model {
+    // Database
+    /// Primary key
+    ///
+    /// This is auto-incremented by the database
+    #[sea_orm(primary_key)]
+    pub primary_key: u32,
+
+    /// Episodes related to this podcast
+    #[sea_orm(has_many)]
+    pub episodes: HasMany<episode::Entity>,
+
+    // User
+    /// User defined slug
+    #[sea_orm(unique)]
+    pub slug: String,
+
     // Required
-    /// App specific id
-    pub id: String,
     /// Title
     pub title: String,
     /// HTML formatted description
@@ -25,7 +44,7 @@ pub struct PodcastInfo {
     /// Categories
     ///
     /// <https://podcasters.apple.com/support/1691-apple-podcasts-categories>
-    pub categories: Vec<PodcastCategory>,
+    pub categories: PodcastCategories,
     /// Parental advisory information
     pub explicit: bool,
 
@@ -54,7 +73,7 @@ impl PodcastInfo {
         self.image.clone().and_then(|url| {
             Url::parse(&url)
                 .map_err(|error| {
-                    warn!(podcast = self.id, %url, %error, "Failed to parse podcast image URL");
+                    warn!(podcast = self.slug, %url, %error, "Failed to parse podcast image URL");
                 })
                 .ok()
         })
@@ -63,12 +82,13 @@ impl PodcastInfo {
     #[must_use]
     pub fn example() -> Self {
         Self {
-            id: "test".to_owned(),
+            slug: "test".to_owned(),
+            primary_key: u32::default(),
             title: "Podcast Title".to_owned(),
             description: "Sed ac volutpat tortor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse placerat leo augue, id elementum orci venenatis eu.".to_owned(),
             image: None,
             language: Some("en-us".to_owned()),
-            categories: Vec::new(),
+            categories: PodcastCategories::default(),
             explicit: false,
             author: None,
             link: Some("https://example.com/".to_owned()),
@@ -79,3 +99,5 @@ impl PodcastInfo {
         }
     }
 }
+
+impl ActiveModelBehavior for ActiveModel {}

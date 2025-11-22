@@ -47,10 +47,10 @@ pub fn IndexPage() -> Element {
             for feed in podcasts.values() {
                 div { class: "block item",
                     Link {
-                        to: Route::Podcast { id: feed.podcast.id.clone() },
+                        to: Route::Podcast { id: feed.podcast.slug.clone() },
                         MediaObject {
                             title: feed.podcast.title.clone(),
-                            subtitle: "{feed.episodes.len()} episodes · {feed.podcast.id}",
+                            subtitle: "{feed.episodes.len()} episodes · {feed.podcast.slug}",
                             image_src: feed.podcast.get_image_url(),
                             image_size: ImageSize::_64,
                             icon: "fa-image",

@@ -1,7 +1,10 @@
 use crate::prelude::*;
 
 /// Episode type
-#[derive(Clone, Copy, Debug, Default, Deserialize, Display, PartialEq, Serialize)]
+#[derive(
+    Clone, Copy, Debug, Default, Deserialize, Display, PartialEq, Serialize, DeriveValueType,
+)]
+#[sea_orm(value_type = "String")]
 pub enum EpisodeKind {
     /// Complete content
     #[default]
@@ -18,10 +21,10 @@ pub enum EpisodeKind {
     Bonus,
 }
 
-impl TryFrom<&String> for EpisodeKind {
-    type Error = Report<EpisodeKindError>;
+impl FromStr for EpisodeKind {
+    type Err = Report<EpisodeKindError>;
 
-    fn try_from(value: &String) -> Result<Self, Self::Error> {
+    fn from_str(value: &str) -> Result<Self, Self::Err> {
         let lower = value.to_lowercase();
         match lower.as_str() {
             "full" => Ok(EpisodeKind::Full),

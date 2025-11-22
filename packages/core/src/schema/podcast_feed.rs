@@ -15,3 +15,9 @@ impl PodcastFeed {
         }
     }
 }
+
+impl From<(PodcastInfo, Vec<EpisodeInfo>)> for PodcastFeed {
+    fn from((podcast, episodes): (PodcastInfo, Vec<EpisodeInfo>)) -> Self {
+        Self { podcast, episodes }
+    }
+}

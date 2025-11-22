@@ -12,14 +12,14 @@ pub struct SimplecastEpisode {
     pub token: String,
     pub description: String,
     pub slug: String,
-    pub number: Option<usize>,
+    pub number: Option<u32>,
     pub audio_file: SimplecastAudioFile,
     pub audio_content_type: String,
-    pub duration: Option<u64>,
+    pub duration: Option<u32>,
     pub season: SimplecastSeason,
     pub title: String,
     pub episode_url: String,
-    pub audio_file_size: u64,
+    pub audio_file_size: i64,
     pub published_at: DateTime<FixedOffset>,
     pub href: Url,
     pub audio_file_path: String,
@@ -43,8 +43,8 @@ pub struct SimplecastAudioFile {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct SimplecastSeason {
     pub href: Url,
-    pub number: usize,
-    pub next_episode_number: usize,
+    pub number: u32,
+    pub next_episode_number: u32,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -67,13 +67,14 @@ impl Display for SimplecastEpisode {
 impl From<SimplecastEpisode> for EpisodeInfo {
     fn from(episode: SimplecastEpisode) -> Self {
         EpisodeInfo {
-            id: EpisodeInfo::determine_uuid(&episode.id),
+            primary_key: u32::default(),
+            podcast_key: None,
             source_id: episode.id,
             title: episode.title,
             description: Some(episode.description),
             image: episode.image_url.map(|url| url.to_string()),
             source_url: episode.enclosure_url.to_string(),
-            kind: (&episode.episode_type).try_into().ok(),
+            kind: EpisodeKind::from_str(&episode.episode_type).ok(),
             season: Some(episode.season.number),
             episode: episode.number,
             source_file_size: episode.audio_file_size,

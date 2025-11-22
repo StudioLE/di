@@ -1,13 +1,13 @@
-pub use episode_info::*;
+pub use episode::EpisodeInfo;
 pub use episode_kind::*;
 pub use podcast_category::*;
 pub use podcast_feed::*;
-pub use podcast_info::*;
+pub use podcast::PodcastInfo;
 pub use podcast_kind::*;
 
-mod episode_info;
+pub mod episode;
 mod episode_kind;
 mod podcast_category;
 mod podcast_feed;
-mod podcast_info;
+pub mod podcast;
 mod podcast_kind;

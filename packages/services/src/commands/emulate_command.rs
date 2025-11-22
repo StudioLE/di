@@ -2,21 +2,24 @@ use crate::prelude::*;
 
 pub struct EmulateCommand {
     paths: PathProvider,
-    metadata: MetadataStore,
+    metadata: MetadataRepository,
 }
 
 impl EmulateCommand {
     #[must_use]
-    pub fn new(paths: PathProvider, metadata: MetadataStore) -> Self {
+    pub fn new(paths: PathProvider, metadata: MetadataRepository) -> Self {
         Self { paths, metadata }
     }
 
     pub async fn execute(&self, options: EmulateOptions) -> Result<(), Report<EmulateError>> {
-        let podcast = self
+        // TODO: Add support for filtering episodes.
+        let feed = self
             .metadata
-            .get(&options.podcast_id)
-            .change_context(EmulateError::GetPodcast)?;
-        let feeds = self.save_feeds(&podcast).await?;
+            .get_feed_by_slug(&options.podcast_slug, None)
+            .await
+            .change_context(EmulateError::Repository)?
+            .ok_or(EmulateError::NoPodcast)?;
+        let feeds = self.save_feeds(&feed).await?;
         info!("Created {} rss feeds", feeds.len());
         Ok(())
     }
@@ -42,7 +45,7 @@ impl EmulateCommand {
     async fn save_feed(
         &self,
         feed: &PodcastFeed,
-        season: Option<usize>,
+        season: Option<u32>,
         year: Option<i32>,
     ) -> Result<PathBuf, Report<EmulateError>> {
         let mut channel = PodcastToRss::execute(feed.clone());
@@ -50,7 +53,7 @@ impl EmulateCommand {
             self.replace_enclosure(feed, item);
         }
         let xml = channel.to_string();
-        let path = self.paths.get_rss_path(&feed.podcast.id, season, year);
+        let path = self.paths.get_rss_path(&feed.podcast.slug, season, year);
         create_parent_dir_if_not_exist(&path)
             .await
             .change_context(EmulateError::CreateDirectory)?;
@@ -74,18 +77,18 @@ impl EmulateCommand {
         let episode = feed
             .episodes
             .iter()
-            .find(|episode| episode.id == EpisodeInfo::determine_uuid(&guid.value))?;
+            .find(|episode| episode.source_id == guid.value)?;
         let enclosure = item.enclosure.as_mut()?;
         enclosure.url = self
             .paths
-            .get_audio_url(&feed.podcast.id, episode)?
+            .get_audio_url(&feed.podcast.slug, episode)?
             .to_string();
         Some(())
     }
 }
 
-fn group_by_season(episodes: Vec<EpisodeInfo>) -> HashMap<Option<usize>, Vec<EpisodeInfo>> {
-    let mut groups: HashMap<Option<usize>, Vec<EpisodeInfo>> = HashMap::new();
+fn group_by_season(episodes: Vec<EpisodeInfo>) -> HashMap<Option<u32>, Vec<EpisodeInfo>> {
+    let mut groups: HashMap<Option<u32>, Vec<EpisodeInfo>> = HashMap::new();
     for episode in episodes {
         let group = groups.entry(episode.season).or_default();
         group.push(episode);
@@ -116,7 +119,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let command = EmulateCommand::new(services.paths, services.metadata);
         let options = EmulateOptions {
-            podcast_id: "irl".to_owned(),
+            podcast_slug: "irl".to_owned(),
         };
 
         // Act

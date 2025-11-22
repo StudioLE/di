@@ -18,6 +18,8 @@ lofty = { workspace = true }
 reqwest = { workspace = true }
 rss = { workspace = true }
 scraper = { workspace = true }
+sea-orm = { workspace = true, features = ["runtime-tokio-rustls", "sqlx-sqlite"] }
+sea-orm-migration = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_yaml = { workspace = true }
@@ -28,6 +30,7 @@ urlencoding = { workspace = true }
 
 [dev-dependencies]
 insta = { workspace = true }
+serial_test = { workspace = true }
 tracing-test = { workspace = true }
 
 [lints]

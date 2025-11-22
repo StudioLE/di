@@ -5,6 +5,8 @@ pub use insta::*;
 pub use reqwest::Client as ReqwestClient;
 pub use reqwest::Response;
 pub use scraper::{Html, Selector};
+#[cfg(test)]
+pub use serial_test::serial;
 pub use std::ffi::{OsStr, OsString};
 pub use std::fs::File;
 pub use std::io::{BufReader, BufWriter};
