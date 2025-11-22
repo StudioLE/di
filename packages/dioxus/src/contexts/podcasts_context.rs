@@ -48,14 +48,7 @@ impl PodcastsContext {
 
 #[get("/api/podcasts")]
 async fn get_podcasts() -> Result<HashMap<String, PodcastFeed>, ServerFnError> {
-    let services = match ServiceProvider::create().await {
-        Ok(services) => services,
-        Err(error) => {
-            error!("{error:?}");
-            return Err(ServerFnError::new(error.to_string()));
-        }
-    };
-    match services.metadata.get_all_feeds().await {
+    match SERVICES.metadata.get_all_feeds().await {
         Ok(podcasts) => Ok(podcasts),
         Err(error) => {
             error!("{error:?}");
