@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use Route::*;
 
 /// Simple responsive horizontal navigation tabs, with different styles.
 ///

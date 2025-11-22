@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use html2text::config::plain;
 
 #[component]
 pub fn EpisodePage(podcast_slug: String, episode_key: u32) -> Element {

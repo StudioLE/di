@@ -1,7 +1,6 @@
+mod commands;
 mod r#const;
-mod errors;
-mod options;
+mod metadata;
 pub mod prelude;
-mod schema;
-mod tests;
+mod services;
 mod utils;

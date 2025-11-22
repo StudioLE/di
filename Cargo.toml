@@ -4,7 +4,6 @@ members = [
     "packages/cli",
     "packages/core",
     "packages/dioxus",
-    "packages/services",
 ]
 
 [workspace.package]
@@ -44,9 +43,6 @@ tracing-subscriber = { version = "0.3.20", features = ["ansi", "env-filter"] }
 tracing-test = "0.2.5"
 url = { version = "2.5.7" }
 urlencoding = { version = "2.1.3" }
-
-[workspace.lints.rust]
-unused_imports = "allow"
 
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -1 }

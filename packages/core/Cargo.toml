@@ -6,6 +6,23 @@ authors.workspace = true
 description.workspace = true
 documentation.workspace = true
 
+[features]
+default = ["server"]
+server = [
+  "sea-orm/runtime-tokio-rustls",
+  "sea-orm/sqlx-sqlite",
+  "dep:dirs",
+  "dep:envy",
+  "dep:fast_image_resize",
+  "dep:futures",
+  "dep:image",
+  "dep:lofty",
+  "dep:scraper",
+  "dep:sea-orm-migration",
+  "dep:tokio",
+  "dep:urlencoding",
+]
+
 [dependencies]
 chrono = { workspace = true }
 clap = { workspace = true }
@@ -21,6 +38,23 @@ thiserror = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 url = { workspace = true }
+
+# Server dependencies
+dirs = { workspace = true, optional = true }
+envy = { workspace = true, optional = true }
+fast_image_resize = { workspace = true, optional = true }
+futures = { workspace = true, optional = true }
+image = { workspace = true, optional = true }
+lofty = { workspace = true, optional = true }
+scraper = { workspace = true, optional = true }
+sea-orm-migration = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }
+urlencoding = { workspace = true, optional = true }
+
+[dev-dependencies]
+insta = { workspace = true }
+serial_test = { workspace = true }
+tracing-test = { workspace = true }
 
 [lints]
 workspace = true

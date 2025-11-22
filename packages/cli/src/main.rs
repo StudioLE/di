@@ -1,4 +1,4 @@
-use alnwick_services::prelude::*;
+use alnwick_core::prelude::*;
 use std::process::exit;
 
 #[tokio::main]

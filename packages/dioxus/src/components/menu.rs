@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use Route::*;
 
 /// Properties for [`Menu`]
 #[derive(Clone, Debug, PartialEq, Props)]

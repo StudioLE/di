@@ -8,11 +8,10 @@ documentation.workspace = true
 
 [features]
 web = ["dioxus/web"]
-server = ["dioxus/server", "dep:alnwick_services"]
+server = ["dioxus/server", "alnwick_core/server"]
 
 [dependencies]
-alnwick_core = { path = "../core" }
-alnwick_services = { path = "../services", optional = true }
+alnwick_core = { path = "../core", default-features = false }
 dioxus = { workspace = true }
 html2text = { workspace = true }
 
