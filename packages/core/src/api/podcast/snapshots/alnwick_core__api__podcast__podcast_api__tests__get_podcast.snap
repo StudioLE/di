@@ -1,0 +1,8 @@
+---
+source: packages/core/src/api/podcast/podcast_api.rs
+expression: podcast
+---
+primary_key: 1
+slug: irl
+title: "IRL: Online Life is Real Life"
+image: "https://image.simplecastcdn.com/images/e54c9a6c-6b5b-4e70-a5b6-fb44ddc05621/9be04061-e117-4a41-9dc1-f5610e29e9a0/3000x3000/irl-201-1-20-1.jpg?aid=rss_feed"

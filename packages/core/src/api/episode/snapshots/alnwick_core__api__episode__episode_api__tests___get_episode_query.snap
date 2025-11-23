@@ -1,0 +1,20 @@
+---
+source: packages/core/src/api/episode/episode_api.rs
+expression: sql
+---
+SELECT
+  "episodes"."primary_key" AS "primary_key",
+  "episodes"."title" AS "title",
+  "episodes"."published_at" AS "published_at",
+  "episodes"."description" AS "description",
+  "episodes"."source_duration" AS "source_duration",
+  "episodes"."image" AS "image",
+  "episodes"."episode" AS "episode",
+  "episodes"."season" AS "season",
+  "episodes"."kind" AS "kind"
+FROM
+  "episodes"
+  INNER JOIN "podcasts" ON "episodes"."podcast_key" = "podcasts"."primary_key"
+WHERE
+  "episodes"."primary_key" = 1
+  AND "podcasts"."slug" = 'irl'

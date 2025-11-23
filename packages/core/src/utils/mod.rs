@@ -12,7 +12,9 @@ mod validator;
 pub use validator::*;
 mod vec_helpers;
 pub use vec_helpers::*;
+#[cfg(test)]
 mod tests;
+#[cfg(test)]
 pub use tests::*;
 
 #[cfg(feature = "server")]

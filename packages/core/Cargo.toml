@@ -54,6 +54,7 @@ urlencoding = { workspace = true, optional = true }
 [dev-dependencies]
 insta = { workspace = true }
 serial_test = { workspace = true }
+sqlformat = { workspace = true }
 tracing-test = { workspace = true }
 
 [lints]

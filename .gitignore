@@ -6,3 +6,4 @@ node_modules
 **/.expect/**/*.actual.json
 **/.expect/**/*.actual.txt
 **/.expect/**/*.actual.yaml
+*.snap.new

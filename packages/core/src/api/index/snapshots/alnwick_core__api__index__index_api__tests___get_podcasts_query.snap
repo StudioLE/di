@@ -1,0 +1,17 @@
+---
+source: packages/core/src/api/index/index_api.rs
+expression: sql
+---
+SELECT
+  "podcasts"."primary_key" AS "primary_key",
+  "podcasts"."slug" AS "slug",
+  "podcasts"."title" AS "title",
+  "podcasts"."image" AS "image",
+  COUNT("episodes"."primary_key") AS "episodes"
+FROM
+  "podcasts"
+  LEFT JOIN "episodes" ON "podcasts"."primary_key" = "episodes"."podcast_key"
+GROUP BY
+  "podcasts"."primary_key"
+ORDER BY
+  "podcasts"."title" ASC
