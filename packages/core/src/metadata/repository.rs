@@ -22,3 +22,48 @@ impl MetadataRepository {
             .change_context(ServiceError::DatabaseMigration)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sqlformat::{format, FormatOptions, QueryParams};
+
+    #[tokio::test]
+    pub async fn migrate() {
+        // Arrange
+        let path = TempDirectory::default()
+            .create()
+            .expect("Should be able to create a temp dir")
+            .join("metadata.db");
+        let metadata = MetadataRepository::new(path)
+            .await
+            .expect("Should be able to create a repository");
+
+        // Act
+        metadata.migrate().await.assert_ok_debug();
+
+        // Assert
+        assert_snapshot!(get_db_structure(&metadata).await);
+    }
+
+    async fn get_db_structure(metadata: &MetadataRepository) -> String {
+        let statement = Statement::from_string(
+            DbBackend::Sqlite,
+            "SELECT sql FROM sqlite_master WHERE sql IS NOT NULL",
+        );
+        let creates: Vec<String> = metadata
+            .db
+            .query_all_raw(statement)
+            .await
+            .expect("sqlite_master query should not fail")
+            .iter()
+            .map(|result| {
+                let sql = result
+                    .try_get::<String>("", "sql")
+                    .expect("should be able to get sql");
+                format(&sql, &QueryParams::None, &FormatOptions::default())
+            })
+            .collect();
+        creates.join("\n\n")
+    }
+}
