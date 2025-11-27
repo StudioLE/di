@@ -6,7 +6,7 @@ impl MetadataRepository {
     /// Get an episode with minimal info for the episode page.
     pub async fn get_episode(
         &self,
-        podcast_slug: &str,
+        podcast_slug: Slug,
         episode_key: u32,
     ) -> Result<Option<EpisodePartial>, DbErr> {
         get_episode_query(podcast_slug, episode_key)
@@ -16,7 +16,7 @@ impl MetadataRepository {
 }
 
 fn get_episode_query(
-    podcast_slug: &str,
+    podcast_slug: Slug,
     episode_key: u32,
 ) -> Selector<SelectModel<EpisodePartial>> {
     episode::Entity::find_by_id(episode_key)
@@ -44,8 +44,10 @@ mod tests {
     #[test]
     pub fn _get_episode_query() {
         // Arrange
+        let slug = Slug::from_str(PODCAST_SLUG).expect("should be valid slug");
+
         // Act
-        let statement = get_episode_query(PODCAST_SLUG, EPISODE_KEY).into_statement(DB_BACKEND);
+        let statement = get_episode_query(slug, EPISODE_KEY).into_statement(DB_BACKEND);
 
         // Assert
         let sql = format_sql(&statement);
@@ -57,15 +59,13 @@ mod tests {
     #[ignore = "Requires an unmodified db"]
     pub async fn get_episode() {
         // Arrange
+        let slug = Slug::from_str(PODCAST_SLUG).expect("should be valid slug");
         let services = ServiceProvider::create()
             .await
             .expect("ServiceProvider should not fail");
 
         // Act
-        let result = services
-            .metadata
-            .get_episode(PODCAST_SLUG, EPISODE_KEY)
-            .await;
+        let result = services.metadata.get_episode(slug, EPISODE_KEY).await;
 
         // Assert
         let episode = result.assert_ok_debug().expect("Episode should exist");

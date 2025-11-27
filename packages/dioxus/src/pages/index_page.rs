@@ -60,7 +60,7 @@ fn Podcasts(podcasts: Vec<PodcastPartial>) -> Element {
             for podcast in podcasts {
                 div { class: "block item",
                     Link {
-                        to: Route::Podcast { id: podcast.slug.clone() },
+                        to: Route::Podcast { slug: podcast.slug.clone() },
                         MediaObject {
                             title: podcast.title.clone(),
                             subtitle: "{podcast.episodes_count} episodes · {podcast.slug}",

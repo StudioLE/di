@@ -25,7 +25,7 @@ impl DownloadCommand {
     pub async fn execute(&self, options: DownloadOptions) -> Result<(), Report<DownloadError>> {
         let feed = self
             .metadata
-            .get_feed_by_slug(&options.podcast_slug, Some(options.filter))
+            .get_feed_by_slug(options.podcast_slug, Some(options.filter))
             .await
             .change_context(DownloadError::Repository)?
             .ok_or(DownloadError::NoPodcast)?;
@@ -112,7 +112,7 @@ impl DownloadCommand {
 
     async fn copy_episode(
         &self,
-        podcast_slug: &str,
+        podcast_slug: &Slug,
         episode: &EpisodeInfo,
         source_path: &PathBuf,
     ) -> Result<PathBuf, Report<ProcessError>> {
@@ -206,7 +206,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let command = DownloadCommand::new(services.paths, services.http, services.metadata);
         let options = DownloadOptions {
-            podcast_slug: "irl".to_owned(),
+            podcast_slug: Slug::from_str("irl").expect("should be valid slug"),
             filter: FilterOptions {
                 from_year: Some(2019),
                 to_year: Some(2019),
@@ -230,7 +230,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let feed = services
             .metadata
-            .get_feed_by_slug("irl", None)
+            .get_feed_by_slug(Slug::from_str("irl").expect("should be valid slug"), None)
             .await
             .expect("repository query should not fail")
             .expect("podcast should exist");

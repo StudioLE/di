@@ -13,7 +13,7 @@ pub struct PodcastPartial {
     /// This is auto-incremented by the database
     pub primary_key: u32,
     /// User defined slug
-    pub slug: String,
+    pub slug: Slug,
     /// Title
     pub title: String,
     /// URL of JPEG or PNG artwork

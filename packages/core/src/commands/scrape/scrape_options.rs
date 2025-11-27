@@ -5,8 +5,7 @@ pub struct ScrapeOptions {
     /// ID of the downloaded podcast
     ///
     /// Must be alphanumeric and hyphenated
-    #[arg(value_parser = Validator::validate_id)]
-    pub podcast_slug: String,
+    pub podcast_slug: Slug,
     /// URL of the RSS feed or website
     pub url: Url,
 }

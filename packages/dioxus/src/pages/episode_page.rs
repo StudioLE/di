@@ -2,7 +2,7 @@ use crate::prelude::*;
 use html2text::config::plain;
 
 #[component]
-pub fn EpisodePage(podcast_slug: String, episode_key: u32) -> Element {
+pub fn EpisodePage(podcast_slug: Slug, episode_key: u32) -> Element {
     let resource_podcast_slug = podcast_slug.clone();
     let resource = use_resource(move || {
         let resource_podcast_slug = resource_podcast_slug.clone();
@@ -43,7 +43,7 @@ fn Loading() -> Element {
 }
 
 #[component]
-fn NoEpisode(podcast_slug: String, episode_key: u32) -> Element {
+fn NoEpisode(podcast_slug: Slug, episode_key: u32) -> Element {
     rsx! {
             Page {
                 title: "Episode not found",
@@ -96,12 +96,12 @@ fn Episode(episode: EpisodePartial) -> Element {
 
 #[get("/api/podcasts/:podcast_slug/episode/:episode_key")]
 async fn get_episode(
-    podcast_slug: String,
+    podcast_slug: Slug,
     episode_key: u32,
 ) -> Result<Option<EpisodePartial>, ServerFnError> {
     match SERVICES
         .metadata
-        .get_episode(&podcast_slug, episode_key)
+        .get_episode(podcast_slug, episode_key)
         .await
     {
         Ok(podcasts) => Ok(podcasts),

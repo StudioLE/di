@@ -20,9 +20,9 @@ pub struct Model {
     ///
     /// This is auto-incremented by the database
     #[sea_orm(primary_key)]
-    pub primary_key: u32,
+    pub primary_key: EpisodeKey,
 
-    pub podcast_key: Option<u32>,
+    pub podcast_key: Option<PodcastKey>,
 
     #[sea_orm(belongs_to, from = "podcast_key", to = "primary_key")]
     pub podcast: HasOne<podcast::Entity>,
@@ -36,9 +36,7 @@ pub struct Model {
     /// - Supported file formats include M4A, MP3, MOV, MP4, M4V, and PDF
     pub source_url: String,
     /// Size of source media file in bytes
-    ///
-    /// Note: `SQLx` does not support `u64` so `i64` is necessary even though values will never be negative.
-    pub source_file_size: i64,
+    pub source_file_size: FileSize,
     /// Mime type of source media file
     #[sea_orm(abbb)]
     pub source_content_type: String,
@@ -49,7 +47,7 @@ pub struct Model {
     /// HTML formatted description
     pub description: Option<String>,
     /// Duration in seconds
-    pub source_duration: Option<u32>,
+    pub source_duration: Option<Duration>,
     /// URL of JPEG or PNG artwork
     /// - Min: 1400 x 1400 px
     /// - Max: 3000 x 3000 px
@@ -61,9 +59,9 @@ pub struct Model {
     /// Apple Podcasts specific title
     pub itunes_title: Option<String>,
     /// Episode number
-    pub episode: Option<u32>,
+    pub episode: Option<EpisodeNumber>,
     /// Season number
-    pub season: Option<u32>,
+    pub season: Option<SeasonNumber>,
     /// Episode type
     pub kind: Option<EpisodeKind>,
 }

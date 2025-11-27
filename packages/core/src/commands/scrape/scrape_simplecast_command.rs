@@ -145,7 +145,7 @@ fn get_element_attr(html: &Html, selector: &str, attr: &str) -> Vec<String> {
 
 #[allow(dead_code)]
 fn convert(
-    podcast_slug: &str,
+    podcast_slug: &Slug,
     podcast: SimplecastPodcast,
     episodes: Vec<SimplecastEpisode>,
 ) -> PodcastFeed {

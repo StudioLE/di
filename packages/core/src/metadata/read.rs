@@ -6,7 +6,7 @@ impl MetadataRepository {
     /// Get a [`PodcastFeed`] by its slug.
     pub async fn get_feed_by_slug(
         &self,
-        slug: &str,
+        slug: Slug,
         options: Option<FilterOptions>,
     ) -> Result<Option<PodcastFeed>, DbErr> {
         let query = podcast::Entity::find_by_slug(slug);
@@ -30,7 +30,7 @@ impl MetadataRepository {
     }
 
     /// Get all [`PodcastFeed`].
-    pub async fn get_all_feeds(&self) -> Result<HashMap<String, PodcastFeed>, DbErr> {
+    pub async fn get_all_feeds(&self) -> Result<HashMap<Slug, PodcastFeed>, DbErr> {
         let feeds = podcast::Entity::find()
             .find_with_related(episode::Entity)
             .all(&self.db)
@@ -175,9 +175,13 @@ mod tests {
         let services = ServiceProvider::create()
             .await
             .expect("ServiceProvider should not fail");
+        let slug = Slug::from_str("irl").expect("should be valid slug");
 
         // Act
-        let result = services.metadata.get_feed_by_slug("irl", options).await;
+        let result = services
+            .metadata
+            .get_feed_by_slug(slug.clone(), options)
+            .await;
 
         // Assert
         let option = result.assert_ok_debug();
@@ -185,7 +189,7 @@ mod tests {
         for episode in &feed.episodes {
             println!("{episode}");
         }
-        assert_eq!(feed.podcast.slug, "irl");
+        assert_eq!(feed.podcast.slug, slug);
         feed.episodes.len()
     }
 }

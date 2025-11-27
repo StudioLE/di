@@ -8,8 +8,6 @@ mod sanitizer;
 pub use sanitizer::*;
 mod url;
 pub use url::*;
-mod validator;
-pub use validator::*;
 mod vec_helpers;
 pub use vec_helpers::*;
 #[cfg(test)]

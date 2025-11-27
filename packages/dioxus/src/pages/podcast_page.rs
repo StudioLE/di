@@ -1,16 +1,16 @@
 use crate::prelude::*;
 
 #[component]
-pub fn PodcastPage(id: String) -> Element {
-    let resource_id = id.clone();
+pub fn PodcastPage(slug: Slug) -> Element {
+    let slug_clone = slug.clone();
     let resource = use_resource(move || {
-        let resource_id = resource_id.clone();
-        async move { get_podcast(resource_id).await }
+        let slug_clone = slug_clone.clone();
+        async move { get_podcast(slug_clone).await }
     });
     match (*resource.read()).clone() {
         None => Loading(),
         Some(Err(error)) => Err(error.into()),
-        Some(Ok(None)) => NoPodcast(NoPodcastProps { id }),
+        Some(Ok(None)) => NoPodcast(NoPodcastProps { slug }),
         Some(Ok(Some((podcast, episodes)))) => Podcast(PodcastProps { podcast, episodes }),
     }
 }
@@ -39,14 +39,14 @@ fn Loading() -> Element {
 }
 
 #[component]
-fn NoPodcast(id: String) -> Element {
+fn NoPodcast(slug: Slug) -> Element {
     rsx! {
         Page {
                 title: "Podcast not found",
                 subtitle: "404",
                 MediaObject {
                     title: "Unable to find podcast",
-                    subtitle: "{id}",
+                    subtitle: "{slug}",
                     image_size: ImageSize::_128,
                     icon: "fa-triangle-exclamation",
                 }
@@ -90,11 +90,11 @@ fn Podcast(podcast: PodcastPartial, episodes: Vec<EpisodePartial>) -> Element {
     }
 }
 
-#[get("/api/podcast/:id")]
+#[get("/api/podcasts/:slug")]
 async fn get_podcast(
-    id: String,
+    slug: Slug,
 ) -> Result<Option<(PodcastPartial, Vec<EpisodePartial>)>, ServerFnError> {
-    match SERVICES.metadata.get_podcast(&id).await {
+    match SERVICES.metadata.get_podcast(slug).await {
         Ok(option) => Ok(option),
         Err(error) => {
             error!("{error:?}");

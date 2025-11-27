@@ -15,3 +15,7 @@ mod episode_partial;
 
 pub use podcast_partial::*;
 mod podcast_partial;
+pub use aliases::*;
+mod aliases;
+mod slug;
+pub use slug::*;

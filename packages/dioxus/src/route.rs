@@ -5,11 +5,11 @@ pub enum Route {
     #[layout(Layout)]
     #[route("/")]
     Index,
-    #[route("/podcasts/:id")]
-    Podcast { id: String },
+    #[route("/podcasts/:slug")]
+    Podcast { slug: Slug },
     #[route("/podcasts/:podcast_slug/:episode_key")]
     Episode {
-        podcast_slug: String,
+        podcast_slug: Slug,
         episode_key: u32,
     },
     #[route("/settings")]
@@ -31,12 +31,12 @@ impl Route {
                 breadcrumbs: vec![Route::Index],
                 path: "/".to_owned(),
             },
-            Route::Podcast { id } => RouteInfo {
+            Route::Podcast { slug } => RouteInfo {
                 title: "Podcast".to_owned(),
                 icon: "fa-user".to_owned(),
                 previous: Some(Route::Index),
-                breadcrumbs: vec![Route::Index, Route::Podcast { id: id.clone() }],
-                path: format!("/podcasts/{id}"),
+                breadcrumbs: vec![Route::Index, Route::Podcast { slug: slug.clone() }],
+                path: format!("/podcasts/{slug}"),
             },
             Route::Episode {
                 podcast_slug,
@@ -45,7 +45,7 @@ impl Route {
                 title: "Episode".to_owned(),
                 icon: "fa-user".to_owned(),
                 previous: Some(Route::Podcast {
-                    id: podcast_slug.clone(),
+                    slug: podcast_slug.clone(),
                 }),
                 breadcrumbs: vec![
                     Route::Index,
@@ -87,12 +87,12 @@ fn Index() -> Element {
 }
 
 #[component]
-fn Podcast(id: String) -> Element {
-    PodcastPage(PodcastPageProps { id })
+fn Podcast(slug: Slug) -> Element {
+    PodcastPage(PodcastPageProps { slug })
 }
 
 #[component]
-fn Episode(podcast_slug: String, episode_key: u32) -> Element {
+fn Episode(podcast_slug: Slug, episode_key: u32) -> Element {
     EpisodePage(EpisodePageProps {
         podcast_slug,
         episode_key,

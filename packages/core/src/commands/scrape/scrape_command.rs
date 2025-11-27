@@ -59,7 +59,7 @@ impl ScrapeCommand {
             .attach_path(path)?;
         let reader = BufReader::new(file);
         let channel = RssChannel::read_from(reader).change_context(ScrapeRssError::Parse)?;
-        PodcastFromRss::execute(channel, &options.podcast_slug)
+        PodcastFromRss::execute(channel, options.podcast_slug.clone())
             .change_context(ScrapeRssError::Convert)
     }
 }
@@ -78,7 +78,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let command = ScrapeCommand::new(services.http, services.metadata);
         let options = ScrapeOptions {
-            podcast_slug: "irl".to_owned(),
+            podcast_slug: Slug::from_str("irl").expect("should be valid slug"),
             url: Url::parse("https://irlpodcast.org").expect("URL should parse"),
         };
 
@@ -100,7 +100,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let command = ScrapeCommand::new(services.http, services.metadata);
         let options = ScrapeOptions {
-            podcast_slug: "irl-rss".to_owned(),
+            podcast_slug: Slug::from_str("irl-rss").expect("should be valid slug"),
             url: Url::parse("https://feeds.simplecast.com/lP7owBq8").expect("URL should parse"),
         };
 

@@ -24,7 +24,7 @@ impl From<SimplecastPodcast> for PodcastInfo {
     fn from(podcast: SimplecastPodcast) -> Self {
         PodcastInfo {
             primary_key: u32::default(),
-            slug: podcast.id,
+            slug: Slug::from_str(&podcast.id).expect("should be valid slug"),
             title: podcast.title,
             description: podcast.description,
             image: podcast.image_url.map(|url| url.to_string()),

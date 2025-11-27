@@ -6,7 +6,7 @@ impl MetadataRepository {
     /// Get a podcast with minimal info for the podcast page.
     pub async fn get_podcast(
         &self,
-        slug: &str,
+        slug: Slug,
     ) -> Result<Option<(PodcastPartial, Vec<EpisodePartial>)>, DbErr> {
         let option = get_podcast_query(slug).one(&self.db).await?;
         let Some(podcast) = option else {
@@ -19,7 +19,7 @@ impl MetadataRepository {
     }
 }
 
-fn get_podcast_query(slug: &str) -> Selector<SelectModel<PodcastPartial>> {
+fn get_podcast_query(slug: Slug) -> Selector<SelectModel<PodcastPartial>> {
     podcast::Entity::find_by_slug(slug)
         .join(JoinType::LeftJoin, podcast::Relation::Episode.def())
         .select_only()
@@ -59,8 +59,10 @@ mod tests {
     #[test]
     pub fn _get_podcast_query() {
         // Arrange
+        let slug = Slug::from_str(PODCAST_SLUG).expect("should be valid");
+
         // Act
-        let statement = get_podcast_query(PODCAST_SLUG).into_statement(DB_BACKEND);
+        let statement = get_podcast_query(slug).into_statement(DB_BACKEND);
 
         // Assert
         let sql = format_sql(&statement);
@@ -82,12 +84,13 @@ mod tests {
     #[traced_test]
     pub async fn get_podcast() {
         // Arrange
+        let slug = Slug::from_str(PODCAST_SLUG).expect("should be valid");
         let services = ServiceProvider::create()
             .await
             .expect("ServiceProvider should not fail");
 
         // Act
-        let result = services.metadata.get_podcast("irl").await;
+        let result = services.metadata.get_podcast(slug).await;
 
         // Assert
         let (podcast, episodes) = result.assert_ok_debug().expect("Podcast should exist");

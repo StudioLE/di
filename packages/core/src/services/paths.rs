@@ -97,7 +97,7 @@ impl PathProvider {
     ///
     /// Example: `$HOME/.local/share/alnwick/podcasts/irl/S00/1970/1970-01-01 001 Hello World.mp3`
     #[must_use]
-    pub fn get_audio_path(&self, podcast_slug: &str, episode: &EpisodeInfo) -> PathBuf {
+    pub fn get_audio_path(&self, podcast_slug: &Slug, episode: &EpisodeInfo) -> PathBuf {
         self.get_podcasts_dir()
             .join(get_sub_path_for_audio(podcast_slug, episode))
     }
@@ -110,7 +110,7 @@ impl PathProvider {
     /// - `https://example.com/irl/S00/1970/1970-01-01 001 Hello World.mp3`
     /// - `file://$HOME/.local/share/alnwick/podcasts/irl/S00/1970/1970-01-01 001 Hello World.mp3`
     #[must_use]
-    pub fn get_audio_url(&self, podcast_slug: &str, episode: &EpisodeInfo) -> Option<Url> {
+    pub fn get_audio_url(&self, podcast_slug: &Slug, episode: &EpisodeInfo) -> Option<Url> {
         if let Some(base) = &self.options.server_base {
             let path = get_sub_path_for_audio(podcast_slug, episode);
             base.join(path.to_string_lossy().as_ref()).ok()
@@ -129,12 +129,11 @@ impl PathProvider {
     #[must_use]
     pub fn get_rss_path(
         &self,
-        podcast_slug: &str,
+        podcast_slug: &Slug,
         season: Option<u32>,
         year: Option<i32>,
     ) -> PathBuf {
-        assert!(!podcast_slug.is_empty(), "podcast id should not be empty");
-        let path = self.get_podcasts_dir().join(podcast_slug);
+        let path = self.get_podcasts_dir().join(podcast_slug.as_str());
         if season.is_none() && year.is_none() {
             return path.join(RSS_FILE_NAME);
         }
@@ -169,9 +168,9 @@ impl PathProvider {
     ///
     /// Example: `$HOME/.local/share/alnwick/podcasts/irl/cover.jpg`
     #[must_use]
-    pub fn get_cover_path(&self, podcast_slug: &str) -> PathBuf {
+    pub fn get_cover_path(&self, podcast_slug: &Slug) -> PathBuf {
         self.get_podcasts_dir()
-            .join(podcast_slug)
+            .join(podcast_slug.as_str())
             .join(COVER_FILE_NAME)
     }
 
@@ -179,9 +178,9 @@ impl PathProvider {
     ///
     /// Example: `$HOME/.local/share/alnwick/podcasts/irl/banner.jpg`
     #[must_use]
-    pub fn get_banner_path(&self, podcast_slug: &str) -> PathBuf {
+    pub fn get_banner_path(&self, podcast_slug: &Slug) -> PathBuf {
         self.get_podcasts_dir()
-            .join(podcast_slug)
+            .join(podcast_slug.as_str())
             .join(BANNER_FILE_NAME)
     }
 
@@ -212,12 +211,12 @@ impl PathProvider {
 /// Sub path for an episodes's audio file.
 ///
 /// Example: `irl/S00/1970/1970-01-01 001 Hello World.mp3`
-fn get_sub_path_for_audio(podcast_slug: &str, episode: &EpisodeInfo) -> PathBuf {
+fn get_sub_path_for_audio(podcast_slug: &Slug, episode: &EpisodeInfo) -> PathBuf {
     let season = episode.get_formatted_season();
     let year = episode.published_at.year().to_string();
     let filename = episode.get_filename();
     PathBuf::new()
-        .join(podcast_slug)
+        .join(podcast_slug.as_str())
         .join(season)
         .join(year)
         .join(filename)
@@ -235,15 +234,16 @@ mod tests {
         let example = EpisodeInfo::example();
         let mut seasonless = EpisodeInfo::example();
         seasonless.season = None;
+        let slug = Slug::from_str("abc").expect("should be valid slug");
 
         // Act
         // Assert
         assert_eq!(
-            paths.get_audio_path("abc", &example),
+            paths.get_audio_path(&slug, &example),
             data_dir.join("podcasts/abc/S02/1970/1970-01-01 003 Lorem ipsum dolor sit amet.mp3")
         );
         assert_eq!(
-            paths.get_audio_path("abc", &seasonless),
+            paths.get_audio_path(&slug, &seasonless),
             data_dir.join("podcasts/abc/S00/1970/1970-01-01 003 Lorem ipsum dolor sit amet.mp3")
         );
     }
@@ -256,10 +256,11 @@ mod tests {
         let expected =
             data_dir.join("podcasts/abc/S02/1970/1970-01-01 003 Lorem ipsum dolor sit amet.mp3");
         let expected = Url::from_file_path(expected).expect("should be valid");
+        let slug = Slug::from_str("abc").expect("should be valid slug");
 
         // Act
         let result = paths
-            .get_audio_url("abc", &EpisodeInfo::example())
+            .get_audio_url(&slug, &EpisodeInfo::example())
             .expect("should be valid");
 
         // Assert
@@ -274,10 +275,11 @@ mod tests {
             ..AppOptions::default()
         };
         let paths = PathProvider::new(options);
+        let slug = Slug::from_str("abc").expect("should be valid slug");
 
         // Act
         let result = paths
-            .get_audio_url("abc", &EpisodeInfo::example())
+            .get_audio_url(&slug, &EpisodeInfo::example())
             .expect("should be valid");
 
         // Assert
@@ -289,23 +291,24 @@ mod tests {
         // Arrange
         let paths = PathProvider::default();
         let data_dir = paths.get_data_dir();
+        let slug = Slug::from_str("abc").expect("should be valid slug");
 
         // Act
         // Assert
         assert_eq!(
-            paths.get_rss_path("abc", None, None),
+            paths.get_rss_path(&slug, None, None),
             data_dir.join("podcasts/abc/feed.rss")
         );
         assert_eq!(
-            paths.get_rss_path("abc", Some(1), None),
+            paths.get_rss_path(&slug, Some(1), None),
             data_dir.join("podcasts/abc/S01/feed.rss")
         );
         assert_eq!(
-            paths.get_rss_path("abc", Some(1), Some(1234)),
+            paths.get_rss_path(&slug, Some(1), Some(1234)),
             data_dir.join("podcasts/abc/S01/1234/feed.rss")
         );
         assert_eq!(
-            paths.get_rss_path("abc", None, Some(1234)),
+            paths.get_rss_path(&slug, None, Some(1234)),
             data_dir.join("podcasts/abc/S00/1234/feed.rss")
         );
     }

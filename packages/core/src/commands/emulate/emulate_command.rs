@@ -17,7 +17,7 @@ impl EmulateCommand {
         // TODO: Add support for filtering episodes.
         let feed = self
             .metadata
-            .get_feed_by_slug(&options.podcast_slug, None)
+            .get_feed_by_slug(options.podcast_slug, None)
             .await
             .change_context(EmulateError::Repository)?
             .ok_or(EmulateError::NoPodcast)?;
@@ -121,7 +121,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let command = EmulateCommand::new(services.paths, services.metadata);
         let options = EmulateOptions {
-            podcast_slug: "irl".to_owned(),
+            podcast_slug: Slug::from_str("irl").expect("should be valid slug"),
         };
 
         // Act

@@ -18,7 +18,7 @@ pub struct Model {
     ///
     /// This is auto-incremented by the database
     #[sea_orm(primary_key)]
-    pub primary_key: u32,
+    pub primary_key: PodcastKey,
 
     /// Episodes related to this podcast
     #[sea_orm(has_many)]
@@ -27,7 +27,7 @@ pub struct Model {
     // User
     /// User defined slug
     #[sea_orm(unique)]
-    pub slug: String,
+    pub slug: Slug,
 
     // Required
     /// Title
@@ -77,7 +77,7 @@ impl PodcastInfo {
     #[must_use]
     pub fn example() -> Self {
         Self {
-            slug: "test".to_owned(),
+            slug: Slug::from_str("test").expect("should be able to parse slug"),
             primary_key: u32::default(),
             title: "Podcast Title".to_owned(),
             description: "Sed ac volutpat tortor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse placerat leo augue, id elementum orci venenatis eu.".to_owned(),

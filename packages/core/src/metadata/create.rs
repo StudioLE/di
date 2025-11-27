@@ -12,14 +12,14 @@ impl MetadataRepository {
         let primary_key = match get_podcast_key_by_slug(&tx, &feed.podcast.slug).await? {
             Some(key) => {
                 trace!(
-                    podcast = feed.podcast.slug,
+                    podcast = %feed.podcast.slug,
                     key, "Overwriting existing podcast"
                 );
                 remove_podcast(&tx, key).await?;
                 Set(key)
             }
             None => {
-                trace!(podcast = feed.podcast.slug, "Inserting new podcast");
+                trace!(podcast = %feed.podcast.slug, "Inserting new podcast");
                 NotSet
             }
         };
@@ -58,12 +58,12 @@ async fn remove_podcast(
 /// Check if a podcast with the given slug already exists
 async fn get_podcast_key_by_slug(
     tx: &DatabaseTransaction,
-    slug: &str,
+    slug: &Slug,
 ) -> Result<Option<u32>, Report<SaveError>> {
     let key = podcast::Entity::find()
         .select_only()
         .column(podcast::Column::PrimaryKey)
-        .filter(podcast::Column::Slug.eq(slug))
+        .filter(podcast::Column::Slug.eq(slug.as_str()))
         .into_tuple::<u32>()
         .one(tx)
         .await

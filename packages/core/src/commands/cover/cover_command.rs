@@ -23,7 +23,7 @@ impl CoverCommand {
     pub async fn execute(&self, options: CoverOptions) -> Result<(), Report<CoverError>> {
         let feed = self
             .metadata
-            .get_feed_by_slug(&options.podcast_slug, None)
+            .get_feed_by_slug(options.podcast_slug.clone(), None)
             .await
             .change_context(CoverError::Repository)?
             .ok_or(CoverError::NoPodcast)?;
@@ -67,7 +67,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let command = CoverCommand::new(services.paths, services.http, services.metadata);
         let options = CoverOptions {
-            podcast_slug: "irl".to_owned(),
+            podcast_slug: Slug::from_str("irl").expect("should be valid slug"),
         };
 
         // Act

@@ -6,10 +6,10 @@ pub struct PodcastFromRss;
 impl PodcastFromRss {
     pub fn execute(
         mut channel: RssChannel,
-        id: &str,
+        slug: Slug,
     ) -> Result<PodcastFeed, Report<PodcastFromRssError>> {
         let items = take(&mut channel.items);
-        let podcast = podcast_from_rss(channel, id)?;
+        let podcast = podcast_from_rss(channel, slug)?;
         let mut episodes = Vec::new();
         let mut report: Option<Report<[EpisodeFromRssError]>> = None;
         for item in items {
@@ -39,7 +39,7 @@ impl PodcastFromRss {
 
 fn podcast_from_rss(
     channel: RssChannel,
-    id: &str,
+    slug: Slug,
 ) -> Result<PodcastInfo, Report<PodcastFromRssError>> {
     let itunes = channel.itunes_ext.ok_or(PodcastFromRssError::NoItunes)?;
     let categories = itunes
@@ -53,7 +53,7 @@ fn podcast_from_rss(
     let categories = PodcastCategories(categories);
     let podcast = PodcastInfo {
         primary_key: u32::default(),
-        slug: id.to_owned(),
+        slug,
         title: channel.title,
         description: channel.description,
         image: if let Some(url) = itunes.image {
@@ -127,19 +127,19 @@ fn episode_from_rss(item: RssItem) -> Result<EpisodeInfo, Report<EpisodeFromRssE
 }
 
 #[allow(clippy::indexing_slicing)]
-fn try_parse_duration(duration: &str) -> Result<u32, Report<EpisodeFromRssError>> {
+fn try_parse_duration(duration: &str) -> Result<Duration, Report<EpisodeFromRssError>> {
     let parts: Vec<&str> = duration.split(':').collect();
     match parts.len() {
         1 => try_parse(parts[0], EpisodeFromRssError::ParseDuration),
         2 => {
-            let minutes: u32 = try_parse(parts[0], EpisodeFromRssError::ParseDuration)?;
-            let seconds: u32 = try_parse(parts[1], EpisodeFromRssError::ParseDuration)?;
+            let minutes: Duration = try_parse(parts[0], EpisodeFromRssError::ParseDuration)?;
+            let seconds: Duration = try_parse(parts[1], EpisodeFromRssError::ParseDuration)?;
             Ok(minutes * 60 + seconds)
         }
         3 => {
-            let hours: u32 = try_parse(parts[0], EpisodeFromRssError::ParseDuration)?;
-            let minutes: u32 = try_parse(parts[1], EpisodeFromRssError::ParseDuration)?;
-            let seconds: u32 = try_parse(parts[2], EpisodeFromRssError::ParseDuration)?;
+            let hours: Duration = try_parse(parts[0], EpisodeFromRssError::ParseDuration)?;
+            let minutes: Duration = try_parse(parts[1], EpisodeFromRssError::ParseDuration)?;
+            let seconds: Duration = try_parse(parts[2], EpisodeFromRssError::ParseDuration)?;
             Ok(hours * 60 * 60 + minutes * 60 + seconds)
         }
         count => {
@@ -230,6 +230,7 @@ mod tests {
     fn round_trip_conversion() {
         // Arrange
         let source = PodcastFeed::example();
+        let slug = Slug::from_str("test").expect("should be valid slug");
 
         // Act
         let rss = PodcastToRss::execute(source.clone());
@@ -239,7 +240,7 @@ mod tests {
         assert_snapshot!(xml);
 
         // Act
-        let result = PodcastFromRss::execute(rss, "test");
+        let result = PodcastFromRss::execute(rss, slug);
 
         // Assert
         let feed = result.assert_ok();

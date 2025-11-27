@@ -5,6 +5,5 @@ pub struct CoverOptions {
     /// ID of the downloaded podcast
     ///
     /// Must be alphanumeric and hyphenated
-    #[arg(value_parser = Validator::validate_id)]
-    pub podcast_slug: String,
+    pub podcast_slug: Slug,
 }
