@@ -207,10 +207,10 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let command = DownloadCommand::new(services.paths, services.http, services.metadata);
         let options = DownloadOptions {
-            podcast_slug: Slug::from_str("irl").expect("should be valid slug"),
+            podcast_slug: example_slug(),
             filter: FilterOptions {
-                from_year: Some(2019),
-                to_year: Some(2019),
+                year: Some(EPISODE_YEAR),
+                season: Some(EPISODE_SEASON),
                 ..FilterOptions::default()
             },
         };
@@ -231,7 +231,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let feed = services
             .metadata
-            .get_feed_by_slug(Slug::from_str("irl").expect("should be valid slug"), None)
+            .get_feed_by_slug(example_slug(), None)
             .await
             .expect("repository query should not fail")
             .expect("podcast should exist");

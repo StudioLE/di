@@ -230,7 +230,7 @@ mod tests {
     pub async fn head_xml() {
         // Arrange
         let http = HttpClient::default();
-        let url = Url::parse("https://feeds.simplecast.com/lP7owBq8").expect("url should be valid");
+        let url = example_rss_url();
         http.remove(&url, Some(HEAD_EXTENSION)).await;
 
         // Act

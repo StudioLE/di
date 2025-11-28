@@ -121,7 +121,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let command = EmulateCommand::new(services.paths, services.metadata);
         let options = EmulateOptions {
-            podcast_slug: Slug::from_str("irl").expect("should be valid slug"),
+            podcast_slug: example_slug(),
         };
 
         // Act

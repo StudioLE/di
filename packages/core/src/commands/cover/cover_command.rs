@@ -72,7 +72,7 @@ mod tests {
             .expect("ServiceProvider should not fail");
         let command = CoverCommand::new(services.paths, services.http, services.metadata);
         let options = CoverOptions {
-            podcast_slug: Slug::from_str("irl").expect("should be valid slug"),
+            podcast_slug: example_slug(),
         };
 
         // Act

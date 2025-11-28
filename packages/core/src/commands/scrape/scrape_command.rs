@@ -76,10 +76,11 @@ mod tests {
         let services = ServiceProvider::create()
             .await
             .expect("ServiceProvider should not fail");
-        let command = ScrapeCommand::new(services.http, services.metadata);
+        let metadata = MetadataRepositoryExample::create().await;
+        let command = ScrapeCommand::new(services.http, metadata);
         let options = ScrapeOptions {
-            podcast_slug: Slug::from_str("irl").expect("should be valid slug"),
-            url: Url::parse("https://irlpodcast.org").expect("URL should parse"),
+            podcast_slug: example_slug(),
+            url: example_simplecast_url(),
         };
 
         // Act
@@ -98,10 +99,11 @@ mod tests {
         let services = ServiceProvider::create()
             .await
             .expect("ServiceProvider should not fail");
-        let command = ScrapeCommand::new(services.http, services.metadata);
+        let metadata = MetadataRepositoryExample::create().await;
+        let command = ScrapeCommand::new(services.http, metadata);
         let options = ScrapeOptions {
-            podcast_slug: Slug::from_str("irl-rss").expect("should be valid slug"),
-            url: Url::parse("https://feeds.simplecast.com/lP7owBq8").expect("URL should parse"),
+            podcast_slug: example_slug(),
+            url: example_rss_url(),
         };
 
         // Act
