@@ -72,7 +72,11 @@ fn podcast_from_rss(
             None
         },
         copyright: channel.copyright,
-        new_feed_url: itunes.new_feed_url,
+        new_feed_url: if let Some(url) = itunes.new_feed_url {
+            Some(try_parse_url(url, PodcastFromRssError::ParseNewFeedUrl)?)
+        } else {
+            None
+        },
         generator: channel.generator,
     };
     Ok(podcast)
@@ -160,11 +164,8 @@ fn parse_explicit(option: Option<String>) -> Option<bool> {
 fn try_parse_url<E: Error + Send + Sync + 'static>(
     url: String,
     error: E,
-) -> Result<String, Report<E>> {
-    Url::parse(&url)
-        .change_context(error)
-        .attach_with(|| format!("URL: {url}"))?;
-    Ok(url)
+) -> Result<UrlWrapper, Report<E>> {
+    UrlWrapper::from_str(&url).change_context(error)
 }
 
 fn try_parse<T: FromStr, E: Error + Send + Sync + 'static>(
@@ -189,6 +190,8 @@ pub enum PodcastFromRssError {
     ParseKind,
     #[error("Unable to parse all episodes")]
     ParseEpisodes,
+    #[error("Unable to parse podcast new feed URL")]
+    ParseNewFeedUrl,
 }
 
 #[derive(Debug, Error)]

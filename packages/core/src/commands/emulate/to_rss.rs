@@ -16,7 +16,7 @@ impl PodcastToRss {
 fn podcast_to_rss(podcast: PodcastInfo) -> RssChannel {
     RssChannel {
         title: podcast.title,
-        link: podcast.link.unwrap_or_default(),
+        link: podcast.link.map(|url| url.to_string()).unwrap_or_default(),
         description: podcast.description.clone(),
         language: podcast.language.clone(),
         copyright: podcast.copyright.clone(),
@@ -36,9 +36,9 @@ fn podcast_to_rss(podcast: PodcastInfo) -> RssChannel {
                     }),
                 })
                 .collect(),
-            image: podcast.image,
+            image: podcast.image.map(|url| url.to_string()),
             explicit: Some(podcast.explicit.to_string()),
-            new_feed_url: podcast.new_feed_url,
+            new_feed_url: podcast.new_feed_url.map(|url| url.to_string()),
             r#type: podcast.kind.map(|kind| kind.to_string()),
             ..ITunesChannelExtension::default()
         }),
@@ -55,7 +55,7 @@ fn episode_to_rss(episode: EpisodeInfo) -> RssItem {
         categories: Vec::new(),
         comments: None,
         enclosure: Some(RssEnclosure {
-            url: episode.source_url.clone(),
+            url: episode.source_url.to_string(),
             length: episode.source_file_size.to_string(),
             mime_type: episode.source_content_type.clone(),
         }),

@@ -27,7 +27,12 @@ impl CoverCommand {
             .await
             .change_context(CoverError::Repository)?
             .ok_or(CoverError::NoPodcast)?;
-        let url = feed.podcast.get_image_url().ok_or(CoverError::NoImage)?;
+        let url = feed
+            .podcast
+            .image
+            .clone()
+            .map(Url::from)
+            .ok_or(CoverError::NoImage)?;
         let src = self
             .http
             .get(&url, None)

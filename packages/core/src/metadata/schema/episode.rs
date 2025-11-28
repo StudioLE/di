@@ -1,3 +1,4 @@
+use crate::metadata::schema::url_wrapper::UrlWrapper;
 use crate::prelude::*;
 use chrono::DateTime;
 use sea_orm::entity::prelude::*;
@@ -34,7 +35,7 @@ pub struct Model {
     pub title: String,
     /// URL of source media file including a file extension
     /// - Supported file formats include M4A, MP3, MOV, MP4, M4V, and PDF
-    pub source_url: String,
+    pub source_url: UrlWrapper,
     /// Size of source media file in bytes
     pub source_file_size: FileSize,
     /// Mime type of source media file
@@ -51,7 +52,7 @@ pub struct Model {
     /// URL of JPEG or PNG artwork
     /// - Min: 1400 x 1400 px
     /// - Max: 3000 x 3000 px
-    pub image: Option<String>,
+    pub image: Option<UrlWrapper>,
     /// Parental advisory information
     pub explicit: Option<bool>,
 
@@ -67,19 +68,6 @@ pub struct Model {
 }
 
 impl EpisodeInfo {
-    #[must_use]
-    pub fn get_source_url(&self) -> Url {
-        Url::parse(&self.source_url)
-            .map_err(|error| {
-                warn!(episode = %self, url = %self.source_url, %error, "Failed to parse episode source URL");
-            })
-            .expect("Should be able to parse episode source URL")
-    }
-
-    #[must_use]
-    pub fn get_image_url(&self) -> Option<Url> {
-        get_image_url(self.image.clone())
-    }
     #[must_use]
     pub fn get_filename(&self) -> String {
         let file_stem = self.get_file_stem();
@@ -112,7 +100,16 @@ impl EpisodeInfo {
 
     #[must_use]
     pub fn get_extension(&self) -> Option<String> {
-        self.get_source_url().get_extension()
+        let extension = match self.source_content_type.as_ref() {
+            "audio/mpeg" => MP3_EXTENSION,
+            "audio/x-m4a" => "m4a",
+            "video/quicktime" => "mov",
+            "video/mp4" => "mp4",
+            "video/x-m4v" => "m4v",
+            "application/pdf" => "pdf",
+            _ => return None,
+        };
+        Some(extension.to_owned())
     }
 
     #[must_use]
@@ -139,14 +136,14 @@ impl EpisodeInfo {
             primary_key: u32::default(),
             podcast_key: None,
             title: "Lorem ipsum dolor sit amet".to_owned(),
-            source_url: "https://example.com/season-1/episode-1.mp3".to_owned(),
+            source_url: UrlWrapper::from_str("https://example.com/season-1/episode-1.mp3").expect("URL should be valid"),
             source_file_size: 1024,
             source_content_type: "audio/mpeg".to_owned(),
             source_id: "550e8400-e29b-41d4-a716-446655440000".to_owned(),
             published_at: DateTime::default(),
             description: Some("Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna.".to_owned()),
             source_duration: None,
-            image: Some("https://example.com/image.jpg".to_owned()),
+            image: Some(UrlWrapper::from_str("https://example.com/image.jpg").expect("URL should be valid")),
             explicit: None,
             itunes_title: None,
             episode: Some(3),

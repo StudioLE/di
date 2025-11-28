@@ -37,7 +37,7 @@ pub struct Model {
     /// URL of JPEG or PNG artwork
     /// - Min: 1400 x 1400 px
     /// - Max: 3000 x 3000 px
-    pub image: Option<String>,
+    pub image: Option<UrlWrapper>,
     /// ISO 639-2 code for language
     ///
     /// <https://www.loc.gov/standards/iso639-2/php/code_list.php>
@@ -53,7 +53,7 @@ pub struct Model {
     /// Group responsible for creating the show
     pub author: Option<String>,
     /// Website associated with the podcast
-    pub link: Option<String>,
+    pub link: Option<UrlWrapper>,
 
     // Situational
     /// Episodic or Serial
@@ -63,17 +63,12 @@ pub struct Model {
     /// New podcast RSS Feed URL
     ///
     /// If you change the URL of your podcast feed, you should use this tag in your new feed
-    pub new_feed_url: Option<String>,
+    pub new_feed_url: Option<UrlWrapper>,
     /// Program or hosting provider used to create the RSS feed
     pub generator: Option<String>,
 }
 
 impl PodcastInfo {
-    #[must_use]
-    pub fn get_image_url(&self) -> Option<Url> {
-        get_image_url(self.image.clone())
-    }
-
     #[must_use]
     pub fn example() -> Self {
         Self {
@@ -86,7 +81,7 @@ impl PodcastInfo {
             categories: PodcastCategories::default(),
             explicit: false,
             author: None,
-            link: Some("https://example.com/".to_owned()),
+            link: Some(UrlWrapper::from_str("https://example.com/").expect("should be able to parse URL")),
             kind: Some(PodcastKind::default()),
             copyright: None,
             new_feed_url: None,

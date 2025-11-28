@@ -64,7 +64,7 @@ fn Podcasts(podcasts: Vec<PodcastPartial>) -> Element {
                         MediaObject {
                             title: podcast.title.clone(),
                             subtitle: "{podcast.episodes_count} episodes · {podcast.slug}",
-                            image_src: get_image_url(podcast.image.clone()),
+                            image_src: podcast.image.clone().map(Url::from),
                             image_size: ImageSize::_64,
                             icon: "fa-image",
                         }

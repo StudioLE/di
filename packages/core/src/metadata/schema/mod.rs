@@ -18,4 +18,7 @@ mod podcast_partial;
 pub use aliases::*;
 mod aliases;
 mod slug;
+pub use url_wrapper::*;
+mod url_wrapper;
+
 pub use slug::*;

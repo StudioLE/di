@@ -13,6 +13,7 @@ pub use std::collections::HashMap;
 pub use std::error::Error;
 pub use std::fmt::{Display, Formatter, Result as FmtResult};
 pub use std::mem::take;
+pub use std::ops::Deref;
 pub use std::path::{Path, PathBuf};
 pub use std::str::FromStr;
 pub use strum_macros::{AsRefStr, Display};

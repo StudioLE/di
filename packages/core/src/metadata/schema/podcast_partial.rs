@@ -19,7 +19,7 @@ pub struct PodcastPartial {
     /// URL of JPEG or PNG artwork
     /// - Min: 1400 x 1400 px
     /// - Max: 3000 x 3000 px
-    pub image: Option<String>,
+    pub image: Option<UrlWrapper>,
     /// Episode count
     pub episodes_count: u32,
 }

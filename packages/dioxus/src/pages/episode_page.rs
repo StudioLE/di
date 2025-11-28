@@ -69,7 +69,7 @@ fn Episode(episode: EpisodePartial) -> Element {
         episode.kind,
     );
     // TODO: Fallback to podcast image?
-    let image = get_image_url(episode.image.clone());
+    let image = episode.image.clone().map(Url::from);
     rsx! {
         Page {
             title: episode.title.clone(),
