@@ -17,4 +17,4 @@ FROM
   INNER JOIN "podcasts" ON "episodes"."podcast_key" = "podcasts"."primary_key"
 WHERE
   "episodes"."primary_key" = 1
-  AND "podcasts"."slug" = 'irl'
+  AND "podcasts"."slug" = 'test-0'

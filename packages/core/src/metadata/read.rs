@@ -68,7 +68,7 @@ fn get_filter_condition(iden: DynIden, options: FilterOptions) -> Condition {
         expressions.push(Expr::col((iden.clone(), episode::Column::PublishedAt)).gte(season));
     }
     if let Some(season) = options.to_season {
-        expressions.push(Expr::col((iden.clone(), episode::Column::Season)).lt(season));
+        expressions.push(Expr::col((iden.clone(), episode::Column::Season)).lte(season));
     }
     expressions
         .into_iter()
@@ -77,22 +77,25 @@ fn get_filter_condition(iden: DynIden, options: FilterOptions) -> Condition {
 
 #[cfg(test)]
 mod tests {
-    #![allow(non_snake_case)]
+    #![allow(non_snake_case, clippy::as_conversions, clippy::cast_possible_wrap)]
     use super::*;
 
     #[tokio::test]
     #[traced_test]
     pub async fn get_all_feeds() {
         // Arrange
-        let services = ServiceProvider::create()
-            .await
-            .expect("ServiceProvider should not fail");
+        let metadata = MetadataRepositoryExample::create().await;
 
         // Act
-        let result = services.metadata.get_all_feeds().await;
+        let result = metadata.get_all_feeds().await;
 
         // Assert
-        result.assert_ok_debug();
+        let hash_map = result.assert_ok_debug();
+        assert_eq!(
+            hash_map.keys().len(),
+            MetadataRepositoryExample::PODCAST_COUNT,
+            "podcast count"
+        );
     }
 
     #[tokio::test]
@@ -103,7 +106,10 @@ mod tests {
 
         // Act
         let count = _get_feed_by_slug(options).await;
-        assert!(count >= 60);
+        let expected = MetadataRepositoryExample::SEASONS_PER_YEAR
+            * MetadataRepositoryExample::EPISODES_PER_SEASON
+            * MetadataRepositoryExample::YEAR_COUNT;
+        assert_eq!(count, expected as usize);
     }
 
     #[tokio::test]
@@ -111,13 +117,15 @@ mod tests {
     pub async fn get_feed_by_slug__filter_year() {
         // Arrange
         let options = FilterOptions {
-            year: Some(2019),
+            year: Some(MetadataRepositoryExample::START_YEAR as i32),
             ..FilterOptions::default()
         };
 
         // Act
         let count = _get_feed_by_slug(Some(options)).await;
-        assert_eq!(count, 13);
+        let expected = MetadataRepositoryExample::SEASONS_PER_YEAR
+            * MetadataRepositoryExample::EPISODES_PER_SEASON;
+        assert_eq!(count, expected as usize);
     }
 
     #[tokio::test]
@@ -125,8 +133,8 @@ mod tests {
     pub async fn get_feed_by_slug__filter_year_range() {
         // Arrange
         let options = FilterOptions {
-            from_year: Some(2019),
-            to_year: Some(2022),
+            from_year: Some(MetadataRepositoryExample::START_YEAR as i32),
+            to_year: Some(MetadataRepositoryExample::START_YEAR as i32 + 2),
             ..FilterOptions::default()
         };
 
@@ -134,7 +142,10 @@ mod tests {
         let count = _get_feed_by_slug(Some(options)).await;
 
         // Assert
-        assert_eq!(count, 19);
+        let expected = 3
+            * MetadataRepositoryExample::SEASONS_PER_YEAR
+            * MetadataRepositoryExample::EPISODES_PER_SEASON;
+        assert_eq!(count, expected as usize);
     }
 
     #[tokio::test]
@@ -150,7 +161,10 @@ mod tests {
         let count = _get_feed_by_slug(Some(options)).await;
 
         // Assert
-        assert_eq!(count, 10);
+        assert_eq!(
+            count,
+            MetadataRepositoryExample::EPISODES_PER_SEASON as usize
+        );
     }
 
     #[tokio::test]
@@ -167,21 +181,17 @@ mod tests {
         let count = _get_feed_by_slug(Some(options)).await;
 
         // Assert
-        assert_eq!(count, 17);
+        let expected = 3 * MetadataRepositoryExample::EPISODES_PER_SEASON;
+        assert_eq!(count, expected as usize);
     }
 
     async fn _get_feed_by_slug(options: Option<FilterOptions>) -> usize {
         // Arrange
-        let services = ServiceProvider::create()
-            .await
-            .expect("ServiceProvider should not fail");
-        let slug = Slug::from_str("irl").expect("should be valid slug");
+        let metadata = MetadataRepositoryExample::create().await;
+        let slug = MetadataRepositoryExample::podcast_slug();
 
         // Act
-        let result = services
-            .metadata
-            .get_feed_by_slug(slug.clone(), options)
-            .await;
+        let result = metadata.get_feed_by_slug(slug.clone(), options).await;
 
         // Assert
         let option = result.assert_ok_debug();

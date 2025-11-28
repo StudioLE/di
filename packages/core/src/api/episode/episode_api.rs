@@ -44,7 +44,7 @@ mod tests {
     #[test]
     pub fn _get_episode_query() {
         // Arrange
-        let slug = Slug::from_str(PODCAST_SLUG).expect("should be valid slug");
+        let slug = MetadataRepositoryExample::podcast_slug();
 
         // Act
         let statement = get_episode_query(slug, EPISODE_KEY).into_statement(DB_BACKEND);
@@ -56,16 +56,13 @@ mod tests {
 
     #[tokio::test]
     #[traced_test]
-    #[ignore = "Requires an unmodified db"]
     pub async fn get_episode() {
         // Arrange
-        let slug = Slug::from_str(PODCAST_SLUG).expect("should be valid slug");
-        let services = ServiceProvider::create()
-            .await
-            .expect("ServiceProvider should not fail");
+        let metadata = MetadataRepositoryExample::create().await;
+        let slug = MetadataRepositoryExample::podcast_slug();
 
         // Act
-        let result = services.metadata.get_episode(slug, EPISODE_KEY).await;
+        let result = metadata.get_episode(slug, EPISODE_KEY).await;
 
         // Assert
         let episode = result.assert_ok_debug().expect("Episode should exist");

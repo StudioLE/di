@@ -30,7 +30,10 @@ impl FromStr for Slug {
         if value.ends_with('-') {
             return Err(SlugError::EndsWithDash);
         }
-        if !value.chars().all(|c| c.is_ascii_lowercase() || c == '-') {
+        if !value
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+        {
             return Err(SlugError::AllowedCharacters);
         }
         Ok(Self(value.to_owned()))

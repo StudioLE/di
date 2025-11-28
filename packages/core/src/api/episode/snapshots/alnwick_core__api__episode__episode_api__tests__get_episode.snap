@@ -3,11 +3,11 @@ source: packages/core/src/api/episode/episode_api.rs
 expression: episode
 ---
 primary_key: 1
-title: "Techish: The Tech Swindler"
-published_at: "2025-08-19T07:00:00Z"
-description: "<p>Today, we’re bringing you an episode from our friends at Techish, a podcast by two tech founders and investors talking about all things tech, pop culture, and life. It's equal parts ChatGPT, equal parts Cardi B. Starring Michael Berhane and Abadesi Osunsade.</p><p>In this episode of <i>Techish</i>, hosts Michael Berhane and Abadesi Osunsade dive into the wild story of the tech con artist who is fooling Silicon Valley startups, exposing some big cracks in how the industry hires. They also break down the rise of AI addictions, the emotional pull of chatbots, and round off with Grammarly's acquisition of Superhuman.</p><p>Stay in touch with the hashtag #Techish</p><p><a href=\"https://www.instagram.com/techishpod/\">https://www.instagram.com/techishpod/</a></p><p><a href=\"https://www.instagram.com/abadesi/\">https://www.instagram.com/abadesi/</a></p><p><a href=\"https://www.instagram.com/michaelberhane_/\">https://www.instagram.com/michaelberhane_/</a></p><p><a href=\"https://www.instagram.com/hustlecrewlive/\">https://www.instagram.com/hustlecrewlive/</a></p><p><a href=\"https://www.instagram.com/pocintech/\">https://www.instagram.com/pocintech/</a></p>"
-source_duration: 1920
-image: "https://image.simplecastcdn.com/images/e54c9a6c-6b5b-4e70-a5b6-fb44ddc05621/a59cae8e-10d3-4ed8-8337-1d09875c3d57/3000x3000/techish-20cover-20art.jpg?aid=rss_feed"
-episode: 5
-season: 8
+title: S01E01 of test-0
+published_at: "2000-04-16T00:00:00Z"
+description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+source_duration: ~
+image: "https://example.com/image.jpg"
+episode: 1
+season: 1
 kind: Full

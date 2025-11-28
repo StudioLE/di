@@ -86,3 +86,35 @@ pub enum SaveError {
     #[error("Unable to commit database transaction")]
     Commit,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[tokio::test]
+    #[traced_test]
+    pub async fn save_feed() {
+        // Arrange
+        let metadata = MetadataRepositoryExample::create().await;
+        let feeds = MetadataRepositoryExample::example_feeds();
+        let feed = feeds.first().expect("should be at least one feed").clone();
+        let slug = feed.podcast.slug.clone();
+
+        // Act
+        let result = metadata.save_feed(feed).await;
+
+        // Assert
+        let saved_feed = result.assert_ok_debug();
+        assert_eq!(saved_feed.podcast.slug, slug);
+        assert_eq!(saved_feed.podcast.primary_key, 1, "podcast primary key");
+        let episode = saved_feed
+            .episodes
+            .iter()
+            .find(|episode| episode.episode == Some(1) && episode.season == Some(1))
+            .expect("episode should exist");
+        assert_eq!(
+            episode.primary_key, 55,
+            "episode primary key should have changed"
+        );
+    }
+}

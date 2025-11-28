@@ -8,7 +8,7 @@ const TORRENT_DIR: &str = "torrent";
 const TORRENT_CONTENT_DIR: &str = "content";
 const TORRENT_FILES_DIR: &str = "files";
 const RSS_FILE_NAME: &str = "feed.rss";
-const METADATA_DB: &str = "metadata.db";
+pub const METADATA_DB: &str = "metadata.db";
 const BANNER_FILE_NAME: &str = "banner.jpg";
 const COVER_FILE_NAME: &str = "cover.jpg";
 

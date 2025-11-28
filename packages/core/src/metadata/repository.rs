@@ -34,7 +34,7 @@ mod tests {
         let path = TempDirectory::default()
             .create()
             .expect("Should be able to create a temp dir")
-            .join("metadata.db");
+            .join(METADATA_DB);
         let metadata = MetadataRepository::new(path)
             .await
             .expect("Should be able to create a repository");

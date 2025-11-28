@@ -46,12 +46,10 @@ mod tests {
     #[traced_test]
     pub async fn get_podcasts() {
         // Arrange
-        let services = ServiceProvider::create()
-            .await
-            .expect("ServiceProvider should not fail");
+        let metadata = MetadataRepositoryExample::create().await;
 
         // Act
-        let result = services.metadata.get_podcasts().await;
+        let result = metadata.get_podcasts().await;
 
         // Assert
         let podcasts = result.assert_ok_debug();

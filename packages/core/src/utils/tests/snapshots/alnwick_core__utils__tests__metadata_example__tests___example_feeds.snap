@@ -1,0 +1,916 @@
+---
+source: packages/core/src/utils/tests/mock_metadata.rs
+expression: feeds
+---
+- podcast:
+    primary_key: 0
+    slug: test-0
+    title: Podcast 0
+    description: "Sed ac volutpat tortor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse placerat leo augue, id elementum orci venenatis eu."
+    image: ~
+    language: en-us
+    categories: []
+    explicit: false
+    author: ~
+    link: "https://example.com/"
+    kind: Episodic
+    copyright: ~
+    new_feed_url: ~
+    generator: ~
+  episodes:
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S01E01 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-04-16T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 1
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S01E02 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-04-23T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 1
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S01E03 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-04-30T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 1
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S02E01 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-07-25T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 2
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S02E02 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-08-01T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 2
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S02E03 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-08-08T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 2
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S03E01 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-04-17T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 3
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S03E02 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-04-24T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 3
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S03E03 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-05-01T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 3
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S04E01 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-07-26T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 4
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S04E02 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-08-02T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 4
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S04E03 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-08-09T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 4
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S05E01 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-04-17T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 5
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S05E02 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-04-24T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 5
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S05E03 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-05-01T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 5
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S06E01 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-07-26T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 6
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S06E02 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-08-02T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 6
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S06E03 of test-0
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-08-09T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 6
+      kind: Full
+- podcast:
+    primary_key: 0
+    slug: test-1
+    title: Podcast 1
+    description: "Sed ac volutpat tortor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse placerat leo augue, id elementum orci venenatis eu."
+    image: ~
+    language: en-us
+    categories: []
+    explicit: false
+    author: ~
+    link: "https://example.com/"
+    kind: Episodic
+    copyright: ~
+    new_feed_url: ~
+    generator: ~
+  episodes:
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S01E01 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-04-16T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 1
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S01E02 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-04-23T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 1
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S01E03 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-04-30T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 1
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S02E01 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-07-25T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 2
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S02E02 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-08-01T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 2
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S02E03 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-08-08T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 2
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S03E01 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-04-17T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 3
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S03E02 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-04-24T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 3
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S03E03 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-05-01T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 3
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S04E01 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-07-26T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 4
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S04E02 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-08-02T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 4
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S04E03 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-08-09T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 4
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S05E01 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-04-17T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 5
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S05E02 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-04-24T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 5
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S05E03 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-05-01T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 5
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S06E01 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-07-26T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 6
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S06E02 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-08-02T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 6
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S06E03 of test-1
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-08-09T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 6
+      kind: Full
+- podcast:
+    primary_key: 0
+    slug: test-2
+    title: Podcast 2
+    description: "Sed ac volutpat tortor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Suspendisse placerat leo augue, id elementum orci venenatis eu."
+    image: ~
+    language: en-us
+    categories: []
+    explicit: false
+    author: ~
+    link: "https://example.com/"
+    kind: Episodic
+    copyright: ~
+    new_feed_url: ~
+    generator: ~
+  episodes:
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S01E01 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-04-16T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 1
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S01E02 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-04-23T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 1
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S01E03 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-04-30T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 1
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S02E01 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-07-25T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 2
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S02E02 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-08-01T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 2
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S02E03 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2000-08-08T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 2
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S03E01 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-04-17T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 3
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S03E02 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-04-24T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 3
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S03E03 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-05-01T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 3
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S04E01 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-07-26T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 4
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S04E02 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-08-02T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 4
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S04E03 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2001-08-09T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 4
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S05E01 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-04-17T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 5
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S05E02 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-04-24T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 5
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S05E03 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-05-01T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 5
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S06E01 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-07-26T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 1
+      season: 6
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S06E02 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-08-02T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 2
+      season: 6
+      kind: Full
+    - primary_key: 0
+      podcast_key: ~
+      source_id: 550e8400-e29b-41d4-a716-446655440000
+      title: S06E03 of test-2
+      source_url: "https://example.com/season-1/episode-1.mp3"
+      source_file_size: 1024
+      source_content_type: audio/mpeg
+      published_at: "2002-08-09T00:00:00Z"
+      description: "Aenean sit amet sem quis velit viverra vestibulum. Vivamus aliquam mattis ipsum, a dignissim elit pulvinar vitae. Aliquam neque risus, tincidunt sit amet elit quis, malesuada ultrices urna."
+      source_duration: ~
+      image: "https://example.com/image.jpg"
+      explicit: ~
+      itunes_title: ~
+      episode: 3
+      season: 6
+      kind: Full

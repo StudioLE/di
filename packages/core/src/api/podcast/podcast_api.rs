@@ -84,17 +84,14 @@ mod tests {
     #[traced_test]
     pub async fn get_podcast() {
         // Arrange
-        let slug = Slug::from_str(PODCAST_SLUG).expect("should be valid");
-        let services = ServiceProvider::create()
-            .await
-            .expect("ServiceProvider should not fail");
+        let metadata = MetadataRepositoryExample::create().await;
+        let slug = MetadataRepositoryExample::podcast_slug();
 
         // Act
-        let result = services.metadata.get_podcast(slug).await;
+        let result = metadata.get_podcast(slug).await;
 
         // Assert
         let (podcast, episodes) = result.assert_ok_debug().expect("Podcast should exist");
-        assert_yaml_snapshot!(podcast);
-        assert_yaml_snapshot!(episodes);
+        assert_yaml_snapshot!((podcast, episodes));
     }
 }
