@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use crate::services::ipinfo::IpInfoProvider;
 use reqwest::Client as ReqwestClient;
 use reqwest::Response;
 use reqwest::header::CONTENT_TYPE;
@@ -9,6 +10,20 @@ const HEAD_EXTENSION: &str = "head";
 #[derive(Clone, Debug)]
 pub struct HttpClient {
     dir: PathBuf,
+}
+
+impl Service for HttpClient {
+    type Error = ServiceError;
+
+    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<ServiceError>> {
+        let ipinfo = services.get_service::<IpInfoProvider>().await?;
+        ipinfo
+            .validate()
+            .await
+            .change_context(ServiceError::Create)?;
+        let paths: Arc<PathProvider> = services.get_service().await?;
+        Ok(Self::new(paths.get_http_dir()))
+    }
 }
 
 impl HttpClient {
@@ -204,7 +219,6 @@ impl Default for HttpClient {
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use serde_json::Value;
 

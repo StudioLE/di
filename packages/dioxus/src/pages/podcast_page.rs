@@ -94,7 +94,7 @@ fn Podcast(podcast: PodcastPartial, episodes: Vec<EpisodePartial>) -> Element {
 async fn get_podcast(
     slug: Slug,
 ) -> Result<Option<(PodcastPartial, Vec<EpisodePartial>)>, ServerFnError> {
-    match SERVICES.metadata.get_podcast(slug).await {
+    match METADATA.get_podcast(slug).await {
         Ok(option) => Ok(option),
         Err(error) => {
             error!("{error:?}");

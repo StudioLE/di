@@ -7,14 +7,30 @@ const CONCURRENCY: usize = 8;
 const IMAGE_SIZE: u32 = 720;
 
 pub struct DownloadCommand {
-    paths: PathProvider,
-    http: HttpClient,
-    metadata: MetadataRepository,
+    paths: Arc<PathProvider>,
+    http: Arc<HttpClient>,
+    metadata: Arc<MetadataRepository>,
+}
+
+impl Service for DownloadCommand {
+    type Error = ServiceError;
+
+    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
+        Ok(Self::new(
+            services.get_service().await?,
+            services.get_service().await?,
+            services.get_service().await?,
+        ))
+    }
 }
 
 impl DownloadCommand {
     #[must_use]
-    pub fn new(paths: PathProvider, http: HttpClient, metadata: MetadataRepository) -> Self {
+    pub fn new(
+        paths: Arc<PathProvider>,
+        http: Arc<HttpClient>,
+        metadata: Arc<MetadataRepository>,
+    ) -> Self {
         Self {
             paths,
             http,
@@ -202,10 +218,11 @@ mod tests {
     #[traced_test]
     pub async fn download_command() {
         // Arrange
-        let services = ServiceProvider::create()
+        let services = ServiceProvider::new();
+        let command = services
+            .get_service::<DownloadCommand>()
             .await
-            .expect("ServiceProvider should not fail");
-        let command = DownloadCommand::new(services.paths, services.http, services.metadata);
+            .expect("should be able to get command");
         let options = DownloadOptions {
             podcast_slug: example_slug(),
             filter: FilterOptions {
@@ -226,16 +243,20 @@ mod tests {
     #[traced_test]
     pub async fn process_episode() {
         // Arrange
-        let services = ServiceProvider::create()
+        let services = ServiceProvider::new();
+        let command = services
+            .get_service::<DownloadCommand>()
             .await
-            .expect("ServiceProvider should not fail");
-        let feed = services
-            .metadata
+            .expect("should be able to get command");
+        let metadata = services
+            .get_service::<MetadataRepository>()
+            .await
+            .expect("should be able to get metadata");
+        let feed = metadata
             .get_feed_by_slug(example_slug(), None)
             .await
             .expect("repository query should not fail")
             .expect("podcast should exist");
-        let command = DownloadCommand::new(services.paths, services.http, services.metadata);
         let episode = feed
             .episodes
             .get(1)

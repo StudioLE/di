@@ -15,13 +15,23 @@ const COVER_FILE_NAME: &str = "cover.jpg";
 /// Service for providing file paths and URL.
 #[derive(Default)]
 pub struct PathProvider {
-    options: AppOptions,
+    options: Arc<AppOptions>,
+}
+
+impl Service for PathProvider {
+    type Error = ServiceError;
+
+    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<ServiceError>> {
+        let paths = Self::new(services.get_service().await?);
+        paths.create_dirs().change_context(ServiceError::Create)?;
+        Ok(paths)
+    }
 }
 
 impl PathProvider {
     /// Create a new `PathProvider`.
     #[must_use]
-    pub fn new(options: AppOptions) -> Self {
+    pub fn new(options: Arc<AppOptions>) -> Self {
         Self { options }
     }
 
@@ -185,7 +195,7 @@ impl PathProvider {
     }
 
     /// Create all the cache and data directories.
-    pub fn create(&self) -> Result<(), Report<ServiceError>> {
+    pub fn create_dirs(&self) -> Result<(), Report<PathProviderError>> {
         let cache_dir = self.get_cache_dir();
         let data_dir = self.get_data_dir();
         let dirs = vec![
@@ -200,12 +210,18 @@ impl PathProvider {
         for (name, dir) in dirs {
             if !dir.exists() {
                 create_dir(&dir)
-                    .change_context(ServiceError::CreateDirectory(name.to_owned()))
+                    .change_context(PathProviderError::CreateDirectory(name.to_owned()))
                     .attach_path(dir)?;
             }
         }
         Ok(())
     }
+}
+
+#[derive(Clone, Debug, Error)]
+pub enum PathProviderError {
+    #[error("Unable to create {0} directory")]
+    CreateDirectory(String),
 }
 
 /// Sub path for an episodes's audio file.
@@ -274,7 +290,7 @@ mod tests {
             server_base: Some(Url::parse("https://example.com").expect("should be valid")),
             ..AppOptions::default()
         };
-        let paths = PathProvider::new(options);
+        let paths = PathProvider::new(Arc::new(options));
         let slug = Slug::from_str("abc").expect("should be valid slug");
 
         // Act

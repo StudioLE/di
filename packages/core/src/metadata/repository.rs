@@ -7,19 +7,41 @@ pub struct MetadataRepository {
     pub(crate) db: DatabaseConnection,
 }
 
+impl Service for MetadataRepository {
+    type Error = MetadataRepositoryCreateError;
+
+    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
+        let paths: Arc<PathProvider> = services
+            .get_service()
+            .await
+            .expect("PathProvider should be available");
+        let metadata = MetadataRepository::new(paths.get_metadata_db_path()).await?;
+        metadata.migrate().await?;
+        Ok(metadata)
+    }
+}
+
+#[derive(Clone, Debug, Error)]
+pub enum MetadataRepositoryCreateError {
+    #[error("Unable to connect to database")]
+    DatabaseConnection,
+    #[error("Unable to migrate database")]
+    DatabaseMigration,
+}
+
 impl MetadataRepository {
-    pub async fn new(path: PathBuf) -> Result<Self, Report<ServiceError>> {
+    pub async fn new(path: PathBuf) -> Result<Self, Report<MetadataRepositoryCreateError>> {
         let connect_options = ConnectOptions::new(format!("sqlite://{}?mode=rwc", path.display()));
         let db = Database::connect(connect_options)
             .await
-            .change_context(ServiceError::DatabaseConnection)?;
+            .change_context(MetadataRepositoryCreateError::DatabaseConnection)?;
         Ok(Self { db })
     }
 
-    pub async fn migrate(&self) -> Result<(), Report<ServiceError>> {
+    pub async fn migrate(&self) -> Result<(), Report<MetadataRepositoryCreateError>> {
         Migrator::up(&self.db, None)
             .await
-            .change_context(ServiceError::DatabaseMigration)
+            .change_context(MetadataRepositoryCreateError::DatabaseMigration)
     }
 }
 

@@ -99,11 +99,7 @@ async fn get_episode(
     podcast_slug: Slug,
     episode_key: u32,
 ) -> Result<Option<EpisodePartial>, ServerFnError> {
-    match SERVICES
-        .metadata
-        .get_episode(podcast_slug, episode_key)
-        .await
-    {
+    match METADATA.get_episode(podcast_slug, episode_key).await {
         Ok(podcasts) => Ok(podcasts),
         Err(error) => {
             error!("{error:?}");

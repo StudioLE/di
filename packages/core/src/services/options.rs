@@ -28,8 +28,16 @@ pub struct AppOptions {
     pub expect_country: Option<String>,
 }
 
-impl AppOptions {
-    pub fn get() -> Result<Self, Report<ServiceError>> {
-        envy::from_env().change_context(ServiceError::EnvConfig)
+impl Service for AppOptions {
+    type Error = AppOptionsError;
+
+    async fn from_services(_services: &ServiceProvider) -> Result<Self, Report<AppOptionsError>> {
+        envy::from_env().change_context(AppOptionsError::EnvConfig)
     }
+}
+
+#[derive(Clone, Debug, Error)]
+pub enum AppOptionsError {
+    #[error("Unable to read config from environment variables")]
+    EnvConfig,
 }

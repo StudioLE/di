@@ -8,7 +8,7 @@ pub use clap::{Args, Parser, Subcommand};
 pub use error_stack::{Report, ResultExt};
 pub use serde::de::DeserializeOwned;
 pub use serde::{Deserialize, Serialize};
-pub use std::any::Any;
+pub use std::any::{Any, TypeId};
 pub use std::collections::HashMap;
 pub use std::error::Error;
 pub use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -20,6 +20,8 @@ pub use strum_macros::{AsRefStr, Display};
 pub use thiserror::Error;
 pub use tracing::{debug, error, info, trace, warn};
 pub use url::Url;
+
+pub use std::sync::{Arc, Mutex};
 
 #[cfg(feature = "server")]
 pub use futures::{StreamExt, TryStreamExt, stream};

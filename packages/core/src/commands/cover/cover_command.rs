@@ -5,14 +5,30 @@ const BANNER_HEIGHT: u32 = 540;
 const COVER_SIZE: u32 = 720;
 
 pub struct CoverCommand {
-    paths: PathProvider,
-    http: HttpClient,
-    metadata: MetadataRepository,
+    paths: Arc<PathProvider>,
+    http: Arc<HttpClient>,
+    metadata: Arc<MetadataRepository>,
+}
+
+impl Service for CoverCommand {
+    type Error = ServiceError;
+
+    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<ServiceError>> {
+        Ok(Self::new(
+            services.get_service().await?,
+            services.get_service().await?,
+            services.get_service().await?,
+        ))
+    }
 }
 
 impl CoverCommand {
     #[must_use]
-    pub fn new(paths: PathProvider, http: HttpClient, metadata: MetadataRepository) -> Self {
+    pub fn new(
+        paths: Arc<PathProvider>,
+        http: Arc<HttpClient>,
+        metadata: Arc<MetadataRepository>,
+    ) -> Self {
         Self {
             paths,
             http,
@@ -67,10 +83,11 @@ mod tests {
     #[traced_test]
     pub async fn cover_command() {
         // Arrange
-        let services = ServiceProvider::create()
+        let services = ServiceProvider::new();
+        let command = services
+            .get_service::<CoverCommand>()
             .await
-            .expect("ServiceProvider should not fail");
-        let command = CoverCommand::new(services.paths, services.http, services.metadata);
+            .expect("should be able to get command");
         let options = CoverOptions {
             podcast_slug: example_slug(),
         };

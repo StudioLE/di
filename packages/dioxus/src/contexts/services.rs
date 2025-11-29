@@ -1,13 +1,16 @@
 use crate::prelude::*;
 use dioxus_fullstack::Lazy;
+use std::convert::Infallible;
 
-pub static SERVICES: Lazy<ServiceProvider> = Lazy::new(|| async move {
-    let services = match ServiceProvider::create().await {
-        Ok(services) => services,
-        Err(error) => {
+pub static SERVICES: Lazy<Arc<ServiceProvider>> =
+    Lazy::new::<_, _, Infallible>(|| async move { Ok(Arc::new(ServiceProvider::new())) });
+
+pub static METADATA: Lazy<Arc<MetadataRepository>> = Lazy::new(|| async move {
+    SERVICES
+        .get_service::<MetadataRepository>()
+        .await
+        .map_err(|error| {
             error!("{error:?}");
-            return Err(ServerFnError::new(error.to_string()));
-        }
-    };
-    Ok(services)
+            ServerFnError::new(error.to_string())
+        })
 });

@@ -3,13 +3,24 @@ use crate::prelude::*;
 use rss::Channel as RssChannel;
 
 pub struct ScrapeCommand {
-    pub(super) http: HttpClient,
-    pub(super) metadata: MetadataRepository,
+    pub(super) http: Arc<HttpClient>,
+    pub(super) metadata: Arc<MetadataRepository>,
+}
+
+impl Service for ScrapeCommand {
+    type Error = ServiceError;
+
+    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
+        Ok(Self::new(
+            services.get_service().await?,
+            services.get_service().await?,
+        ))
+    }
 }
 
 impl ScrapeCommand {
     #[must_use]
-    pub fn new(http: HttpClient, metadata: MetadataRepository) -> Self {
+    pub fn new(http: Arc<HttpClient>, metadata: Arc<MetadataRepository>) -> Self {
         Self { http, metadata }
     }
 
@@ -73,11 +84,13 @@ mod tests {
     #[serial]
     pub async fn scrape_command_simplecast() {
         // Arrange
-        let services = ServiceProvider::create()
-            .await
-            .expect("ServiceProvider should not fail");
+        let mut services = ServiceProvider::new();
         let metadata = MetadataRepositoryExample::create().await;
-        let command = ScrapeCommand::new(services.http, metadata);
+        services.add_instance(metadata);
+        let command = services
+            .get_service::<ScrapeCommand>()
+            .await
+            .expect("should be able to get command");
         let options = ScrapeOptions {
             podcast_slug: example_slug(),
             url: example_simplecast_url(),
@@ -96,11 +109,13 @@ mod tests {
     #[serial]
     pub async fn scrape_command_rss() {
         // Arrange
-        let services = ServiceProvider::create()
-            .await
-            .expect("ServiceProvider should not fail");
+        let mut services = ServiceProvider::new();
         let metadata = MetadataRepositoryExample::create().await;
-        let command = ScrapeCommand::new(services.http, metadata);
+        services.add_instance(metadata);
+        let command = services
+            .get_service::<ScrapeCommand>()
+            .await
+            .expect("should be able to get command");
         let options = ScrapeOptions {
             podcast_slug: example_slug(),
             url: example_rss_url(),

@@ -1,42 +1,66 @@
 use crate::prelude::*;
+use reqwest::Client as ReqwestClient;
 
 #[derive(Default)]
 pub struct IpInfoProvider {
-    options: AppOptions,
-    http: HttpClient,
+    options: Arc<AppOptions>,
+}
+
+impl Service for IpInfoProvider {
+    type Error = ServiceError;
+
+    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
+        Ok(Self::new(services.get_service().await?))
+    }
 }
 
 impl IpInfoProvider {
     #[must_use]
-    pub fn new(options: AppOptions, http: HttpClient) -> Self {
-        Self { options, http }
+    pub fn new(options: Arc<AppOptions>) -> Self {
+        Self { options }
     }
 
-    pub async fn validate(&self) -> Result<(), Report<ServiceError>> {
+    pub async fn validate(&self) -> Result<(), Report<IpInfoError>> {
         if self.options.expect_ip.is_none() && self.options.expect_country.is_none() {
             return Ok(());
         }
-        let info = self.get().await?;
+        let info = self.get().await.change_context(IpInfoError::IpRequest)?;
         let validation = info.validate(&self.options);
         if validation.is_empty() {
             return Ok(());
         }
         let report = validation
             .into_iter()
-            .fold(Report::new(ServiceError::ValidateIp), |report, error| {
+            .fold(Report::new(IpInfoError::ValidateIp), |report, error| {
                 report.attach(error)
             });
         Err(report)
     }
 
-    async fn get(&self) -> Result<IpInfo, Report<ServiceError>> {
-        let ip_url = Url::parse("https://ipinfo.io").expect("URL should be valid");
-        self.http.remove(&ip_url, Some(JSON_EXTENSION)).await;
-        self.http
-            .get_json(&ip_url)
+    async fn get(&self) -> Result<IpInfo, Report<HttpError>> {
+        let url = "https://ipinfo.io";
+        let client = ReqwestClient::new();
+        let response = client
+            .get(url)
+            .send()
             .await
-            .change_context(ServiceError::IpRequest)
+            .change_context(HttpError::Request)
+            .attach_with(|| format!("URL: {url}"))?;
+        if !response.status().is_success() {
+            let report = Report::new(HttpError::Status(response.status().as_u16()))
+                .attach(format!("URL: {url}"));
+            return Err(report);
+        }
+        response.json().await.change_context(HttpError::Deserialize)
     }
+}
+
+#[derive(Clone, Debug, Error)]
+pub enum IpInfoError {
+    #[error("Failed to make request for external IP")]
+    IpRequest,
+    #[error("IP validation failed")]
+    ValidateIp,
 }
 
 #[derive(Debug, Deserialize)]
@@ -98,35 +122,57 @@ mod tests {
     #[ignore = "uses ipinfo.io"]
     async fn validate_env() {
         // Arrange
+        let services = ServiceProvider::new();
+        let ipinfo = services
+            .get_service::<IpInfoProvider>()
+            .await
+            .expect("should be able to get ipinfo");
+
         // Act
-        let result = ServiceProvider::create().await;
+        let result = ipinfo.validate().await;
 
         // Assert
-        let _services = result.assert_ok_debug();
+        result.assert_ok_debug();
     }
 
     #[tokio::test]
     #[ignore = "uses ipinfo.io"]
     async fn validate_none() {
         // Arrange
-        let mut ipinfo = IpInfoProvider::default();
-        ipinfo.options.expect_ip = None;
-        ipinfo.options.expect_country = None;
+        let mut services = ServiceProvider::new();
+        let options = AppOptions {
+            expect_ip: None,
+            expect_country: None,
+            ..AppOptions::default()
+        };
+        services.add_instance(options);
+        let ipinfo = services
+            .get_service::<IpInfoProvider>()
+            .await
+            .expect("should be able to get ipinfo");
 
         // Act
         let result = ipinfo.validate().await;
 
         // Assert
-        assert!(result.is_ok());
+        result.assert_ok_debug();
     }
 
     #[tokio::test]
     #[ignore = "uses ipinfo.io"]
     async fn validate_invalid() {
         // Arrange
-        let mut ipinfo = IpInfoProvider::default();
-        ipinfo.options.expect_ip = Some("203.0.113.1".to_owned());
-        ipinfo.options.expect_country = Some("INVALID".to_owned());
+        let mut services = ServiceProvider::new();
+        let options = AppOptions {
+            expect_ip: Some("203.0.113.1".to_owned()),
+            expect_country: Some("INVALID".to_owned()),
+            ..AppOptions::default()
+        };
+        services.add_instance(options);
+        let ipinfo = services
+            .get_service::<IpInfoProvider>()
+            .await
+            .expect("should be able to get ipinfo");
 
         // Act
         let result = ipinfo.validate().await;

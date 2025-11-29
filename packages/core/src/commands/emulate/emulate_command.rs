@@ -3,13 +3,23 @@ use crate::prelude::*;
 use rss::Item as RssItem;
 
 pub struct EmulateCommand {
-    paths: PathProvider,
-    metadata: MetadataRepository,
+    paths: Arc<PathProvider>,
+    metadata: Arc<MetadataRepository>,
+}
+
+impl Service for EmulateCommand {
+    type Error = ServiceError;
+    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
+        Ok(Self::new(
+            services.get_service().await?,
+            services.get_service().await?,
+        ))
+    }
 }
 
 impl EmulateCommand {
     #[must_use]
-    pub fn new(paths: PathProvider, metadata: MetadataRepository) -> Self {
+    pub fn new(paths: Arc<PathProvider>, metadata: Arc<MetadataRepository>) -> Self {
         Self { paths, metadata }
     }
 
@@ -116,10 +126,11 @@ mod tests {
     #[traced_test]
     pub async fn feeds_command() {
         // Arrange
-        let services = ServiceProvider::create()
+        let services = ServiceProvider::new();
+        let command = services
+            .get_service::<EmulateCommand>()
             .await
-            .expect("ServiceProvider should not fail");
-        let command = EmulateCommand::new(services.paths, services.metadata);
+            .expect("should be able to get command");
         let options = EmulateOptions {
             podcast_slug: example_slug(),
         };
