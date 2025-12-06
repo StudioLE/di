@@ -23,7 +23,7 @@ pub enum EpisodeKind {
 }
 
 impl FromStr for EpisodeKind {
-    type Err = Report<EpisodeKindError>;
+    type Err = EpisodeKindError;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         let lower = value.to_lowercase();
@@ -31,11 +31,11 @@ impl FromStr for EpisodeKind {
             "full" => Ok(EpisodeKind::Full),
             "trailer" => Ok(EpisodeKind::Trailer),
             "bonus" => Ok(EpisodeKind::Bonus),
-            _ => Err(Report::new(EpisodeKindError).attach(format!("Invalid type: {value}"))),
+            _ => Err(EpisodeKindError(value.to_owned())),
         }
     }
 }
 
 #[derive(Debug, Error)]
-#[error("Unable to parse episode type")]
-pub struct EpisodeKindError;
+#[error("Unable to parse episode type: {0}")]
+pub struct EpisodeKindError(String);

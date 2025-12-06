@@ -11,7 +11,7 @@ members = [
 [workspace.package]
 version = "0.0.0"
 authors = ["Laurence Elsdon <le@studiole.uk>"]
-edition = "2021"
+edition = "2024"
 description = "A self hosted podcast library"
 documentation = "https://github.com/StudioLE/Alnwick"
 
@@ -19,34 +19,34 @@ documentation = "https://github.com/StudioLE/Alnwick"
 async-trait = { version = "0.1.89" }
 base64 = { version = "0.22.1" }
 chrono = { version = "0.4.42", features = ["serde"] }
-clap = { version = "4.5.48", features = ["derive"] }
-dioxus = { version = "0.7.1", features = ["fullstack", "router"] }
-dioxus-cli-config = { version = "0.7.1" }
+clap = { version = "4.5.53", features = ["derive"] }
+dioxus = { version = "0.7.2", features = ["fullstack", "router"] }
+dioxus-cli-config = { version = "0.7.2" }
 dirs = { version = "6.0.0" }
 envy = { version = "0.4.2" }
 error-stack = { version = "0.6.0", features = ["serde", "tracing"] }
-fast_image_resize = { version = "5.3.0", features = ["image"] }
+fast_image_resize = { version = "5.4.0", features = ["image"] }
 futures = { version = "0.3.31" }
-html2text = { version = "0.16.2" }
-image = { version = "0.25.8" }
+html2text = { version = "0.16.5" }
+image = { version = "0.25.9" }
 indicatif = { version = "0.18.3" }
-insta = { version = "1.43.1", features = ["yaml"] }
+insta = { version = "1.44.3", features = ["yaml"] }
 lofty = { version = "0.22.4" }
-reqwest = { version = "0.12.23", default-features = false, features = ["blocking", "json", "rustls-tls", "stream"] }
+reqwest = { version = "0.12.24", default-features = false, features = ["blocking", "json", "rustls-tls", "stream"] }
 rss = { version = "2.0.12", features = ["validation"] }
 scraper = { version = "0.24.0" }
-sea-orm = { version = "2.0.0-rc.18", default-features = false, features = ["with-chrono", "with-json"] }
-sea-orm-migration = { version = "2.0.0-rc.18" }
-serde = { version = "1.0.225", features = ["derive"] }
+sea-orm = { version = "2.0.0-rc.20", default-features = false, features = ["with-chrono", "with-json"] }
+sea-orm-migration = { version = "2.0.0-rc.20" }
+serde = { version = "1.0.228", features = ["derive"] }
 serde_json = { version = "1.0.145" }
 serde_yaml = { version = "0.9.34" }
 serial_test = { version = "3.2.0" }
 strum_macros = { version = "0.27.2" }
 sqlformat = { version = "0.5.0" }
 thiserror = "2.0.17"
-tokio = { version = "1.47.1", features = ["macros", "rt-multi-thread", "fs", "io-util"] }
-tracing = "0.1.41"
-tracing-subscriber = { version = "0.3.20", features = ["ansi", "env-filter"] }
+tokio = { version = "1.48.0", features = ["macros", "rt-multi-thread", "fs", "io-util"] }
+tracing = "0.1.43"
+tracing-subscriber = { version = "0.3.22", features = ["ansi", "env-filter"] }
 tracing-test = "0.2.5"
 tracing-wasm = "0.2.1"
 url = { version = "2.5.7" }

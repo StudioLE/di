@@ -21,18 +21,18 @@ pub enum PodcastKind {
 }
 
 impl FromStr for PodcastKind {
-    type Err = Report<PodcastKindError>;
+    type Err = PodcastKindError;
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         let lower = value.to_lowercase();
         match lower.as_str() {
             "episodic" => Ok(PodcastKind::Episodic),
             "serial" => Ok(PodcastKind::Serial),
-            _ => Err(Report::new(PodcastKindError).attach(format!("Invalid type: {value}"))),
+            _ => Err(PodcastKindError(value.to_owned())),
         }
     }
 }
 
 #[derive(Debug, Error)]
-#[error("Unable to parse podcast type")]
-pub struct PodcastKindError;
+#[error("Unable to parse podcast type: {0}")]
+pub struct PodcastKindError(String);
