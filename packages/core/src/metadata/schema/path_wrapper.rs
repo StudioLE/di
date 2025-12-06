@@ -1,7 +1,6 @@
 use crate::prelude::*;
 use sea_orm::sea_query::*;
 use sea_orm::*;
-use std::convert::Infallible;
 
 /// A wrapper type for [`PathBuf`] that can be used as a `SeaORM` model field
 ///

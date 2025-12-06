@@ -2,7 +2,7 @@ use crate::prelude::*;
 use sea_orm::Selector;
 use sea_orm::*;
 
-impl DownloadCommand {
+impl DownloadHandler {
     pub(super) async fn context_step(
         &self,
         request: &DownloadRequest,

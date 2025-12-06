@@ -16,9 +16,12 @@ server = [
   "dep:fast_image_resize",
   "dep:futures",
   "dep:image",
+  "dep:indicatif",
   "dep:lofty",
   "dep:scraper",
   "dep:sea-orm-migration",
+  "dep:studiole_command",
+  "dep:studiole_di",
   "dep:tokio",
   "dep:urlencoding",
 ]
@@ -45,9 +48,12 @@ envy = { workspace = true, optional = true }
 fast_image_resize = { workspace = true, optional = true }
 futures = { workspace = true, optional = true }
 image = { workspace = true, optional = true }
+indicatif = { workspace = true, optional = true }
 lofty = { workspace = true, optional = true }
 scraper = { workspace = true, optional = true }
 sea-orm-migration = { workspace = true, optional = true }
+studiole_command = { path = "../command", optional = true }
+studiole_di = { path = "../di", optional = true }
 tokio = { workspace = true, optional = true }
 urlencoding = { workspace = true, optional = true }
 

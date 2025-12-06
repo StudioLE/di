@@ -1,0 +1,16 @@
+[package]
+name = "studiole_di"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+[dependencies]
+error-stack = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tokio = { workspace = true, optional = true }
+
+[lints]
+workspace = true

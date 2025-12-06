@@ -1,0 +1,25 @@
+[package]
+name = "studiole_command"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+description.workspace = true
+documentation.workspace = true
+
+[features]
+
+[dependencies]
+async-trait = { workspace = true }
+error-stack = { workspace = true }
+futures = { workspace = true }
+indicatif = { workspace = true }
+studiole_di = { path = "../di" }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["sync", "time"] }
+tracing = { workspace = true }
+
+[dev-dependencies]
+tracing-subscriber = { workspace = true }
+
+[lints]
+workspace = true

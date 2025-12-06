@@ -2,9 +2,12 @@ use crate::prelude::*;
 
 const CONCURRENCY: usize = 8;
 
+define_commands!(Download(DownloadRequest));
+
 pub struct DownloadCliCommand {
     metadata: Arc<MetadataRepository>,
-    command: Arc<DownloadCommand>,
+    runner: Arc<CommandRunner<CommandInfo>>,
+    progress: Arc<CliProgress<CommandInfo>>,
 }
 
 impl Service for DownloadCliCommand {
@@ -14,16 +17,26 @@ impl Service for DownloadCliCommand {
         Ok(Self::new(
             services.get_service().await?,
             services.get_service().await?,
+            services.get_service().await?,
         ))
     }
 }
 
 impl DownloadCliCommand {
     #[must_use]
-    pub fn new(metadata: Arc<MetadataRepository>, command: Arc<DownloadCommand>) -> Self {
-        Self { metadata, command }
+    pub fn new(
+        metadata: Arc<MetadataRepository>,
+        runner: Arc<CommandRunner<CommandInfo>>,
+        progress: Arc<CliProgress<CommandInfo>>,
+    ) -> Self {
+        Self {
+            metadata,
+            runner,
+            progress,
+        }
     }
 
+    #[allow(unreachable_patterns, clippy::match_wildcard_for_single_variants)]
     pub async fn execute(&self, options: DownloadOptions) -> Result<(), Report<DownloadCliError>> {
         let feed = self
             .metadata
@@ -32,24 +45,33 @@ impl DownloadCliCommand {
             .change_context(DownloadCliError::Repository)?
             .ok_or(DownloadCliError::NoPodcast)?;
         let podcast = feed.podcast.primary_key;
-        let results = stream::iter(feed.episodes.into_iter().map(|episode| {
+        for episode in feed.episodes.iter() {
             let request = DownloadRequest::new(podcast, episode.primary_key);
-            async move { self.command.execute(request).await }
-        }))
-        .buffer_unordered(CONCURRENCY)
-        .collect::<Vec<_>>()
-        .await;
+            self.runner
+                .queue_request(request)
+                .await
+                .expect("should be able to queue request");
+        }
+        self.progress.start().await;
+        self.runner.start(CONCURRENCY).await;
+        self.runner.drain().await;
+        let results = self.runner.drain_results().await;
+        self.progress.finish().await;
         let mut episodes = Vec::new();
         let mut errors = Vec::new();
         for result in results {
             match result {
-                Ok(episode) => episodes.push(episode),
-                Err(e) => errors.push(e),
+                CommandResult::Download(_, Ok(episode)) => episodes.push(episode),
+                CommandResult::Download(_, Err(e)) => errors.push(e),
+                _ => unreachable!("Should only get download results"),
             }
         }
         info!("Downloaded audio files for {} episodes", episodes.len());
         if !errors.is_empty() {
             warn!("Skipped {} episodes due to failures", errors.len());
+            for error in errors {
+                warn!("{error:?}");
+            }
         }
         Ok(())
     }

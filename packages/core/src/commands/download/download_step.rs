@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-impl DownloadCommand {
+impl DownloadHandler {
     pub(super) async fn download_episode_step(
         &self,
         context: &DownloadContext,

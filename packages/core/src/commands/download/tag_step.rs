@@ -6,7 +6,7 @@ use lofty::picture::{Picture, PictureType};
 use lofty::prelude::{Accessor, TagExt};
 use lofty::tag::TagType;
 
-impl DownloadCommand {
+impl DownloadHandler {
     #[allow(clippy::unused_self)]
     pub(super) fn tag_step(&self, context: &DownloadContext) -> Result<(), Report<DownloadError>> {
         let content_type = context.episode.source_content_type.as_str();

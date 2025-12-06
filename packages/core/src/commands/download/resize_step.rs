@@ -3,7 +3,7 @@ use tokio::task::spawn_blocking;
 
 const IMAGE_SIZE: u32 = 720;
 
-impl DownloadCommand {
+impl DownloadHandler {
     pub(super) async fn resize_step(
         &self,
         context: &DownloadContext,

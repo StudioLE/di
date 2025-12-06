@@ -1,7 +1,7 @@
 use crate::prelude::*;
 use sea_orm::*;
 
-impl DownloadCommand {
+impl DownloadHandler {
     pub(super) async fn save_step(
         &self,
         context: &DownloadContext,

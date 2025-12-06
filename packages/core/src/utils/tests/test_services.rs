@@ -4,7 +4,10 @@ pub struct TestServiceProvider;
 
 impl TestServiceProvider {
     pub async fn create() -> ServiceProvider {
-        let mut services = ServiceProvider::new();
+        let mut services = ServiceProvider::new()
+            .with_commands()
+            .await
+            .expect("should be able to create services with commands");
         let temp_dir = TempDirectory::default()
             .create()
             .expect("should be able to create temp dir");

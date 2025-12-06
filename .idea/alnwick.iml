@@ -6,6 +6,8 @@
       <sourceFolder url="file://$MODULE_DIR$/packages/core/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/packages/dioxus/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/packages/services/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/command/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/packages/di/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

@@ -7,9 +7,6 @@ mod ipinfo;
 mod options;
 #[cfg(feature = "server")]
 mod paths;
-#[cfg(feature = "server")]
-mod provider;
-mod service;
 
 #[cfg(feature = "server")]
 pub use http::*;
@@ -18,6 +15,3 @@ pub use http_error::*;
 pub use options::*;
 #[cfg(feature = "server")]
 pub use paths::*;
-#[cfg(feature = "server")]
-pub use provider::*;
-pub use service::*;

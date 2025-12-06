@@ -1,6 +1,5 @@
 use crate::prelude::*;
 use dioxus_fullstack::Lazy;
-use std::convert::Infallible;
 
 pub static SERVICES: Lazy<Arc<ServiceProvider>> =
     Lazy::new::<_, _, Infallible>(|| async move { Ok(Arc::new(ServiceProvider::new())) });

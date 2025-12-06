@@ -1,10 +1,9 @@
 use crate::prelude::*;
-use std::any::type_name;
 
 pub struct ServiceProvider {
     factories:
         HashMap<TypeId, Box<dyn Fn(&ServiceProvider) -> Arc<dyn Any + Send + Sync> + Send + Sync>>,
-    instances: Mutex<HashMap<TypeId, Arc<dyn Any + Send + Sync>>>,
+    instances: StdMutex<HashMap<TypeId, Arc<dyn Any + Send + Sync>>>,
 }
 
 impl ServiceProvider {
@@ -12,7 +11,7 @@ impl ServiceProvider {
     pub fn new() -> Self {
         Self {
             factories: HashMap::new(),
-            instances: Mutex::new(HashMap::new()),
+            instances: StdMutex::new(HashMap::new()),
         }
     }
 

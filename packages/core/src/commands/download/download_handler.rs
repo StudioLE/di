@@ -1,45 +1,27 @@
 use crate::prelude::*;
 
-pub struct DownloadCommand {
+pub struct DownloadHandler {
     pub(super) paths: Arc<PathProvider>,
     pub(super) http: Arc<HttpClient>,
     pub(super) metadata: Arc<MetadataRepository>,
 }
 
-impl Service for DownloadCommand {
+impl Service for DownloadHandler {
     type Error = ServiceError;
 
     async fn from_services(services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
-        Ok(Self::new(
-            services.get_service().await?,
-            services.get_service().await?,
-            services.get_service().await?,
-        ))
+        Ok(Self {
+            paths: services.get_service().await?,
+            http: services.get_service().await?,
+            metadata: services.get_service().await?,
+        })
     }
 }
 
-impl DownloadCommand {
-    #[must_use]
-    pub fn new(
-        paths: Arc<PathProvider>,
-        http: Arc<HttpClient>,
-        metadata: Arc<MetadataRepository>,
-    ) -> Self {
-        Self {
-            paths,
-            http,
-            metadata,
-        }
-    }
-}
-
-impl Command for DownloadCommand {
-    type Input = DownloadRequest;
-    type Output = ();
-    type CommandError = DownloadError;
-
-    async fn execute(&self, request: DownloadRequest) -> Result<(), Report<DownloadError>> {
-        let context = self.context_step(&request).await?;
+#[async_trait]
+impl Execute<DownloadRequest, (), DownloadError> for DownloadHandler {
+    async fn execute(&self, request: &DownloadRequest) -> Result<(), Report<DownloadError>> {
+        let context = self.context_step(request).await?;
         let podcast = context.podcast.to_string();
         let episode = context.episode.to_string();
         trace!(podcast, episode, "Downloading episode file");
@@ -62,17 +44,17 @@ mod tests {
 
     #[tokio::test]
     #[traced_test]
-    pub async fn download_command() {
+    pub async fn download_handler() {
         // Arrange
         let services = TestServiceProvider::create().await;
-        let command = services
-            .get_service::<DownloadCommand>()
+        let download = services
+            .get_service::<DownloadHandler>()
             .await
             .expect("should be able to get command");
         let request = DownloadRequest::new(PODCAST_KEY, EPISODE_KEY);
 
         // Act
-        let result = command.execute(request).await;
+        let result = download.execute(&request).await;
 
         // Assert
         result.assert_ok_debug();

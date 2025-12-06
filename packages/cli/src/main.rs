@@ -5,7 +5,10 @@ use std::process::exit;
 async fn main() {
     init_logger().expect("should be able to init logger");
     let cli = Cli::parse();
-    let services = ServiceProvider::new();
+    let services = ServiceProvider::new()
+        .with_commands()
+        .await
+        .expect("should be able to create services with commands");
     match cli.command {
         Command::Scrape(options) => {
             let command = services

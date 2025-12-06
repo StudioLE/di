@@ -1,9 +1,11 @@
 [workspace]
 resolver = "3"
 members = [
-    "packages/cli",
-    "packages/core",
-    "packages/dioxus",
+  "packages/cli",
+  "packages/command",
+  "packages/core",
+  "packages/di",
+  "packages/dioxus",
 ]
 
 [workspace.package]
@@ -14,6 +16,7 @@ description = "A self hosted podcast library"
 documentation = "https://github.com/StudioLE/Alnwick"
 
 [workspace.dependencies]
+async-trait = { version = "0.1.89" }
 base64 = { version = "0.22.1" }
 chrono = { version = "0.4.42", features = ["serde"] }
 clap = { version = "4.5.48", features = ["derive"] }
@@ -26,6 +29,7 @@ fast_image_resize = { version = "5.3.0", features = ["image"] }
 futures = { version = "0.3.31" }
 html2text = { version = "0.16.2" }
 image = { version = "0.25.8" }
+indicatif = { version = "0.18.3" }
 insta = { version = "1.43.1", features = ["yaml"] }
 lofty = { version = "0.22.4" }
 reqwest = { version = "0.12.23", default-features = false, features = ["blocking", "json", "rustls-tls", "stream"] }
