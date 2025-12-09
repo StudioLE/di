@@ -1,5 +1,6 @@
 use super::to_rss::PodcastToRss;
 use crate::prelude::*;
+use error_stack::bail;
 use rss::Item as RssItem;
 
 pub struct EmulateCommand {
@@ -71,8 +72,24 @@ impl EmulateCommand {
         year: Option<i32>,
     ) -> Result<PathBuf, Report<EmulateError>> {
         let mut channel = PodcastToRss::execute(feed.clone());
-        for item in &mut channel.items {
-            self.replace_enclosure(feed, item)?;
+        let items = take(&mut channel.items);
+        for item in items {
+            let episode = item
+                .title
+                .clone()
+                .unwrap_or_else(|| item.guid.clone().map(|x| x.value).unwrap_or_default());
+            match self.replace_enclosure(feed, item) {
+                Ok(item) => channel.items.push(item),
+                Err(report) => {
+                    let error = report
+                        .downcast_ref::<EmulateError>()
+                        .expect("Report should have an EmulateError");
+                    if error != &EmulateError::NoPath {
+                        bail!(report)
+                    }
+                    trace!("Skipping episode as it has not been downloaded: {episode}");
+                }
+            }
         }
         let xml = channel.to_string();
         let path = self.paths.get_rss_path(&feed.podcast.slug, season, year);
@@ -97,17 +114,19 @@ impl EmulateCommand {
     fn replace_enclosure(
         &self,
         feed: &PodcastFeed,
-        item: &mut RssItem,
-    ) -> Result<(), Report<EmulateError>> {
+        mut item: RssItem,
+    ) -> Result<RssItem, Report<EmulateError>> {
         let guid = item.guid.clone().ok_or(EmulateError::NoGuid)?;
         let episode = feed
             .episodes
             .iter()
             .find(|episode| episode.source_id == guid.value)
             .ok_or(EmulateError::NoMatch)?;
-        let enclosure = item.enclosure.as_mut().ok_or(EmulateError::NoEnclosure)?;
+        let Some(enclosure) = item.enclosure.as_mut() else {
+            bail!(EmulateError::NoEnclosure);
+        };
         enclosure.url = self.get_audio_url(episode)?.to_string();
-        Ok(())
+        Ok(item)
     }
 
     /// URL of the episode audio file.
@@ -156,7 +175,12 @@ mod tests {
     #[traced_test]
     pub async fn feeds_command() {
         // Arrange
-        let services = ServiceProvider::new();
+        let mut services = ServiceProvider::new();
+        let options = AppOptions {
+            server_base: Some(Url::parse("https://example.com").expect("should be valid URL")),
+            ..AppOptions::default()
+        };
+        services.add_instance(options);
         let command = services
             .get_service::<EmulateCommand>()
             .await

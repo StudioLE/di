@@ -70,10 +70,6 @@ fn write_tag(path: &PathBuf, tag: Id3v2Tag) -> Result<(), LoftyError> {
 
 fn get_tag_types(path: &Path) -> Result<Vec<TagType>, LoftyError> {
     let tagged_file = Probe::open(path)?.read()?;
-    let tag_types = tagged_file
-        .tags()
-        .iter()
-        .map(Tag::tag_type)
-        .collect();
+    let tag_types = tagged_file.tags().iter().map(Tag::tag_type).collect();
     Ok(tag_types)
 }

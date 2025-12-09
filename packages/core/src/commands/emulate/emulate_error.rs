@@ -1,6 +1,6 @@
 use crate::prelude::*;
 
-#[derive(Clone, Debug, Error)]
+#[derive(Clone, Debug, Error, PartialEq)]
 pub enum EmulateError {
     #[error("Unable to get podcast")]
     Repository,
