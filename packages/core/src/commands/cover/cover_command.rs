@@ -80,7 +80,6 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    #[traced_test]
     pub async fn cover_command() {
         // Arrange
         let services = ServiceProvider::new();
@@ -91,6 +90,7 @@ mod tests {
         let options = CoverOptions {
             podcast_slug: example_slug(),
         };
+        let _logger = init_test_logger();
 
         // Act
         let result = command.execute(options).await;

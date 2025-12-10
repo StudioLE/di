@@ -144,21 +144,16 @@ mod tests {
 
     #[tokio::test]
     async fn command_runner() {
-        init_elapsed_logger();
-
         // Arrange
         let services = ServiceProvider::new()
             .with_commands()
             .await
             .expect("should be able to create services with commands");
-        // let mut registry: CommandRegistry<CommandInfo> = CommandRegistry::new();
-        // let handler = services.get_service::<DelayHandler>().await.expect("should be able to get handler");
-        // registry.register::<DelayRequest>(handler);
-        // services.add_instance(registry);
         let runner = services
             .get_service::<CommandRunner<CommandInfo>>()
             .await
             .expect("should be able to get runner");
+        let _logger = init_test_logger();
 
         // Act
         runner.workers.start(WORKER_COUNT).await;

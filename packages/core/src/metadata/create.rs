@@ -92,13 +92,13 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    #[traced_test]
     pub async fn save_feed() {
         // Arrange
         let metadata = MetadataRepositoryExample::create().await;
         let feeds = MetadataRepositoryExample::example_feeds();
         let feed = feeds.first().expect("should be at least one feed").clone();
         let slug = feed.podcast.slug.clone();
+        let _logger = init_test_logger();
 
         // Act
         let result = metadata.save_feed(feed).await;

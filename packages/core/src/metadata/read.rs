@@ -81,10 +81,10 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    #[traced_test]
     pub async fn get_all_feeds() {
         // Arrange
         let metadata = MetadataRepositoryExample::create().await;
+        let _logger = init_test_logger();
 
         // Act
         let result = metadata.get_all_feeds().await;
@@ -99,7 +99,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[traced_test]
     pub async fn get_feed_by_slug() {
         // Arrange
         let options = None;
@@ -113,7 +112,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[traced_test]
     pub async fn get_feed_by_slug__filter_year() {
         // Arrange
         let options = FilterOptions {
@@ -129,7 +127,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[traced_test]
     pub async fn get_feed_by_slug__filter_year_range() {
         // Arrange
         let options = FilterOptions {
@@ -149,7 +146,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[traced_test]
     pub async fn get_feed_by_slug__filter_season() {
         // Arrange
         let options = FilterOptions {
@@ -168,7 +164,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[traced_test]
     pub async fn get_feed_by_slug__filter_season_range() {
         // Arrange
         let options = FilterOptions {
@@ -189,6 +184,7 @@ mod tests {
         // Arrange
         let metadata = MetadataRepositoryExample::create().await;
         let slug = MetadataRepositoryExample::podcast_slug();
+        let _logger = init_test_logger();
 
         // Act
         let result = metadata.get_feed_by_slug(slug.clone(), options).await;

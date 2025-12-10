@@ -80,10 +80,10 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    #[traced_test]
     #[serial]
     pub async fn scrape_command_simplecast() {
         // Arrange
+        let _logger = init_test_logger();
         let mut services = ServiceProvider::new();
         let metadata = MetadataRepositoryExample::create().await;
         services.add_instance(metadata);
@@ -105,10 +105,10 @@ mod tests {
     }
 
     #[tokio::test]
-    #[traced_test]
     #[serial]
     pub async fn scrape_command_rss() {
         // Arrange
+        let _logger = init_test_logger();
         let mut services = ServiceProvider::new();
         let metadata = MetadataRepositoryExample::create().await;
         services.add_instance(metadata);

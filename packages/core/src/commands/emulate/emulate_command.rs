@@ -172,7 +172,6 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    #[traced_test]
     pub async fn feeds_command() {
         // Arrange
         let mut services = ServiceProvider::new();
@@ -188,6 +187,7 @@ mod tests {
         let options = EmulateOptions {
             podcast_slug: example_slug(),
         };
+        let _logger = init_test_logger();
 
         // Act
         let result = command.execute(options).await;

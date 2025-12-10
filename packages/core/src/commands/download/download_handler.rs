@@ -43,7 +43,6 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    #[traced_test]
     pub async fn download_handler() {
         // Arrange
         let services = TestServiceProvider::create().await;
@@ -52,6 +51,7 @@ mod tests {
             .await
             .expect("should be able to get command");
         let request = DownloadRequest::new(PODCAST_KEY, EPISODE_KEY);
+        let _logger = init_test_logger();
 
         // Act
         let result = download.execute(&request).await;

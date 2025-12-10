@@ -91,9 +91,9 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    #[traced_test]
     pub async fn download_command() {
         // Arrange
+        warn!("Starting test");
         let services = TestServiceProvider::create().await;
         let command = services
             .get_service::<DownloadCliCommand>()
@@ -107,6 +107,7 @@ mod tests {
                 ..FilterOptions::default()
             },
         };
+        let _logger = init_test_logger();
 
         // Act
         let result = command.execute(options).await;

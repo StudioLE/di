@@ -77,9 +77,9 @@ mod tests {
     }
 
     #[tokio::test]
-    #[traced_test]
     pub async fn update_episode() {
         // Arrange
+        let _logger = init_test_logger();
         let metadata = MetadataRepositoryExample::create().await;
         let slug = MetadataRepositoryExample::podcast_slug();
 

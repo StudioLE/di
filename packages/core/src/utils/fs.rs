@@ -21,7 +21,8 @@ pub async fn copy_with_logging(
         .await
         .change_context(HttpError::CreateDestinationDirectory)?;
     if destination.exists() {
-        remove_file(&destination).await
+        remove_file(&destination)
+            .await
             .change_context(HttpError::RemoveExisting)?;
     }
     let result = if use_hardlink(&source, &destination).await {

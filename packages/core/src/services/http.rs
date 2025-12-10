@@ -240,12 +240,12 @@ mod tests {
     use serde_json::Value;
 
     #[tokio::test]
-    #[traced_test]
     pub async fn head() {
         // Arrange
         let http = HttpClient::default();
         let url = Url::parse("https://example.com/?abc=123&def=456").expect("url should be valid");
         http.remove(&url, Some(HEAD_EXTENSION)).await;
+        let _logger = init_test_logger();
 
         // Act
         let result = http.head(&url).await;
@@ -256,13 +256,13 @@ mod tests {
     }
 
     #[tokio::test]
-    #[traced_test]
     #[ignore = "uses simplecast.com"]
     pub async fn head_xml() {
         // Arrange
         let http = HttpClient::default();
         let url = example_rss_url();
         http.remove(&url, Some(HEAD_EXTENSION)).await;
+        let _logger = init_test_logger();
 
         // Act
         let result = http.head(&url).await;
@@ -273,13 +273,13 @@ mod tests {
     }
 
     #[tokio::test]
-    #[traced_test]
     pub async fn get() {
         // Arrange
         let http = HttpClient::default();
         let url = Url::parse("https://example.com/?abc=123&def=456").expect("url should be valid");
         let expected = http.get_cache_path(&url, Some(HTML_EXTENSION));
         http.remove(&url, Some(HTML_EXTENSION)).await;
+        let _logger = init_test_logger();
 
         // Act
         let result = http.get(&url, Some(HTML_EXTENSION)).await;
@@ -291,12 +291,12 @@ mod tests {
     }
 
     #[tokio::test]
-    #[traced_test]
     pub async fn get_html() {
         // Arrange
         let http = HttpClient::default();
         let url = Url::parse("https://example.com").expect("url should be valid");
         http.remove(&url, Some(HTML_EXTENSION)).await;
+        let _logger = init_test_logger();
 
         // Act
         let result = http.get_html(&url).await;
@@ -306,13 +306,13 @@ mod tests {
     }
 
     #[tokio::test]
-    #[traced_test]
     #[ignore = "uses ipinfo.io"]
     pub async fn get_json() {
         // Arrange
         let http = HttpClient::default();
         let url = Url::parse("https://ipinfo.io").expect("url should be valid");
         http.remove(&url, Some(JSON_EXTENSION)).await;
+        let _logger = init_test_logger();
 
         // Act
         let result = http.get_json::<Value>(&url).await;

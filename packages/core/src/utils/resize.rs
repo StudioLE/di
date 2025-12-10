@@ -101,7 +101,6 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    #[traced_test]
     #[ignore = "uses httpbin.org"]
     pub async fn resize_jpeg() {
         // Arrange
@@ -115,6 +114,7 @@ mod tests {
                 .get(&url, None)
                 .await
                 .expect("get image should not fail");
+            let _logger = init_test_logger();
 
             // Act
             let result = Resize::new(&path).assert_ok_debug().to_bytes(100, 100);

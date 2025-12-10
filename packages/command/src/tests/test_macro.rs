@@ -39,12 +39,11 @@ mod tests {
 
     #[tokio::test]
     async fn command_execute() {
-        init_elapsed_logger();
-
         // Arrange
         let request = DelayRequest::default();
         let handler = Arc::new(DelayHandler);
         let command = Command::Delay(request, handler);
+        let _logger = init_test_logger();
 
         // Act
         let response = command.execute().await;

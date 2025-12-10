@@ -54,7 +54,5 @@ pub use tokio::io::AsyncWriteExt;
 pub use tokio::sync::{Mutex, Notify, RwLock};
 #[cfg(feature = "server")]
 pub use tokio::task::JoinHandle;
-#[cfg(all(test, feature = "server"))]
-pub use tracing_test::traced_test;
 #[cfg(feature = "server")]
 pub use urlencoding::encode;

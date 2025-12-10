@@ -43,10 +43,10 @@ mod tests {
     }
 
     #[tokio::test]
-    #[traced_test]
     pub async fn get_podcasts() {
         // Arrange
         let metadata = MetadataRepositoryExample::create().await;
+        let _logger = init_test_logger();
 
         // Act
         let result = metadata.get_podcasts().await;
