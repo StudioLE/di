@@ -20,22 +20,54 @@ pub async fn copy_with_logging(
     create_parent_dir_if_not_exist(&destination)
         .await
         .change_context(HttpError::CreateDestinationDirectory)?;
-    trace!(
-        source = %source.display(),
-        destination = %destination.display(),
-        "Copying file"
-    );
-    if hard_link(&source, &destination).await.is_err() {
-        copy(&source, &destination)
-            .await
-            .change_context(HttpError::Copy)
-            .attach_with(|| {
-                format!(
-                    "Source: {}\nDestination: {}",
-                    source.display(),
-                    destination.display()
-                )
-            })?;
+    if destination.exists() {
+        remove_file(&destination).await
+            .change_context(HttpError::RemoveExisting)?;
     }
-    Ok(())
+    let result = if use_hardlink(&source, &destination).await {
+        trace!(
+            source = %source.display(),
+            destination = %destination.display(),
+            "Hard linking file"
+        );
+        hard_link(&source, &destination).await
+    } else {
+        trace!(
+            source = %source.display(),
+            destination = %destination.display(),
+            "Copying file"
+        );
+        copy(&source, &destination).await.map(|_| ())
+    };
+    result.change_context(HttpError::Copy).attach_with(|| {
+        format!(
+            "Source: {}\nDestination: {}",
+            source.display(),
+            destination.display()
+        )
+    })
+}
+
+#[cfg(unix)]
+async fn use_hardlink(source: &Path, destination: &Path) -> bool {
+    use std::os::unix::fs::MetadataExt;
+    use tokio::fs::metadata;
+    let source = source
+        .parent()
+        .expect("source should have a parent directory");
+    let source = metadata(source)
+        .await
+        .expect("should be able to get source metadata");
+    let destination = destination
+        .parent()
+        .expect("destination should have a parent directory");
+    let destination = metadata(destination)
+        .await
+        .expect("should be able to get destination metadata");
+    source.dev() == destination.dev()
+}
+
+#[cfg(not(unix))]
+async fn use_hardlink(_source: &Path, _dest: &Path) -> bool {
+    false
 }

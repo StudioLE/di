@@ -32,6 +32,8 @@ pub enum HttpError {
     Metadata,
     #[error("File size is zero")]
     Size,
+    #[error("Unable to remove existing file")]
+    RemoveExisting,
 }
 
 fn get_reason(number: &u16) -> &str {
