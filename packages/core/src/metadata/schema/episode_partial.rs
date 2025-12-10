@@ -32,4 +32,12 @@ pub struct EpisodePartial {
     pub season: Option<u32>,
     /// Episode type
     pub kind: Option<EpisodeKind>,
+    /// Relative file path to the downloaded audio file.
+    ///
+    /// Value will be `None` until the file is downloaded with [`DownloadContext`].
+    pub file_sub_path: Option<PathWrapper>,
+    /// Relative file path to the downloaded image file.
+    ///
+    /// Value will be `None` until the file is downloaded with [`DownloadContext`].
+    pub image_sub_path: Option<PathWrapper>,
 }

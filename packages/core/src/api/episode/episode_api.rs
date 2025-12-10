@@ -30,6 +30,8 @@ fn get_episode_query(
             episode::Column::Description,
             episode::Column::SourceDuration,
             episode::Column::Image,
+            episode::Column::FileSubPath,
+            episode::Column::ImageSubPath,
             episode::Column::Episode,
             episode::Column::Season,
             episode::Column::Kind,

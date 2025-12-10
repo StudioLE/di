@@ -30,5 +30,5 @@ pub fn get_targets() -> Targets {
         .with_target("lofty", LevelFilter::INFO)
         .with_target("reqwest", LevelFilter::INFO)
         .with_target("selectors", LevelFilter::INFO)
-        .with_target("sqlx", LevelFilter::WARN)
+        .with_target("sqlx", LevelFilter::TRACE)
 }

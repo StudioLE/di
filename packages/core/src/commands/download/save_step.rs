@@ -33,25 +33,28 @@ impl MetadataRepository {
         file_path: PathBuf,
         image_path: Option<PathBuf>,
     ) -> Result<(), DbErr> {
-        let _model = update_episode_query(episode_key, file_path, image_path)
-            .exec(&self.db)
-            .await;
+        let query = self.update_episode_query(episode_key, file_path, image_path);
+        let _ = self.db.execute_raw(query).await?;
         Ok(())
     }
-}
 
-fn update_episode_query(
-    episode_key: EpisodeKey,
-    file_path: PathBuf,
-    image_path: Option<PathBuf>,
-) -> UpdateOne<episode::ActiveModel> {
-    let model = episode::ActiveModel {
-        primary_key: Set(episode_key),
-        file_sub_path: Set(Some(PathWrapper::from(file_path))),
-        image_sub_path: Set(image_path.map(PathWrapper::from)),
-        ..Default::default()
-    };
-    episode::Entity::update(model)
+    fn update_episode_query(
+        &self,
+        episode_key: EpisodeKey,
+        file_path: PathBuf,
+        image_path: Option<PathBuf>,
+    ) -> Statement {
+        let model = episode::ActiveModel {
+            primary_key: Set(episode_key),
+            file_sub_path: Set(Some(PathWrapper::from(file_path))),
+            image_sub_path: Set(image_path.map(PathWrapper::from)),
+            ..Default::default()
+        };
+        episode::Entity::update(model)
+            .validate()
+            .expect("query should be valid")
+            .build(self.db.get_database_backend())
+    }
 }
 
 #[cfg(test)]
@@ -59,17 +62,15 @@ mod tests {
     #![allow(non_snake_case)]
     use super::*;
 
-    #[test]
-    pub fn _update_episode_query() {
+    #[tokio::test]
+    pub async fn update_episode_query() {
         // Arrange
+        let metadata = MetadataRepositoryExample::create().await;
         let file_path = PathBuf::from("path/to/audio.mp3");
         let image_path = Some(PathBuf::from("path/to/image.jpg"));
 
         // Act
-        let statement = update_episode_query(EPISODE_KEY, file_path, image_path)
-            .validate()
-            .expect("should be valid")
-            .build(DB_BACKEND);
+        let statement = metadata.update_episode_query(EPISODE_KEY, file_path, image_path);
 
         // Assert
         let sql = format_sql(&statement);
@@ -79,15 +80,25 @@ mod tests {
     #[tokio::test]
     pub async fn update_episode() {
         // Arrange
-        let _logger = init_test_logger();
         let metadata = MetadataRepositoryExample::create().await;
-        let slug = MetadataRepositoryExample::podcast_slug();
+        let file_path = PathBuf::from("path/to/audio.mp3");
+        let image_path = Some(PathBuf::from("path/to/image.jpg"));
+        let _logger = init_test_logger();
+        let slug = podcast_slug();
 
         // Act
-        let result = metadata.get_podcast(slug).await;
+        let result = metadata
+            .update_episode(EPISODE_KEY, file_path.clone(), image_path.clone())
+            .await;
 
         // Assert
-        let (podcast, episodes) = result.assert_ok_debug().expect("Podcast should exist");
-        assert_yaml_snapshot!((podcast, episodes));
+        result.assert_ok_debug();
+        let episode = metadata
+            .get_episode(slug, EPISODE_KEY)
+            .await
+            .expect("should be able to get episode")
+            .expect("episode should exist");
+        assert_eq!(episode.file_sub_path, Some(PathWrapper::from(file_path)));
+        assert_eq!(episode.image_sub_path, image_path.map(PathWrapper::from));
     }
 }
