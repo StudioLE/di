@@ -35,19 +35,26 @@ impl EmulateCommand {
     }
 
     pub async fn execute(&self, options: EmulateOptions) -> Result<(), Report<EmulateError>> {
-        // TODO: Add support for filtering episodes.
         let feed = self
             .metadata
             .get_feed_by_slug(options.podcast_slug, None)
             .await
             .change_context(EmulateError::Repository)?
             .ok_or(EmulateError::NoPodcast)?;
-        let feeds = self.save_feeds(&feed).await?;
+        let feeds: Vec<_> = self
+            .save_feeds(&feed)
+            .await?
+            .into_iter()
+            .flatten()
+            .collect();
         info!("Created {} rss feeds", feeds.len());
         Ok(())
     }
 
-    async fn save_feeds(&self, feed: &PodcastFeed) -> Result<Vec<PathBuf>, Report<EmulateError>> {
+    async fn save_feeds(
+        &self,
+        feed: &PodcastFeed,
+    ) -> Result<Vec<Option<PathBuf>>, Report<EmulateError>> {
         let mut paths = Vec::new();
         paths.push(self.save_feed(feed, None, None).await?);
         let mut feed = feed.clone();
@@ -70,7 +77,7 @@ impl EmulateCommand {
         feed: &PodcastFeed,
         season: Option<u32>,
         year: Option<i32>,
-    ) -> Result<PathBuf, Report<EmulateError>> {
+    ) -> Result<Option<PathBuf>, Report<EmulateError>> {
         let mut channel = PodcastToRss::execute(feed.clone());
         let items = take(&mut channel.items);
         for item in items {
@@ -87,9 +94,13 @@ impl EmulateCommand {
                     if error != &EmulateError::NoPath {
                         bail!(report)
                     }
-                    trace!("Skipping episode as it has not been downloaded: {episode}");
+                    trace!(episode, "Skipping episode as it has not been downloaded");
                 }
             }
+        }
+        if channel.items.is_empty() {
+            trace!(season, year, "Skipping feed as it contains no episodes");
+            return Ok(None);
         }
         let xml = channel.to_string();
         let path = self.paths.get_rss_path(&feed.podcast.slug, season, year);
@@ -108,7 +119,7 @@ impl EmulateCommand {
             .await
             .change_context(EmulateError::Flush)
             .attach_path(&path)?;
-        Ok(path)
+        Ok(Some(path))
     }
 
     fn replace_enclosure(
