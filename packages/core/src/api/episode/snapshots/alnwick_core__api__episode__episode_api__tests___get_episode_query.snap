@@ -9,6 +9,8 @@ SELECT
   "episodes"."description",
   "episodes"."source_duration",
   "episodes"."image",
+  "episodes"."file_sub_path",
+  "episodes"."image_sub_path",
   "episodes"."episode",
   "episodes"."season",
   "episodes"."kind"
