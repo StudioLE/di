@@ -8,7 +8,7 @@ pub type WorkerId = usize;
 pub enum Instruction<'a, T: ICommandInfo> {
     Wait(Notified<'a>),
     Stop,
-    Execute(T::Command),
+    Execute(T::Request, T::Command),
 }
 
 /// A worker that executes commands
@@ -39,11 +39,11 @@ impl Worker {
 async fn internal_loop<T: ICommandInfo>(mediator: Arc<CommandMediator<T>>, worker: WorkerId) {
     loop {
         match mediator.get_instruction().await {
-            Instruction::Execute(command) => {
+            Instruction::Execute(request, command) => {
                 let command_id = command.to_string();
                 trace!(worker, %command, "Executing");
-                let response = command.execute().await;
-                mediator.add_result(response).await;
+                let result = command.execute().await;
+                mediator.completed(request, result).await;
                 trace!(worker, command = command_id, "Executed");
             }
             Instruction::Wait(notified) => {

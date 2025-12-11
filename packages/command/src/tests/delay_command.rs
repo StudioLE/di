@@ -2,7 +2,7 @@ use crate::prelude::*;
 use std::time::Duration;
 use tokio::time::sleep;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub struct DelayRequest {
     name: String,
     duration: u64,
@@ -35,6 +35,7 @@ impl Executable for DelayRequest {
     type Handler = DelayHandler;
 }
 
+#[derive(Debug)]
 pub struct DelayHandler;
 
 impl Service for DelayHandler {

@@ -39,7 +39,7 @@ impl<T: ICommandInfo + 'static> WorkerPool<T> {
         let end = start + worker_count;
         *index_guard = end;
         drop(index_guard);
-        self.mediator.set_status(RunnerStatus::Running).await;
+        self.mediator.set_runner_status(RunnerStatus::Running).await;
         let mut handles = Vec::with_capacity(worker_count);
         for worker_id in start..=end {
             let handle = Worker::new(worker_id, self.mediator.clone());
@@ -52,13 +52,17 @@ impl<T: ICommandInfo + 'static> WorkerPool<T> {
 
     /// Stop workers after draining the queue
     pub async fn drain(&self) {
-        self.mediator.set_status(RunnerStatus::Draining).await;
+        self.mediator
+            .set_runner_status(RunnerStatus::Draining)
+            .await;
         self.wait_for_stop().await;
     }
 
     /// Stop workers after their current work is complete
     pub async fn stop(&self) {
-        self.mediator.set_status(RunnerStatus::Stopping).await;
+        self.mediator
+            .set_runner_status(RunnerStatus::Stopping)
+            .await;
         self.wait_for_stop().await;
     }
 

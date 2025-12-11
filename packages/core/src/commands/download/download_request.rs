@@ -1,7 +1,7 @@
 use crate::prelude::*;
 
 /// A request to execute a [`DownloadHandler`].
-#[derive(Clone, Copy, Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct DownloadRequest {
     pub(super) podcast: PodcastKey,
     pub(super) episode: EpisodeKey,

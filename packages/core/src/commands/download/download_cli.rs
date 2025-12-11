@@ -56,13 +56,15 @@ impl DownloadCliCommand {
         self.runner.start(CONCURRENCY).await;
         self.runner.drain().await;
         self.progress.finish().await;
-        let results = self.runner.get_results().await;
+        let results = self.runner.get_commands().await;
         let mut episodes = Vec::new();
         let mut errors = Vec::new();
-        for result in results.iter() {
-            match result {
-                CommandResult::Download(_, Ok(episode)) => episodes.push(episode),
-                CommandResult::Download(_, Err(e)) => errors.push(e),
+        for (_request, status) in results.iter() {
+            match status {
+                CommandStatus::Completed(CommandResult::Download(_, Ok(episode))) => {
+                    episodes.push(episode);
+                }
+                CommandStatus::Completed(CommandResult::Download(_, Err(e))) => errors.push(e),
                 _ => unreachable!("Should only get download results"),
             }
         }

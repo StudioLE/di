@@ -19,7 +19,7 @@ pub(crate) use std::mem::take;
 pub(crate) use std::sync::Arc;
 pub(crate) use studiole_di::prelude::*;
 pub(crate) use thiserror::Error;
-pub(crate) use tokio::sync::{Mutex, Notify, RwLock};
+pub(crate) use tokio::sync::{Mutex, MutexGuard, Notify};
 pub(crate) use tokio::task::JoinHandle;
 #[allow(unused_imports)]
 pub(crate) use tracing::{debug, error, info, trace, warn};

@@ -59,32 +59,36 @@ impl<T: ICommandInfo + 'static> CommandRunner<T> {
 
     /// Stop workers after draining the queue.
     pub async fn drain(&self) {
-        self.mediator.set_status(RunnerStatus::Draining).await;
+        self.mediator
+            .set_runner_status(RunnerStatus::Draining)
+            .await;
         self.workers.wait_for_stop().await;
     }
 
     /// Stop workers after their current work is complete
     pub async fn stop(&self) {
-        self.mediator.set_status(RunnerStatus::Stopping).await;
+        self.mediator
+            .set_runner_status(RunnerStatus::Stopping)
+            .await;
         self.workers.wait_for_stop().await;
     }
 
     /// Queue a command as a request.
-    pub async fn queue_request<R: Executable + Send + Sync + 'static>(
+    pub async fn queue_request<R: Executable + Into<T::Request> + Send + Sync + 'static>(
         &self,
         request: R,
     ) -> Result<(), Report<QueueError>> {
-        let command = self.registry.resolve(request)?;
-        self.mediator.queue_command(command).await;
+        let command = self.registry.resolve(request.clone())?;
+        self.mediator.queue(request.into(), command).await;
         Ok(())
     }
 
-    /// Get the results.
+    /// Get the commands.
     ///
     /// Note: The [`MutexGuard`] must be dropped or the [`Worker`] will be unable to finish
     /// execution.
-    pub async fn get_results(&self) -> MutexGuard<'_, Vec<T::Result>> {
-        self.mediator.get_results().await
+    pub async fn get_commands(&self) -> MutexGuard<'_, HashMap<T::Request, CommandStatus<T>>> {
+        self.mediator.get_commands().await
     }
 }
 

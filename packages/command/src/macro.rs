@@ -1,9 +1,10 @@
 use crate::prelude::*;
+use std::hash::Hash;
 
 #[macro_export]
 macro_rules! define_commands {
     ($($kind:ident($req:ty)),* $(,)?) => {
-        #[derive(Debug)]
+        #[derive(Clone, Debug, Eq, Hash, PartialEq)]
         pub enum CommandRequest {
             $(
                 $kind($req),
@@ -11,6 +12,14 @@ macro_rules! define_commands {
         }
 
         impl IRequest for CommandRequest {}
+
+        $(
+            impl From<$req> for CommandRequest {
+                fn from(request: $req) -> Self {
+                    Self::$kind(request)
+                }
+            }
+        )*
 
         #[derive(Clone)]
         pub enum CommandHandler {
@@ -113,7 +122,7 @@ macro_rules! define_commands {
     };
 }
 
-pub trait IRequest: Debug + Send + Sync {}
+pub trait IRequest: Clone + Debug + Eq + Hash + PartialEq + Send + Sync {}
 
 pub trait IHandler: Clone + Send + Sync {}
 
