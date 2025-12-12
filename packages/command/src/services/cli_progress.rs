@@ -1,6 +1,8 @@
 use crate::prelude::*;
 use indicatif::ProgressBar;
 use tokio::spawn;
+use tokio::sync::broadcast::error::RecvError;
+use tracing::{error, warn};
 
 pub struct CliProgress<T: ICommandInfo> {
     mediator: Arc<CommandMediator<T>>,
@@ -26,14 +28,33 @@ impl<T: ICommandInfo + 'static> CliProgress<T> {
             return;
         }
         let mediator = self.mediator.clone();
+        let mut receiver = mediator.subscribe();
         let bar = self.bar.clone();
         let finished = self.finished.clone();
+        let mut total: u64 = 0;
         let handle = spawn(async move {
-            let progress = mediator.get_progress().await;
-            update(&bar, &progress);
             while !*finished.lock().await {
-                let progress = mediator.wait_for_progress().await;
-                update(&bar, &progress);
+                let event = match receiver.recv().await {
+                    Err(RecvError::Lagged(count)) => {
+                        warn!("CLI Progress missed {count} events due to lagging");
+                        continue;
+                    }
+                    Err(RecvError::Closed) => {
+                        error!("Event pipe was closed. CLI Progress can't proceed.");
+                        break;
+                    }
+                    Ok(event) => event,
+                };
+                match event.kind {
+                    EventKind::Queued => {
+                        total += 1;
+                        bar.set_length(total);
+                    }
+                    EventKind::Executing => {}
+                    EventKind::Succeeded | EventKind::Failed => {
+                        bar.inc(1);
+                    }
+                }
             }
         });
         *handle_guard = Some(handle);
@@ -50,12 +71,6 @@ impl<T: ICommandInfo + 'static> CliProgress<T> {
         drop(handle_guard);
         self.bar.finish();
     }
-}
-
-#[allow(clippy::as_conversions)]
-fn update(bar: &ProgressBar, progress: &CommandProgress) {
-    bar.set_length(progress.total as u64);
-    bar.set_position(progress.completed as u64);
 }
 
 impl<T: ICommandInfo + 'static> Service for CliProgress<T> {

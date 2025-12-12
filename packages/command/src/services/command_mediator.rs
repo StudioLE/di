@@ -1,17 +1,18 @@
 use crate::prelude::*;
+use tokio::sync::broadcast::{Receiver, Sender, channel};
+
+const CHANNEL_CAPACITY: usize = 16;
 
 /// A mediator between the [`CommandRunner`], [`Worker`] and [`CliProgress`] services.
 pub struct CommandMediator<T: ICommandInfo> {
-    /// Number of commands queued over time
-    progress: Mutex<CommandProgress>,
+    /// Events
+    events: Sender<CommandEvent<T::Request>>,
     /// Queue of commands to execute
     queue: Mutex<VecDeque<T::Request>>,
     /// Current status of the runner
     commands: Mutex<HashMap<T::Request, CommandStatus<T>>>,
     /// Notify workers when new work is available
     notify_workers: Notify,
-    /// Notify progress subscribers when work is queued, executing, or completed
-    notify_progress: Notify,
     /// Current status of the runner
     runner_status: Mutex<RunnerStatus>,
 }
@@ -26,11 +27,11 @@ impl<T: ICommandInfo + 'static> Service for CommandMediator<T> {
 
 impl<T: ICommandInfo> CommandMediator<T> {
     pub(super) fn new() -> Self {
+        let (events, _) = channel::<CommandEvent<T::Request>>(CHANNEL_CAPACITY);
         Self {
-            progress: Mutex::default(),
+            events,
             queue: Mutex::default(),
             notify_workers: Notify::default(),
-            notify_progress: Notify::default(),
             runner_status: Mutex::default(),
             commands: Mutex::default(),
         }
@@ -38,13 +39,6 @@ impl<T: ICommandInfo> CommandMediator<T> {
 
     async fn get_runner_status(&self) -> RunnerStatus {
         *self.runner_status.lock().await
-    }
-
-    async fn update_progress(&self, callback: fn(&mut MutexGuard<CommandProgress>)) {
-        let mut progress = self.progress.lock().await;
-        callback(&mut progress);
-        drop(progress);
-        self.notify_progress.notify_waiters();
     }
 }
 
@@ -69,11 +63,9 @@ impl<T: ICommandInfo> CommandMediator<T> {
         }
         commands.insert(request.clone(), CommandStatus::Queued(command));
         drop(commands);
-        self.update_progress(|progress| {
-            progress.queued += 1;
-            progress.total += 1;
-        })
-        .await;
+        let _ = self
+            .events
+            .send(CommandEvent::new(request.clone(), EventKind::Queued));
         let mut queue = self.queue.lock().await;
         queue.push_back(request);
         drop(queue);
@@ -103,11 +95,9 @@ impl<T: ICommandInfo> CommandMediator<T> {
         }
         if let Some(request) = queue_guard.pop_front() {
             drop(queue_guard);
-            self.update_progress(|progress| {
-                progress.queued -= 1;
-                progress.executing += 1;
-            })
-            .await;
+            let _ = self
+                .events
+                .send(CommandEvent::new(request.clone(), EventKind::Executing));
             let mut commands = self.commands.lock().await;
             let option = commands.insert(request.clone(), CommandStatus::Executing);
             drop(commands);
@@ -132,32 +122,26 @@ impl<T: ICommandInfo> CommandMediator<T> {
         let mut commands = self.commands.lock().await;
         match result {
             Ok(success) => {
-                commands.insert(request, CommandStatus::Succeeded(success));
+                commands.insert(request.clone(), CommandStatus::Succeeded(success));
+                let _ = self
+                    .events
+                    .send(CommandEvent::new(request, EventKind::Succeeded));
             }
             Err(failure) => {
-                commands.insert(request, CommandStatus::Failed(failure));
+                commands.insert(request.clone(), CommandStatus::Failed(failure));
+                let _ = self
+                    .events
+                    .send(CommandEvent::new(request, EventKind::Failed));
             }
         }
         drop(commands);
-        self.update_progress(|progress| {
-            progress.executing -= 1;
-            progress.completed += 1;
-        })
-        .await;
     }
 }
 
-// Implementation for `Progress` subscribers
+// Implementation for event subscribers
 impl<T: ICommandInfo> CommandMediator<T> {
-    /// Get the current progress.
-    pub async fn get_progress(&self) -> CommandProgress {
-        let guard = self.progress.lock().await;
-        (*guard).clone()
-    }
-
-    /// Wait for progress to be reported
-    pub async fn wait_for_progress(&self) -> CommandProgress {
-        self.notify_progress.notified().await;
-        self.get_progress().await
+    /// Subscribe to events.
+    pub fn subscribe(&self) -> Receiver<CommandEvent<T::Request>> {
+        self.events.subscribe()
     }
 }
