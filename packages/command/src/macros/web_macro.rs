@@ -3,7 +3,7 @@ use crate::prelude::*;
 #[macro_export]
 macro_rules! define_commands_web {
     ($($kind:ident($req:ty)),* $(,)?) => {
-        #[derive(Clone, Debug, Eq, Hash, PartialEq)]
+        #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
         pub enum CommandRequest {
             $(
                 $kind($req),
@@ -38,6 +38,26 @@ macro_rules! define_commands_web {
 
         impl IFailure for CommandFailure {}
 
+        #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
+        pub struct CommandEvent {
+            pub request: CommandRequest,
+            pub kind: EventKind,
+        }
+
+        impl IEvent<CommandRequest> for CommandEvent {
+            fn new(request: CommandRequest, kind: EventKind) -> Self {
+                Self { request, kind }
+            }
+
+            fn get_request(&self) -> &CommandRequest {
+                &self.request
+            }
+
+            fn get_kind(&self) -> &EventKind {
+                &self.kind
+            }
+        }
+
         pub struct CommandInfo;
 
         impl ICommandInfo for CommandInfo {
@@ -48,6 +68,7 @@ macro_rules! define_commands_web {
             type Handler = CommandHandler;
             type Success = CommandSuccess;
             type Failure = CommandFailure;
+            type Event = CommandEvent;
         }
     };
 }
@@ -56,6 +77,13 @@ pub trait IRequest: Clone + Debug + Eq + Hash + PartialEq + Send + Sync {}
 
 pub trait ISuccess: Debug + Send + Sync {}
 pub trait IFailure: Debug + Send + Sync {}
+pub trait IEvent<Req: IRequest>: Clone + Debug + Send + Sync {
+    fn new(request: Req, kind: EventKind) -> Self;
+
+    fn get_request(&self) -> &Req;
+
+    fn get_kind(&self) -> &EventKind;
+}
 
 pub trait ICommandInfo {
     type Request: IRequest;
@@ -65,4 +93,5 @@ pub trait ICommandInfo {
     type Handler: IHandler;
     type Success: ISuccess;
     type Failure: IFailure;
+    type Event: IEvent<Self::Request>;
 }

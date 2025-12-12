@@ -1,11 +1,14 @@
 #![allow(unused_imports)]
 
+pub use crate::event_kind::*;
 pub use crate::macros::*;
 pub use crate::traits::*;
 pub use crate::{define_commands, define_commands_web};
 
 pub(crate) use async_trait::async_trait;
 pub(crate) use error_stack::{Report, ResultExt};
+pub(crate) use serde::de::DeserializeOwned;
+pub(crate) use serde::{Deserialize, Serialize};
 pub(crate) use std::any::{Any, TypeId, type_name};
 pub(crate) use std::collections::{HashMap, VecDeque};
 pub(crate) use std::convert::Infallible;
