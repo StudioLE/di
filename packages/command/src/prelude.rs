@@ -23,3 +23,4 @@ pub(crate) use tokio::sync::{Mutex, MutexGuard, Notify};
 pub(crate) use tokio::task::JoinHandle;
 #[allow(unused_imports)]
 pub(crate) use tracing::{debug, error, info, trace, warn};
+pub(crate) use std::hash::Hash;

@@ -1,5 +1,4 @@
 use crate::prelude::*;
-use std::hash::Hash;
 
 #[macro_export]
 macro_rules! define_commands {
@@ -140,7 +139,3 @@ pub trait ICommandInfo {
     type Handler: IHandler;
     type Result: IResult;
 }
-
-#[derive(Debug, Error)]
-#[error("Command return an error result")]
-pub struct ExecutionFailed;
