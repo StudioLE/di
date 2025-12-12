@@ -8,5 +8,4 @@ pub trait Execute<In, Out, E> {
 pub trait Executable: Clone + Display + Sized {
     type Response: Debug + Send + Sync;
     type ExecutionError: Error + Send + Sync;
-    type Handler: Execute<Self, Self::Response, Self::ExecutionError> + Send + Sync;
 }

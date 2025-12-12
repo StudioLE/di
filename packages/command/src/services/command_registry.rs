@@ -13,9 +13,14 @@ impl<T: ICommandInfo> CommandRegistry<T> {
     }
 
     #[allow(clippy::as_conversions)]
-    pub fn register<R: Executable + Send + Sync + 'static>(&mut self, handler: Arc<R::Handler>)
-    where
-        Arc<R::Handler>: Into<T::Handler>,
+    pub fn register<
+        R: Executable + Send + Sync + 'static,
+        H: Execute<R, R::Response, R::ExecutionError>,
+    >(
+        &mut self,
+        handler: Arc<H>,
+    ) where
+        Arc<H>: Into<T::Handler>,
     {
         let request_type = TypeId::of::<R>();
         self.handlers.insert(request_type, handler.into());

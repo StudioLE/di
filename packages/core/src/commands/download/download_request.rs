@@ -20,9 +20,7 @@ impl Display for DownloadRequest {
     }
 }
 
-#[cfg(feature = "server")]
 impl Executable for DownloadRequest {
     type Response = ();
     type ExecutionError = DownloadError;
-    type Handler = DownloadHandler;
 }

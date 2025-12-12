@@ -2,8 +2,6 @@ use crate::prelude::*;
 
 const CONCURRENCY: usize = 8;
 
-define_commands!(Download(DownloadRequest));
-
 pub struct DownloadCliCommand {
     metadata: Arc<MetadataRepository>,
     runner: Arc<CommandRunner<CommandInfo>>,

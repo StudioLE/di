@@ -92,7 +92,7 @@ impl<T: ICommandInfo + 'static> CommandRunner<T> {
     }
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "server"))]
 mod tests {
     use super::*;
 

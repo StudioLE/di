@@ -20,7 +20,7 @@ server = [
   "dep:lofty",
   "dep:scraper",
   "dep:sea-orm-migration",
-  "dep:studiole_command",
+  "studiole_command/server",
   "dep:studiole_di",
   "dep:tokio",
   "dep:urlencoding",
@@ -36,6 +36,7 @@ sea-orm = { workspace = true, features = ["macros"] }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_yaml = { workspace = true }
+studiole_command = { path = "../command", default-features = false }
 strum_macros = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
@@ -52,7 +53,6 @@ indicatif = { workspace = true, optional = true }
 lofty = { workspace = true, optional = true }
 scraper = { workspace = true, optional = true }
 sea-orm-migration = { workspace = true, optional = true }
-studiole_command = { path = "../command", optional = true }
 studiole_di = { path = "../di", optional = true }
 tokio = { workspace = true, optional = true }
 urlencoding = { workspace = true, optional = true }

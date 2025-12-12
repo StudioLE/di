@@ -1,26 +1,23 @@
-pub use crate::define_commands;
-pub use crate::r#macro::*;
-pub use crate::services::*;
-#[cfg(test)]
-pub(crate) use crate::tests::*;
+#![allow(unused_imports)]
+
+pub use crate::macros::*;
 pub use crate::traits::*;
+pub use crate::{define_commands, define_commands_web};
 
 pub(crate) use async_trait::async_trait;
 pub(crate) use error_stack::{Report, ResultExt};
-#[allow(unused_imports)]
 pub(crate) use std::any::{Any, TypeId, type_name};
 pub(crate) use std::collections::{HashMap, VecDeque};
 pub(crate) use std::convert::Infallible;
 pub(crate) use std::error::Error;
 pub(crate) use std::fmt::{Debug, Display, Formatter, Result as FmtResult};
-#[allow(unused_imports)]
-pub(crate) use std::future::Future;
+pub(crate) use std::hash::Hash;
 pub(crate) use std::mem::take;
 pub(crate) use std::sync::Arc;
-pub(crate) use studiole_di::prelude::*;
 pub(crate) use thiserror::Error;
-pub(crate) use tokio::sync::{Mutex, MutexGuard, Notify};
-pub(crate) use tokio::task::JoinHandle;
-#[allow(unused_imports)]
-pub(crate) use tracing::{debug, error, info, trace, warn};
-pub(crate) use std::hash::Hash;
+pub(crate) use tracing::{debug, info, trace};
+
+#[cfg(feature = "server")]
+pub use crate::server_prelude::*;
+#[cfg(test)]
+pub(crate) use crate::tests::*;

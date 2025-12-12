@@ -7,15 +7,23 @@ description.workspace = true
 documentation.workspace = true
 
 [features]
+default = ["server"]
+server = [
+  "dep:indicatif",
+  "dep:studiole_di",
+  "dep:tokio",
+]
 
 [dependencies]
 async-trait = { workspace = true }
 error-stack = { workspace = true }
-indicatif = { workspace = true }
-studiole_di = { path = "../di" }
 thiserror = { workspace = true }
-tokio = { workspace = true, features = ["sync", "time"] }
 tracing = { workspace = true }
+
+# Server dependencies
+indicatif = { workspace = true, optional = true }
+studiole_di = { path = "../di", optional = true }
+tokio = { workspace = true, optional = true, features = ["sync", "time"] }
 
 [dev-dependencies]
 tracing-subscriber = { workspace = true }
