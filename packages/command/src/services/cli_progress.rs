@@ -45,7 +45,7 @@ impl<T: ICommandInfo + 'static> CliProgress<T> {
                     }
                     Ok(event) => event,
                 };
-                match event.kind {
+                match event.get_kind() {
                     EventKind::Queued => {
                         total += 1;
                         bar.set_length(total);

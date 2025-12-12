@@ -6,7 +6,7 @@ const CHANNEL_CAPACITY: usize = 16;
 /// A mediator between the [`CommandRunner`], [`Worker`] and [`CliProgress`] services.
 pub struct CommandMediator<T: ICommandInfo> {
     /// Events
-    events: Sender<CommandEvent<T::Request>>,
+    events: Sender<T::Event>,
     /// Queue of commands to execute
     queue: Mutex<VecDeque<T::Request>>,
     /// Current status of the runner
@@ -27,7 +27,7 @@ impl<T: ICommandInfo + 'static> Service for CommandMediator<T> {
 
 impl<T: ICommandInfo> CommandMediator<T> {
     pub(super) fn new() -> Self {
-        let (events, _) = channel::<CommandEvent<T::Request>>(CHANNEL_CAPACITY);
+        let (events, _) = channel::<T::Event>(CHANNEL_CAPACITY);
         Self {
             events,
             queue: Mutex::default(),
@@ -65,7 +65,7 @@ impl<T: ICommandInfo> CommandMediator<T> {
         drop(commands);
         let _ = self
             .events
-            .send(CommandEvent::new(request.clone(), EventKind::Queued));
+            .send(T::Event::new(request.clone(), EventKind::Queued));
         let mut queue = self.queue.lock().await;
         queue.push_back(request);
         drop(queue);
@@ -97,7 +97,7 @@ impl<T: ICommandInfo> CommandMediator<T> {
             drop(queue_guard);
             let _ = self
                 .events
-                .send(CommandEvent::new(request.clone(), EventKind::Executing));
+                .send(T::Event::new(request.clone(), EventKind::Executing));
             let mut commands = self.commands.lock().await;
             let option = commands.insert(request.clone(), CommandStatus::Executing);
             drop(commands);
@@ -125,13 +125,11 @@ impl<T: ICommandInfo> CommandMediator<T> {
                 commands.insert(request.clone(), CommandStatus::Succeeded(success));
                 let _ = self
                     .events
-                    .send(CommandEvent::new(request, EventKind::Succeeded));
+                    .send(T::Event::new(request, EventKind::Succeeded));
             }
             Err(failure) => {
                 commands.insert(request.clone(), CommandStatus::Failed(failure));
-                let _ = self
-                    .events
-                    .send(CommandEvent::new(request, EventKind::Failed));
+                let _ = self.events.send(T::Event::new(request, EventKind::Failed));
             }
         }
         drop(commands);
@@ -141,7 +139,7 @@ impl<T: ICommandInfo> CommandMediator<T> {
 // Implementation for event subscribers
 impl<T: ICommandInfo> CommandMediator<T> {
     /// Subscribe to events.
-    pub fn subscribe(&self) -> Receiver<CommandEvent<T::Request>> {
+    pub fn subscribe(&self) -> Receiver<T::Event> {
         self.events.subscribe()
     }
 }

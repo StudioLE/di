@@ -1,5 +1,4 @@
 mod cli_progress;
-mod command_event;
 mod command_events;
 mod command_mediator;
 mod command_progress;
@@ -10,7 +9,6 @@ mod worker;
 mod worker_pool;
 
 pub use cli_progress::*;
-pub use command_event::*;
 pub use command_events::*;
 pub use command_mediator::*;
 pub use command_progress::*;

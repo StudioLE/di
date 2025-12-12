@@ -5438,6 +5438,7 @@ dependencies = [
  "async-trait",
  "error-stack",
  "indicatif",
+ "serde",
  "studiole_di",
  "thiserror 2.0.17",
  "tokio",

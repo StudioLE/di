@@ -5,7 +5,7 @@ use tracing::{error, warn};
 
 pub struct CommandEvents<T: ICommandInfo> {
     mediator: Arc<CommandMediator<T>>,
-    events: Arc<Mutex<Vec<CommandEvent<T::Request>>>>,
+    events: Arc<Mutex<Vec<T::Event>>>,
     handle: Mutex<Option<JoinHandle<()>>>,
 }
 
@@ -56,7 +56,7 @@ impl<T: ICommandInfo + 'static> CommandEvents<T> {
         *handle_guard = Some(handle);
     }
 
-    pub async fn get(&self) -> MutexGuard<'_, Vec<CommandEvent<<T as ICommandInfo>::Request>>> {
+    pub async fn get(&self) -> MutexGuard<'_, Vec<T::Event>> {
         self.events.lock().await
     }
 
@@ -64,7 +64,7 @@ impl<T: ICommandInfo + 'static> CommandEvents<T> {
         let mut counts = CommandEventCounts::default();
         let events = self.events.lock().await;
         for event in events.iter() {
-            match event.kind {
+            match event.get_kind() {
                 EventKind::Queued => counts.queued += 1,
                 EventKind::Executing => counts.executing += 1,
                 EventKind::Succeeded => counts.succeeded += 1,
