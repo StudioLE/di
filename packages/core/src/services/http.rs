@@ -95,10 +95,11 @@ impl HttpClient {
         &self,
         url: &Url,
         destination_path: PathBuf,
+        hardlink: bool,
     ) -> Result<(), Report<HttpError>> {
         let extension = destination_path.extension().and_then(|e| e.to_str());
         let source_path = self.get(url, extension).await?;
-        copy_with_logging(source_path, destination_path).await?;
+        hardlink_or_copy(source_path, destination_path, hardlink).await?;
         Ok(())
     }
 
@@ -167,7 +168,7 @@ impl HttpClient {
     async fn download_to_cache(&self, url: &Url, path: &PathBuf) -> Result<(), Report<HttpError>> {
         create_dir(path).await?;
         let client = ReqwestClient::new();
-        trace!("Downloading {url} to {}", path.display());
+        trace!(%url, path = %path.display(), "Downloading file");
         let mut response = client
             .get(url.as_str())
             .send()
@@ -203,7 +204,7 @@ async fn create_dir(path: &Path) -> Result<(), Report<HttpError>> {
         .parent()
         .expect("cache path should have a parent directory");
     if !dir.exists() {
-        trace!("Creating cache directory: {}", dir.display());
+        trace!(path = %dir.display(), "Creating cache directory");
         create_dir_all(dir)
             .await
             .change_context(HttpError::CreateCacheDirectory)
@@ -232,6 +233,43 @@ impl Default for HttpClient {
             dir: PathProvider::default().get_http_dir(),
         }
     }
+}
+
+pub async fn hardlink_or_copy(
+    source: PathBuf,
+    destination: PathBuf,
+    hardlink: bool,
+) -> Result<(), Report<HttpError>> {
+    create_parent_dir_if_not_exist(&destination)
+        .await
+        .change_context(HttpError::CreateDestinationDirectory)?;
+    if destination.exists() {
+        remove_file(&destination)
+            .await
+            .change_context(HttpError::RemoveExisting)?;
+    }
+    let result = if hardlink {
+        trace!(
+            source = %source.display(),
+            destination = %destination.display(),
+            "Hard linking file"
+        );
+        hard_link(&source, &destination).await
+    } else {
+        trace!(
+            source = %source.display(),
+            destination = %destination.display(),
+            "Copying file"
+        );
+        copy(&source, &destination).await.map(|_| ())
+    };
+    result.change_context(HttpError::Copy).attach_with(|| {
+        format!(
+            "Source: {}\nDestination: {}",
+            source.display(),
+            destination.display()
+        )
+    })
 }
 
 #[cfg(test)]
