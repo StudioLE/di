@@ -26,6 +26,10 @@ pub struct AppOptions {
     ///
     /// Default: None
     pub expect_country: Option<String>,
+    /// Should hardlinks be used when copying between cache and data directory?
+    ///
+    /// Defaults to automatically determining
+    pub hard_link_from_cache: Option<bool>,
 }
 
 impl Service for AppOptions {

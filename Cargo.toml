@@ -32,6 +32,7 @@ image = { version = "0.25.9" }
 indicatif = { version = "0.18.3" }
 insta = { version = "1.44.3", features = ["yaml"] }
 lofty = { version = "0.22.4" }
+procfs = { version = "0.18.0" }
 reqwest = { version = "0.12.24", default-features = false, features = ["blocking", "json", "rustls-tls", "stream"] }
 rss = { version = "2.0.12", features = ["validation"] }
 scraper = { version = "0.24.0" }

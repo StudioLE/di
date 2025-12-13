@@ -18,6 +18,7 @@ server = [
   "dep:image",
   "dep:indicatif",
   "dep:lofty",
+  "dep:procfs",
   "dep:scraper",
   "dep:sea-orm-migration",
   "studiole_command/server",
@@ -56,6 +57,9 @@ sea-orm-migration = { workspace = true, optional = true }
 studiole_di = { path = "../di", optional = true }
 tokio = { workspace = true, optional = true }
 urlencoding = { workspace = true, optional = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+procfs = { workspace = true, optional = true }
 
 [dev-dependencies]
 base64 = { workspace = true }
