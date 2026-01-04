@@ -16,6 +16,7 @@ jobs:
       package_name: alnwick
       binary_name: alnwick
       test_args: --workspace --exclude alnwick_dioxus
+      check_args: --workspace --exclude alnwick_dioxus
       run_before_test: |
         mkdir -p "${HOME}/.cache/alnwick"
         mkdir -p "${HOME}/.local/share/alnwick"
