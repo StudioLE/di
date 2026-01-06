@@ -91,6 +91,7 @@ mod tests {
     use super::*;
 
     #[tokio::test]
+    #[serial]
     pub async fn download_command() {
         // Arrange
         warn!("Starting test");

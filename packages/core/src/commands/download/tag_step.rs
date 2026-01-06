@@ -26,7 +26,13 @@ impl DownloadHandler {
             None
         };
         let tag = create_tag(&context.podcast, &context.episode, cover);
-        write_tag(&context.file_path, tag).change_context(DownloadError::TagEpisode)?;
+        write_tag(&context.file_path, tag)
+            .change_context(DownloadError::TagEpisode)
+            .attach_path(&context.file_path)
+            .attach(format!(
+                "File size: {:?}",
+                get_file_size(&context.file_path)
+            ))?;
         Ok(())
     }
 }
@@ -72,4 +78,9 @@ fn get_tag_types(path: &Path) -> Result<Vec<TagType>, LoftyError> {
     let tagged_file = Probe::open(path)?.read()?;
     let tag_types = tagged_file.tags().iter().map(Tag::tag_type).collect();
     Ok(tag_types)
+}
+
+#[allow(clippy::absolute_paths)]
+fn get_file_size(path: &Path) -> Option<u64> {
+    Some(std::fs::metadata(path).ok()?.len())
 }

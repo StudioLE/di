@@ -46,6 +46,7 @@ mod tests {
     use super::*;
 
     #[tokio::test]
+    #[serial]
     pub async fn download_handler() {
         // Arrange
         let services = TestServiceProvider::create().await;

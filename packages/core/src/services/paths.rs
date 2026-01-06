@@ -10,7 +10,7 @@ const BANNER_FILE_NAME: &str = "banner.jpg";
 const COVER_FILE_NAME: &str = "cover.jpg";
 
 /// Service for providing file paths and URL.
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct PathProvider {
     /// Directory for app data.
     ///
@@ -189,7 +189,11 @@ mod tests {
     #[test]
     fn get_rss_path() {
         // Arrange
-        let paths = PathProvider::default();
+        let paths = PathProvider {
+            data_dir: PathBuf::default(),
+            cache_dir: PathBuf::default(),
+            hard_link_from_cache: false,
+        };
         let data_dir = paths.data_dir.clone();
         let slug = Slug::from_str("abc").expect("should be valid slug");
 

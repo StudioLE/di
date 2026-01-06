@@ -14,6 +14,8 @@ pub enum HttpError {
     CreateCache,
     #[error("Unable to write cache file")]
     WriteCache,
+    #[error("Unable to sync cache file")]
+    SyncCache,
     #[error("Unable to open cache file")]
     OpenCache,
     #[error("Unable to create cache directory")]

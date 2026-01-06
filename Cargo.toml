@@ -26,6 +26,7 @@ dirs = { version = "6.0.0" }
 envy = { version = "0.4.2" }
 error-stack = { version = "0.6.0", features = ["serde", "tracing"] }
 fast_image_resize = { version = "5.4.0", features = ["image"] }
+governor = { version = "0.8" }
 futures = { version = "0.3.31" }
 html2text = { version = "0.16.5" }
 image = { version = "0.25.9" }

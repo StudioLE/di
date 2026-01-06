@@ -104,7 +104,11 @@ mod tests {
     #[ignore = "uses httpbin.org"]
     pub async fn resize_jpeg() {
         // Arrange
-        let http = HttpClient::default();
+        let services = ServiceProvider::new();
+        let http = services
+            .get_service::<HttpClient>()
+            .await
+            .expect("should be able to get HttpClient");
         let formats = vec!["jpeg", "png", "webp"];
         for format in formats {
             eprintln!("format: {format}");

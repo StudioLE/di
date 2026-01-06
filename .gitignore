@@ -1,6 +1,7 @@
 /target
 .env
 .envrc
+.claude
 **/*.rs.bk
 node_modules
 **/.expect/**/*.actual.json

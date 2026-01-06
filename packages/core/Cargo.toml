@@ -15,6 +15,7 @@ server = [
   "dep:envy",
   "dep:fast_image_resize",
   "dep:futures",
+  "dep:governor",
   "dep:image",
   "dep:indicatif",
   "dep:lofty",
@@ -49,6 +50,7 @@ dirs = { workspace = true, optional = true }
 envy = { workspace = true, optional = true }
 fast_image_resize = { workspace = true, optional = true }
 futures = { workspace = true, optional = true }
+governor = { workspace = true, optional = true }
 image = { workspace = true, optional = true }
 indicatif = { workspace = true, optional = true }
 lofty = { workspace = true, optional = true }
