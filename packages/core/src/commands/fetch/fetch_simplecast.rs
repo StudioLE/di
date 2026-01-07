@@ -8,8 +8,8 @@ impl FetchHandler {
     pub(super) async fn get_simplecast_rss(
         &self,
         _slug: &Slug,
-        url: &Url,
-    ) -> Result<Url, Report<FetchSimplecastError>> {
+        url: &UrlWrapper,
+    ) -> Result<UrlWrapper, Report<FetchSimplecastError>> {
         let player_id = self.get_player_id(url).await?;
         let episode = self.get_episode(&player_id).await?;
         let podcast = self.get_podcast(&episode).await?;
@@ -24,7 +24,10 @@ impl FetchHandler {
         Err(report)
     }
 
-    async fn get_player_id(&self, url: &Url) -> Result<String, Report<FetchSimplecastError>> {
+    async fn get_player_id(
+        &self,
+        url: &UrlWrapper,
+    ) -> Result<String, Report<FetchSimplecastError>> {
         let html = self
             .http
             .get_html(url)
@@ -42,11 +45,11 @@ impl FetchHandler {
         &self,
         id: &str,
     ) -> Result<SimplecastEpisode, Report<FetchSimplecastError>> {
-        let episode_url = Url::parse(&format!("https://api.simplecast.com/episodes/{id}"))
+        let url = UrlWrapper::from_str(&format!("https://api.simplecast.com/episodes/{id}"))
             .expect("URL should be valid");
         let episode: SimplecastEpisode = self
             .http
-            .get_json(&episode_url)
+            .get_json(&url)
             .await
             .change_context(FetchSimplecastError::GetEpisode)
             .attach_with(|| format!("Episode ID: {id}"))?;
@@ -58,7 +61,7 @@ impl FetchHandler {
         episode: &SimplecastEpisode,
     ) -> Result<SimplecastPodcast, Report<FetchSimplecastError>> {
         debug!("Fetching podcast for {}", episode.podcast.title);
-        let url = Url::parse(&format!(
+        let url = UrlWrapper::from_str(&format!(
             "https://api.simplecast.com/podcasts/{}",
             episode.podcast.id
         ))
@@ -76,7 +79,7 @@ impl FetchHandler {
         episode: &SimplecastEpisode,
     ) -> Result<Vec<SimplecastPlaylistEpisode>, Report<FetchSimplecastError>> {
         debug!("Fetching playlist for {}", episode.podcast.title);
-        let mut playlist_url = Url::parse(&format!(
+        let mut playlist_url = UrlWrapper::from_str(&format!(
             "https://api.simplecast.com/podcasts/{}/playlist",
             episode.podcast.id
         ))

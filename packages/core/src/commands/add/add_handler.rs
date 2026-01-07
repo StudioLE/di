@@ -28,7 +28,7 @@ impl Execute<AddRequest, AddResponse, Report<AddError>> for AddHandler {
         trace!(slug = %request.slug, url = %request.feed_url, "Fetching podcast");
         let mut feed = self
             .fetch
-            .fetch_feed(&request.slug, request.feed_url.as_ref())
+            .fetch_feed(&request.slug, &request.feed_url)
             .await
             .change_context(AddError::Parse)?;
         trace!(slug = %request.slug, episodes = feed.episodes.len(), "Fetched feed");
@@ -62,7 +62,7 @@ mod tests {
             .expect("should be able to get handler");
         let request = AddRequest {
             slug: example_slug(),
-            feed_url: UrlWrapper::from(example_rss_url()),
+            feed_url: example_rss_url(),
         };
         let _logger = init_test_logger();
 

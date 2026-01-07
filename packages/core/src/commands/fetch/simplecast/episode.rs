@@ -6,7 +6,7 @@ use crate::prelude::*;
 pub struct SimplecastEpisode {
     pub long_description: String,
     pub audio_status: String,
-    pub image_url: Option<Url>,
+    pub image_url: Option<UrlWrapper>,
     #[serde(rename = "type")]
     pub episode_type: String,
     pub token: String,
@@ -21,9 +21,9 @@ pub struct SimplecastEpisode {
     pub episode_url: String,
     pub audio_file_size: i64,
     pub published_at: DateTime<FixedOffset>,
-    pub href: Url,
+    pub href: UrlWrapper,
     pub audio_file_path: String,
-    pub enclosure_url: Url,
+    pub enclosure_url: UrlWrapper,
     pub authors: SimplecastAuthors,
     pub id: String,
     pub is_explicit: bool,
@@ -37,21 +37,21 @@ pub struct SimplecastAudioFile {
     pub path_tc: String,
     pub path: String,
     pub name: String,
-    pub href: Url,
+    pub href: UrlWrapper,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct SimplecastSeason {
-    pub href: Url,
+    pub href: UrlWrapper,
     pub number: u32,
     pub next_episode_number: u32,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct SimplecastEpisodePodcast {
-    pub href: Url,
+    pub href: UrlWrapper,
     pub title: String,
-    pub image_url: Option<Url>,
+    pub image_url: Option<UrlWrapper>,
     pub id: String,
     pub episodes: SimplecastCount,
     pub created_at: NaiveDateTime,
@@ -74,8 +74,8 @@ impl From<SimplecastEpisode> for EpisodeInfo {
             source_id: episode.id,
             title: episode.title,
             description: Some(episode.description),
-            image: episode.image_url.map(UrlWrapper::from),
-            source_url: UrlWrapper::from(episode.enclosure_url),
+            image: episode.image_url,
+            source_url: episode.enclosure_url,
             kind: EpisodeKind::from_str(&episode.episode_type).ok(),
             season: Some(episode.season.number),
             episode: episode.number,

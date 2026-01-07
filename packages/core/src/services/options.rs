@@ -13,7 +13,7 @@ pub struct AppOptions {
     /// Base URL to use for server.
     ///
     /// Default: None
-    pub server_base: Option<Url>,
+    pub server_base: Option<UrlWrapper>,
     /// Expected external IP address.
     ///
     /// Execution will stop if different.

@@ -8,7 +8,7 @@ use reqwest::header::CONTENT_TYPE;
 const HEAD_EXTENSION: &str = "head";
 const DEFAULT_DOMAIN: &str = "__unknown";
 
-/// A client for making HTTP requests and caching responses
+/// A client for making HTTP requests and caching responses.
 ///
 /// `HttpClient` orchestrates HTTP requests with caching and rate limiting:
 /// - Uses `HttpCache` for file-based response caching
@@ -39,7 +39,10 @@ impl Service for HttpClient {
 }
 
 impl HttpClient {
-    pub async fn get_html(&self, url: &Url) -> Result<Html, Report<HttpError>> {
+    /// Fetch HTML content from a URL.
+    ///
+    /// Returns the parsed HTML document. The response is cached for future requests.
+    pub async fn get_html(&self, url: &UrlWrapper) -> Result<Html, Report<HttpError>> {
         let path = self.get(url, Some(HTML_EXTENSION)).await?;
         let contents = read_to_string(&path)
             .await
@@ -48,7 +51,13 @@ impl HttpClient {
         Ok(Html::parse_document(&contents))
     }
 
-    pub async fn get_json<T: DeserializeOwned>(&self, url: &Url) -> Result<T, Report<HttpError>> {
+    /// Fetch JSON content from a URL and deserialize it.
+    ///
+    /// The response is cached. If deserialization fails, the cache entry is removed.
+    pub async fn get_json<T: DeserializeOwned>(
+        &self,
+        url: &UrlWrapper,
+    ) -> Result<T, Report<HttpError>> {
         let path = self.get(url, Some(JSON_EXTENSION)).await?;
         let file = File::open(&path)
             .change_context(HttpError::OpenCache)
@@ -63,7 +72,10 @@ impl HttpClient {
         result
     }
 
-    pub async fn head(&self, url: &Url) -> Result<String, Report<HttpError>> {
+    /// Perform a HEAD request to get the Content-Type of a URL.
+    ///
+    /// The Content-Type is cached for future requests.
+    pub async fn head(&self, url: &UrlWrapper) -> Result<String, Report<HttpError>> {
         let extension = Some(HEAD_EXTENSION);
         if self.cache.exists(url, extension) {
             trace!("HEAD cache HIT: {url}");
@@ -86,9 +98,13 @@ impl HttpClient {
         Ok(content_type)
     }
 
+    /// Fetch content from a URL and cache it.
+    ///
+    /// Returns the path to the cached file. If the content is already cached,
+    /// returns immediately without making a network request.
     pub async fn get(
         &self,
-        url: &Url,
+        url: &UrlWrapper,
         extension: Option<&str>,
     ) -> Result<PathBuf, Report<HttpError>> {
         if self.cache.exists(url, extension) {
@@ -117,9 +133,12 @@ impl HttpClient {
         Ok(path)
     }
 
+    /// Download a file from a URL to a destination path.
+    ///
+    /// The file is first cached, then either hard-linked or copied to the destination.
     pub async fn download(
         &self,
-        url: &Url,
+        url: &UrlWrapper,
         destination_path: PathBuf,
         hardlink: bool,
     ) -> Result<(), Report<HttpError>> {
@@ -196,7 +215,8 @@ mod tests {
             .get_service::<HttpClient>()
             .await
             .expect("should be able to get HttpClient");
-        let url = Url::parse("https://example.com/?abc=123&def=456").expect("url should be valid");
+        let url =
+            UrlWrapper::from_str("https://example.com/?abc=123&def=456").expect("valid test URL");
         http.cache.remove(&url, Some(HEAD_EXTENSION)).await;
         let _logger = init_test_logger();
 
@@ -238,7 +258,8 @@ mod tests {
             .get_service::<HttpClient>()
             .await
             .expect("should be able to get HttpClient");
-        let url = Url::parse("https://example.com/?abc=123&def=456").expect("url should be valid");
+        let url =
+            UrlWrapper::from_str("https://example.com/?abc=123&def=456").expect("valid test URL");
         let expected = http.cache.get_path(&url, Some(HTML_EXTENSION));
         http.cache.remove(&url, Some(HTML_EXTENSION)).await;
         let _logger = init_test_logger();
@@ -261,7 +282,7 @@ mod tests {
             .get_service::<HttpClient>()
             .await
             .expect("should be able to get HttpClient");
-        let url = Url::parse("https://example.com").expect("url should be valid");
+        let url = UrlWrapper::from_str("https://example.com").expect("valid test URL");
         http.cache.remove(&url, Some(HTML_EXTENSION)).await;
         let _logger = init_test_logger();
 
@@ -281,7 +302,7 @@ mod tests {
             .get_service::<HttpClient>()
             .await
             .expect("should be able to get HttpClient");
-        let url = Url::parse("https://ipinfo.io/json").expect("url should be valid");
+        let url = UrlWrapper::from_str("https://ipinfo.io/json").expect("valid test URL");
         http.cache.remove(&url, Some(JSON_EXTENSION)).await;
         let _logger = init_test_logger();
 
@@ -301,14 +322,12 @@ mod tests {
             .get_service::<HttpClient>()
             .await
             .expect("should be able to get HttpClient");
-        let url = Url::parse("https://example.com").expect("url should be valid");
+        let url = UrlWrapper::from_str("https://example.com").expect("valid test URL");
         let _logger = init_test_logger();
-
-        // Prime the cache with a real request
         let result = http.get(&url, Some(HTML_EXTENSION)).await;
         assert!(result.is_ok(), "Failed to prime cache");
 
-        // Act - Make 100 cache hits
+        // Act
         let start = Instant::now();
         for _ in 0..100 {
             let result = http.get(&url, Some(HTML_EXTENSION)).await;
@@ -316,7 +335,7 @@ mod tests {
         }
         let elapsed = start.elapsed();
 
-        // Assert - Cache hits should be instant (< 500ms for 100 hits)
+        // Assert
         assert!(
             elapsed < Duration::from_millis(500),
             "Expected cache hits to be instant, elapsed: {elapsed:?}"
@@ -333,44 +352,37 @@ mod tests {
             .await
             .expect("should be able to get HttpClient");
         let _logger = init_test_logger();
-
-        // Clear cache
         for i in 0..10 {
-            let url1 = Url::parse(&format!("https://example.com/isolated-{i}"))
-                .expect("url should be valid");
-            let url2 = Url::parse(&format!("https://httpbin.org/isolated-{i}"))
-                .expect("url should be valid");
+            let url1 = UrlWrapper::from_str(&format!("https://example.com/isolated-{i}"))
+                .expect("valid test URL");
+            let url2 = UrlWrapper::from_str(&format!("https://httpbin.org/isolated-{i}"))
+                .expect("valid test URL");
             http.cache.remove(&url1, Some(HTML_EXTENSION)).await;
             http.cache.remove(&url2, Some(HTML_EXTENSION)).await;
         }
-
-        // Act - Make requests to both domains concurrently
-        let start = Instant::now();
         let http1 = http.clone();
         let http2 = http.clone();
 
+        // Act
+        let start = Instant::now();
         let task1 = tokio::spawn(async move {
             for i in 0..6 {
-                let url = Url::parse(&format!("https://example.com/isolated-{i}"))
-                    .expect("url should be valid");
+                let url = UrlWrapper::from_str(&format!("https://example.com/isolated-{i}"))
+                    .expect("valid test URL");
                 let _ = http1.get(&url, Some(HTML_EXTENSION)).await;
             }
         });
-
         let task2 = tokio::spawn(async move {
             for i in 0..6 {
-                let url = Url::parse(&format!("https://httpbin.org/isolated-{i}"))
-                    .expect("url should be valid");
+                let url = UrlWrapper::from_str(&format!("https://httpbin.org/isolated-{i}"))
+                    .expect("valid test URL");
                 let _ = http2.get(&url, Some(HTML_EXTENSION)).await;
             }
         });
-
         let _ = tokio::try_join!(task1, task2);
         let elapsed = start.elapsed();
 
-        // Assert - Each domain should have independent 5 req/sec limit
-        // Both tasks should complete in roughly the same time (not 2x the time)
-        // With 6 requests each at 5 req/sec, should take ~1 second per domain (in parallel)
+        // Assert
         assert!(
             elapsed < Duration::from_secs(3),
             "Expected parallel execution with independent rate limits, elapsed: {elapsed:?}"

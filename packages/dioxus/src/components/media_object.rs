@@ -8,7 +8,7 @@ pub fn MediaObject(
     title: String,
     subtitle: Option<String>,
     image_size: ImageSize,
-    image_src: Option<Url>,
+    image_src: Option<UrlWrapper>,
     icon: Option<String>,
     children: Element,
 ) -> Element {

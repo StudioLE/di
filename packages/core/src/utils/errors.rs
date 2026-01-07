@@ -12,7 +12,7 @@ pub trait CustomResultExt {
     where
         P: AsRef<Path>;
 
-    fn attach_url(self, url: &Url) -> Result<Self::Ok, Report<Self::Context>>;
+    fn attach_url(self, url: &UrlWrapper) -> Result<Self::Ok, Report<Self::Context>>;
 }
 
 impl<T, E> CustomResultExt for Result<T, E>
@@ -33,7 +33,7 @@ where
         self.attach_with(|| format!("Path: {}", path.as_ref().display()))
     }
 
-    fn attach_url(self, url: &Url) -> Result<T, Report<E::Context>> {
+    fn attach_url(self, url: &UrlWrapper) -> Result<T, Report<E::Context>> {
         self.attach_with(|| format!("URL: {url}"))
     }
 }

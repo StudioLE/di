@@ -6,10 +6,13 @@ impl DownloadHandler {
         &self,
         context: &DownloadContext,
     ) -> Result<(), Report<DownloadError>> {
-        let url = context.episode.source_url.as_ref();
         let hardlink = self.paths.get_hard_link_from_cache();
         self.http
-            .download(url, context.file_path.clone(), hardlink)
+            .download(
+                &context.episode.source_url,
+                context.file_path.clone(),
+                hardlink,
+            )
             .await
             .change_context(DownloadError::DownloadEpisode)
     }
@@ -27,7 +30,7 @@ impl DownloadHandler {
         };
         let hardlink = self.paths.get_hard_link_from_cache();
         self.http
-            .download(url.as_ref(), path.clone(), hardlink)
+            .download(url, path.clone(), hardlink)
             .await
             .change_context(DownloadError::DownloadImage)
     }

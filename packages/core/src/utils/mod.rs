@@ -8,6 +8,7 @@ mod logging;
 mod mount_provider_linux;
 #[cfg(all(feature = "server", not(target_os = "linux")))]
 mod mount_provider_other;
+mod path_safety;
 #[cfg(feature = "server")]
 mod resize;
 mod resize_error;
@@ -28,6 +29,7 @@ pub use logging::*;
 pub use mount_provider_linux::*;
 #[cfg(all(feature = "server", not(target_os = "linux")))]
 pub use mount_provider_other::*;
+pub use path_safety::*;
 #[cfg(feature = "server")]
 pub use resize::*;
 pub use resize_error::*;

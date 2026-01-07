@@ -64,7 +64,7 @@ fn Podcast(podcast: PodcastPartial, episodes: Vec<EpisodePartial>) -> Element {
             MediaObject {
                 title: podcast.title.clone(),
                 subtitle: subtitle,
-                image_src: podcast.image.clone().map(Url::from),
+                image_src: podcast.image.clone(),
                 image_size: ImageSize::_128,
                 icon: "fa-image",
             }
@@ -79,7 +79,7 @@ fn Podcast(podcast: PodcastPartial, episodes: Vec<EpisodePartial>) -> Element {
                                 episode.episode,
                                 episode.source_duration,
                                 episode.kind),
-                            image_src: episode.image.clone().or_else(|| podcast.image.clone()).map(Url::from),
+                            image_src: episode.image.clone().or_else(|| podcast.image.clone()),
                             image_size: ImageSize::_64,
                             icon: "fa-image",
                             EpisodeButton { episode: episode.clone(), podcast: podcast.clone() }

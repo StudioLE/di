@@ -10,7 +10,7 @@ impl FetchHandler {
     pub async fn fetch_feed(
         &self,
         slug: &Slug,
-        url: &Url,
+        url: &UrlWrapper,
     ) -> Result<PodcastFeed, Report<FetchRssError>> {
         let content_type = self
             .http
@@ -29,7 +29,7 @@ impl FetchHandler {
 
     async fn parse_rss(
         &self,
-        url: &Url,
+        url: &UrlWrapper,
         slug: &Slug,
     ) -> Result<PodcastFeed, Report<FetchRssError>> {
         let path = self

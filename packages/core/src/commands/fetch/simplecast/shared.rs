@@ -3,7 +3,7 @@ use crate::prelude::*;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct SimplecastSite {
     pub subdomain: String,
-    pub external_website: Url,
+    pub external_website: UrlWrapper,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]

@@ -103,7 +103,6 @@ mod tests {
     #[tokio::test]
     #[ignore = "uses httpbin.org"]
     pub async fn resize_jpeg() {
-        // Arrange
         let services = ServiceProvider::new();
         let http = services
             .get_service::<HttpClient>()
@@ -112,7 +111,7 @@ mod tests {
         let formats = vec!["jpeg", "png", "webp"];
         for format in formats {
             eprintln!("format: {format}");
-            let url = Url::parse(&format!("https://httpbin.org/image/{format}"))
+            let url = UrlWrapper::from_str(&format!("https://httpbin.org/image/{format}"))
                 .expect("url should be valid");
             let path = http
                 .get(&url, None)

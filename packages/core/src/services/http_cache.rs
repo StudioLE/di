@@ -3,7 +3,7 @@ use reqwest::Response;
 use reqwest::header::{CONTENT_LENGTH, CONTENT_TYPE};
 use std::ffi::OsString;
 
-/// Service for managing HTTP response caching
+/// Service for managing HTTP response caching.
 #[derive(Clone, Debug)]
 pub struct HttpCache {
     cache_dir: PathBuf,
@@ -21,7 +21,7 @@ impl Service for HttpCache {
 }
 
 impl HttpCache {
-    /// Get the cache file path for a URL with optional file extension
+    /// Get the cache file path for a URL with optional file extension.
     ///
     /// The cache path is structured as: `{cache_dir}/{domain}/{url_path}/{query}.{extension}`
     /// - Domain from URL (or `__unknown` if missing)
@@ -29,11 +29,11 @@ impl HttpCache {
     /// - Query parameters encoded and appended to filename
     /// - Extension added at end
     #[must_use]
-    pub fn get_path(&self, url: &Url, extension: Option<&str>) -> PathBuf {
+    pub fn get_path(&self, url: &UrlWrapper, extension: Option<&str>) -> PathBuf {
         let domain = url.domain().unwrap_or("__unknown");
         let mut segments: PathBuf = url
             .path_segments()
-            .expect("url should have path segments")
+            .expect("http/https URLs have path segments")
             .collect();
         if segments == PathBuf::new() {
             segments = PathBuf::from("__root");
@@ -51,19 +51,24 @@ impl HttpCache {
         if let Some(extension) = extension {
             path.set_extension(extension);
         }
+        assert!(
+            is_path_within(&path, &self.cache_dir),
+            "URL validation should prevent path escape: {}",
+            path.display()
+        );
         path
     }
 
-    /// Check if a cached file exists for the given URL
+    /// Check if a cached file exists for the given URL.
     #[must_use]
-    pub fn exists(&self, url: &Url, extension: Option<&str>) -> bool {
+    pub fn exists(&self, url: &UrlWrapper, extension: Option<&str>) -> bool {
         self.get_path(url, extension).exists()
     }
 
-    /// Remove a cached file for the given URL
+    /// Remove a cached file for the given URL.
     ///
-    /// Returns `true` if the file existed and was removed, `false` otherwise
-    pub async fn remove(&self, url: &Url, extension: Option<&str>) -> bool {
+    /// Returns `true` if the file existed and was removed, `false` otherwise.
+    pub async fn remove(&self, url: &UrlWrapper, extension: Option<&str>) -> bool {
         let path = self.get_path(url, extension);
         let exists = path.exists();
         if exists {
@@ -76,10 +81,10 @@ impl HttpCache {
         exists
     }
 
-    /// Read a string from the cache
+    /// Read a string from the cache.
     pub async fn read_string(
         &self,
-        url: &Url,
+        url: &UrlWrapper,
         extension: Option<&str>,
     ) -> Result<String, Report<HttpError>> {
         let path = self.get_path(url, extension);
@@ -90,15 +95,15 @@ impl HttpCache {
         Ok(contents)
     }
 
-    /// Write a string to the cache
+    /// Write a string to the cache.
     pub async fn write_string(
         &self,
-        url: &Url,
+        url: &UrlWrapper,
         extension: Option<&str>,
         content: &str,
     ) -> Result<PathBuf, Report<HttpError>> {
         let path = self.get_path(url, extension);
-        trace!(%url, path = %path.display(),  "Writing string to cache");
+        trace!(%url, path = %path.display(), "Writing string to cache");
         ensure_dir_exists(&path).await?;
         let mut file = AsyncFile::create(&path)
             .await
@@ -115,10 +120,10 @@ impl HttpCache {
         Ok(path)
     }
 
-    /// Write a response as chunks to the cache
+    /// Write a response as chunks to the cache.
     pub async fn write_response(
         &self,
-        url: &Url,
+        url: &UrlWrapper,
         extension: Option<&str>,
         response: &mut Response,
     ) -> Result<PathBuf, Report<HttpError>> {
@@ -168,9 +173,9 @@ impl HttpCache {
     }
 }
 
-/// Ensure the cache directory exists for a given path
+/// Ensure the cache directory exists for a given path.
 ///
-/// Creates all parent directories if they don't exist
+/// Creates all parent directories if they don't exist.
 async fn ensure_dir_exists(path: &Path) -> Result<(), Report<HttpError>> {
     let dir = path
         .parent()
@@ -198,9 +203,8 @@ mod tests {
     #[test]
     fn get_path_basic_url() {
         let cache = test_cache();
-        let url = Url::parse("https://example.com/path/to/file").expect("valid url");
+        let url = UrlWrapper::from_str("https://example.com/path/to/file").expect("valid test URL");
         let path = cache.get_path(&url, Some("html"));
-
         assert_eq!(
             path,
             PathBuf::from("/test/cache/example.com/path/to/file.html")
@@ -210,9 +214,9 @@ mod tests {
     #[test]
     fn get_path_with_query() {
         let cache = test_cache();
-        let url = Url::parse("https://example.com/api?foo=bar&baz=qux").expect("valid url");
+        let url = UrlWrapper::from_str("https://example.com/api?foo=bar&baz=qux")
+            .expect("valid test URL");
         let path = cache.get_path(&url, Some("json"));
-
         assert!(path.to_string_lossy().contains("example.com"));
         assert!(path.to_string_lossy().contains("api"));
         assert!(path.to_string_lossy().ends_with(".json"));
@@ -221,36 +225,44 @@ mod tests {
     #[test]
     fn get_path_root_url() {
         let cache = test_cache();
-        let url = Url::parse("https://example.com").expect("valid url");
+        let url = UrlWrapper::from_str("https://example.com").expect("valid test URL");
         let path = cache.get_path(&url, Some("html"));
-
         assert_eq!(path, PathBuf::from("/test/cache/example.com/__root.html"));
     }
 
     #[test]
     fn get_path_no_extension() {
         let cache = test_cache();
-        let url = Url::parse("https://example.com/file").expect("valid url");
+        let url = UrlWrapper::from_str("https://example.com/file").expect("valid test URL");
         let path = cache.get_path(&url, None);
-
         assert_eq!(path, PathBuf::from("/test/cache/example.com/file"));
-    }
-
-    #[test]
-    fn get_path_unknown_domain() {
-        let cache = test_cache();
-        // URL without domain (e.g., file:// or data:// URLs)
-        let url = Url::parse("file:///path/to/file").expect("valid url");
-        let path = cache.get_path(&url, Some("txt"));
-
-        assert!(path.to_string_lossy().contains("__unknown"));
     }
 
     #[test]
     fn exists_returns_false_for_missing_file() {
         let cache = test_cache();
-        let url = Url::parse("https://example.com/nonexistent").expect("valid url");
-
+        let url = UrlWrapper::from_str("https://example.com/nonexistent").expect("valid test URL");
         assert!(!cache.exists(&url, Some("html")));
+    }
+
+    #[test]
+    fn get_path_with_dots_in_filename() {
+        let cache = test_cache();
+        let url = UrlWrapper::from_str("https://example.com/file.name.with.dots.mp3")
+            .expect("valid test URL");
+        let path = cache.get_path(&url, None);
+        assert_eq!(
+            path,
+            PathBuf::from("/test/cache/example.com/file.name.with.dots.mp3")
+        );
+    }
+
+    #[test]
+    fn get_path_filters_empty_segments() {
+        let cache = test_cache();
+        let url =
+            UrlWrapper::from_str("https://example.com//path///to////file").expect("valid test URL");
+        let path = cache.get_path(&url, None);
+        assert!(!path.to_string_lossy().contains("//"));
     }
 }
