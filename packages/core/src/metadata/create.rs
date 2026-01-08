@@ -27,7 +27,10 @@ impl MetadataRepository {
             primary_key,
             ..podcast::ActiveModel::from(feed.podcast)
         };
-        let podcast = model.insert(&tx).await.change_context(SaveError::Podcast)?;
+        let podcast = insert_podcast(model)
+            .exec_with_returning(&tx)
+            .await
+            .change_context(SaveError::Podcast)?;
         let models = feed
             .episodes
             .into_iter()
@@ -36,7 +39,7 @@ impl MetadataRepository {
                 podcast_key: Set(Some(podcast.primary_key)),
                 ..episode::ActiveModel::from(episode)
             });
-        let episodes = episode::Entity::insert_many(models)
+        let episodes = insert_episodes(models)
             .exec_with_returning(&tx)
             .await
             .change_context(SaveError::Episodes)?;
@@ -45,30 +48,47 @@ impl MetadataRepository {
     }
 }
 
+fn remove_podcast_statement(primary_key: u32, backend: DatabaseBackend) -> Statement {
+    podcast::Entity::delete_by_id(primary_key).build(backend)
+}
+
 async fn remove_podcast(
     tx: &DatabaseTransaction,
     primary_key: u32,
-) -> Result<DeleteResult, Report<SaveError>> {
-    podcast::Entity::delete_by_id(primary_key)
-        .exec(tx)
+) -> Result<ExecResult, Report<SaveError>> {
+    let backend = ConnectionTrait::get_database_backend(tx);
+    let statement = remove_podcast_statement(primary_key, backend);
+    tx.execute_raw(statement)
         .await
-        .change_context(SaveError::Commit)
+        .change_context(SaveError::Remove)
 }
 
-/// Check if a podcast with the given slug already exists
+fn get_podcast_key_by_slug_select(slug: &Slug) -> Select<podcast::Entity> {
+    podcast::Entity::find()
+        .select_only()
+        .column(podcast::Column::PrimaryKey)
+        .filter(podcast::Column::Slug.eq(slug.as_str()))
+}
+
 async fn get_podcast_key_by_slug(
     tx: &DatabaseTransaction,
     slug: &Slug,
 ) -> Result<Option<u32>, Report<SaveError>> {
-    let key = podcast::Entity::find()
-        .select_only()
-        .column(podcast::Column::PrimaryKey)
-        .filter(podcast::Column::Slug.eq(slug.as_str()))
+    get_podcast_key_by_slug_select(slug)
         .into_tuple::<u32>()
         .one(tx)
         .await
-        .change_context(SaveError::Unique)?;
-    Ok(key)
+        .change_context(SaveError::Unique)
+}
+
+fn insert_podcast(model: podcast::ActiveModel) -> Insert<podcast::ActiveModel> {
+    podcast::Entity::insert(model)
+}
+
+fn insert_episodes(
+    models: impl IntoIterator<Item = episode::ActiveModel>,
+) -> InsertMany<episode::ActiveModel> {
+    episode::Entity::insert_many(models)
 }
 
 #[derive(Clone, Debug, Error)]
@@ -89,7 +109,66 @@ pub enum SaveError {
 
 #[cfg(test)]
 mod tests {
+    #![allow(non_snake_case)]
     use super::*;
+
+    #[test]
+    fn _get_podcast_key_by_slug_select() {
+        // Arrange
+        let slug = MetadataRepositoryExample::podcast_slug();
+
+        // Act
+        let statement = get_podcast_key_by_slug_select(&slug).build(DB_BACKEND);
+
+        // Assert
+        assert_snapshot!(format_sql(&statement));
+    }
+
+    #[test]
+    fn _remove_podcast_statement() {
+        // Arrange
+        // Act
+        let statement = remove_podcast_statement(PODCAST_KEY, DB_BACKEND);
+
+        // Assert
+        assert_snapshot!(format_sql(&statement));
+    }
+
+    #[test]
+    fn _insert_podcast() {
+        // Arrange
+        let feed = MetadataRepositoryExample::example_feeds()
+            .into_iter()
+            .next()
+            .expect("should have at least one feed");
+        let model = podcast::ActiveModel::from(feed.podcast);
+
+        // Act
+        let statement = insert_podcast(model).build(DB_BACKEND);
+
+        // Assert
+        assert_snapshot!(format_sql(&statement));
+    }
+
+    #[test]
+    fn _insert_episodes() {
+        // Arrange
+        let feed = MetadataRepositoryExample::example_feeds()
+            .into_iter()
+            .next()
+            .expect("should have at least one feed");
+        let models = feed.episodes.into_iter().map(|e| episode::ActiveModel {
+            primary_key: NotSet,
+            podcast_key: Set(Some(PODCAST_KEY)),
+            ..episode::ActiveModel::from(e)
+        });
+
+        // Act
+        let statement = insert_episodes(models).build(DB_BACKEND);
+
+        // Assert
+        assert_snapshot!(format_sql(&statement));
+    }
 
     #[tokio::test]
     pub async fn save_feed() {
