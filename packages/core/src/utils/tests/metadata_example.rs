@@ -37,7 +37,7 @@ impl MetadataRepositoryExample {
             .expect("should be able to migrate metadata database");
         for feed in Self::example_feeds() {
             metadata
-                .save_feed(feed)
+                .create_feed(feed)
                 .await
                 .expect("should be able to save feed");
         }

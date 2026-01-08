@@ -1,5 +1,5 @@
 ---
-source: packages/core/src/metadata/create.rs
+source: packages/core/src/metadata/update_feed.rs
 expression: format_sql(&statement)
 ---
 SELECT

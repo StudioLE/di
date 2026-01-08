@@ -1,0 +1,8 @@
+---
+source: packages/core/src/metadata/update_feed.rs
+expression: format_sql(&statement)
+---
+DELETE FROM
+  "episodes"
+WHERE
+  "episodes"."podcast_key" = 1

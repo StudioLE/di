@@ -1,8 +1,0 @@
----
-source: packages/core/src/metadata/create.rs
-expression: format_sql(&statement)
----
-DELETE FROM
-  "podcasts"
-WHERE
-  "podcasts"."primary_key" = 1

@@ -35,7 +35,7 @@ impl Execute<AddRequest, AddResponse, Report<AddError>> for AddHandler {
         feed.podcast.feed_url = Some(request.feed_url.clone());
         let feed = self
             .metadata
-            .save_feed(feed)
+            .create_feed(feed)
             .await
             .change_context(AddError::Save)?;
         info!(slug = %feed.podcast.slug, episodes = feed.episodes.len(), "Added podcast");

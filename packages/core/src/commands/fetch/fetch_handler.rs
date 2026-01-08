@@ -37,7 +37,7 @@ impl Execute<FetchRequest, FetchResponse, Report<FetchError>> for FetchHandler {
         feed.podcast.feed_url = Some(feed_url);
         let feed = self
             .metadata
-            .save_feed(feed)
+            .update_feed(feed)
             .await
             .change_context(FetchError::Save)?;
         info!(slug = %feed.podcast.slug, episodes = feed.episodes.len(), "Fetched podcast");

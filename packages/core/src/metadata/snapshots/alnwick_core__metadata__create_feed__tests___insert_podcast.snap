@@ -1,10 +1,9 @@
 ---
-source: packages/core/src/metadata/create.rs
+source: packages/core/src/metadata/create_feed.rs
 expression: format_sql(&statement)
 ---
 INSERT INTO
   "podcasts" (
-    "primary_key",
     "slug",
     "feed_url",
     "title",
@@ -22,7 +21,6 @@ INSERT INTO
   )
 VALUES
   (
-    0,
     'test-0',
     NULL,
     'Podcast 0',
