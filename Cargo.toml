@@ -5,6 +5,7 @@ members = [
   "packages/command",
   "packages/core",
   "packages/di",
+  "packages/di-macros",
   "packages/dioxus",
 ]
 

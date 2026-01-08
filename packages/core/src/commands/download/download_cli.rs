@@ -7,39 +7,14 @@ const CONCURRENCY: usize = 8;
 ///
 /// Queues multiple [`DownloadRequest`]s based on filter criteria and
 /// executes them concurrently with a progress bar.
+#[derive(Service)]
 pub struct DownloadCliCommand {
     metadata: Arc<MetadataRepository>,
     runner: Arc<CommandRunner<CommandInfo>>,
     progress: Arc<CliProgress<CommandInfo>>,
 }
 
-impl Service for DownloadCliCommand {
-    type Error = ServiceError;
-
-    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
-        Ok(Self::new(
-            services.get_service().await?,
-            services.get_service().await?,
-            services.get_service().await?,
-        ))
-    }
-}
-
 impl DownloadCliCommand {
-    /// Create a new [`DownloadCliCommand`] from services.
-    #[must_use]
-    pub fn new(
-        metadata: Arc<MetadataRepository>,
-        runner: Arc<CommandRunner<CommandInfo>>,
-        progress: Arc<CliProgress<CommandInfo>>,
-    ) -> Self {
-        Self {
-            metadata,
-            runner,
-            progress,
-        }
-    }
-
     /// Download episodes matching the filter criteria.
     #[allow(unreachable_patterns, clippy::match_wildcard_for_single_variants)]
     pub async fn execute(&self, options: DownloadOptions) -> Result<(), Report<DownloadCliError>> {

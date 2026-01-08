@@ -1,18 +1,9 @@
 use crate::prelude::*;
 
 /// CLI command for fetching an existing podcast.
+#[derive(Service)]
 pub struct FetchCliCommand {
     handler: Arc<FetchHandler>,
-}
-
-impl Service for FetchCliCommand {
-    type Error = ServiceError;
-
-    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
-        Ok(Self {
-            handler: services.get_service().await?,
-        })
-    }
 }
 
 impl FetchCliCommand {

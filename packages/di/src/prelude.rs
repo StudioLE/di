@@ -6,5 +6,6 @@ pub(crate) use std::collections::HashMap;
 pub(crate) use std::error::Error;
 pub(crate) use std::future::Future;
 pub(crate) use std::sync::{Arc, Mutex as StdMutex};
+pub use studiole_di_macros::Service;
 pub(crate) use thiserror::Error;
 pub(crate) use tracing::trace;

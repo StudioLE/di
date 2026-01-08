@@ -1,16 +1,17 @@
 [package]
-name = "studiole_di"
+name = "studiole_di_macros"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
 description.workspace = true
 documentation.workspace = true
 
+[lib]
+proc-macro = true
+
 [dependencies]
-error-stack = { workspace = true }
-studiole_di_macros = { path = "../di-macros" }
-thiserror = { workspace = true }
-tracing = { workspace = true }
+syn = "2.0.114"
+quote = "1.0.43"
 
 [lints]
 workspace = true

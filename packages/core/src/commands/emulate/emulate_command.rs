@@ -3,37 +3,14 @@ use crate::prelude::*;
 use error_stack::bail;
 use rss::Item as RssItem;
 
+#[derive(Service)]
 pub struct EmulateCommand {
     options: Arc<AppOptions>,
     paths: Arc<PathProvider>,
     metadata: Arc<MetadataRepository>,
 }
 
-impl Service for EmulateCommand {
-    type Error = ServiceError;
-    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
-        Ok(Self::new(
-            services.get_service().await?,
-            services.get_service().await?,
-            services.get_service().await?,
-        ))
-    }
-}
-
 impl EmulateCommand {
-    #[must_use]
-    pub fn new(
-        options: Arc<AppOptions>,
-        paths: Arc<PathProvider>,
-        metadata: Arc<MetadataRepository>,
-    ) -> Self {
-        Self {
-            options,
-            paths,
-            metadata,
-        }
-    }
-
     pub async fn execute(&self, options: EmulateOptions) -> Result<(), Report<EmulateError>> {
         let feed = self
             .metadata

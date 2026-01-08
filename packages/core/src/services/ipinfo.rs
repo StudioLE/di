@@ -1,25 +1,12 @@
 use crate::prelude::*;
 use reqwest::Client as ReqwestClient;
 
-#[derive(Default)]
+#[derive(Service)]
 pub struct IpInfoProvider {
     options: Arc<AppOptions>,
 }
 
-impl Service for IpInfoProvider {
-    type Error = ServiceError;
-
-    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
-        Ok(Self::new(services.get_service().await?))
-    }
-}
-
 impl IpInfoProvider {
-    #[must_use]
-    pub fn new(options: Arc<AppOptions>) -> Self {
-        Self { options }
-    }
-
     pub async fn validate(&self) -> Result<(), Report<IpInfoError>> {
         if self.options.expect_ip.is_none() && self.options.expect_country.is_none() {
             return Ok(());

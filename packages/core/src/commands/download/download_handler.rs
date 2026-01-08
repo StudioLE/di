@@ -6,22 +6,11 @@ use crate::prelude::*;
 /// - Fetch and resize artwork
 /// - Add ID3 tags
 /// - Save file paths to database
+#[derive(Service)]
 pub struct DownloadHandler {
     pub(super) paths: Arc<PathProvider>,
     pub(super) http: Arc<HttpClient>,
     pub(super) metadata: Arc<MetadataRepository>,
-}
-
-impl Service for DownloadHandler {
-    type Error = ServiceError;
-
-    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
-        Ok(Self {
-            paths: services.get_service().await?,
-            http: services.get_service().await?,
-            metadata: services.get_service().await?,
-        })
-    }
 }
 
 #[async_trait]

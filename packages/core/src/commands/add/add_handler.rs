@@ -5,20 +5,10 @@ use crate::prelude::*;
 /// - Fetches and parses the RSS feed
 /// - Stores the feed URL for future fetching
 /// - Saves the podcast and episodes to the database
+#[derive(Service)]
 pub struct AddHandler {
     fetch: Arc<FetchHandler>,
     metadata: Arc<MetadataRepository>,
-}
-
-impl Service for AddHandler {
-    type Error = ServiceError;
-
-    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
-        Ok(Self {
-            fetch: services.get_service().await?,
-            metadata: services.get_service().await?,
-        })
-    }
 }
 
 #[async_trait]

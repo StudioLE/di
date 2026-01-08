@@ -4,38 +4,14 @@ const BANNER_WIDTH: u32 = 960;
 const BANNER_HEIGHT: u32 = 540;
 const COVER_SIZE: u32 = 720;
 
+#[derive(Service)]
 pub struct CoverCommand {
     paths: Arc<PathProvider>,
     http: Arc<HttpClient>,
     metadata: Arc<MetadataRepository>,
 }
 
-impl Service for CoverCommand {
-    type Error = ServiceError;
-
-    async fn from_services(services: &ServiceProvider) -> Result<Self, Report<ServiceError>> {
-        Ok(Self::new(
-            services.get_service().await?,
-            services.get_service().await?,
-            services.get_service().await?,
-        ))
-    }
-}
-
 impl CoverCommand {
-    #[must_use]
-    pub fn new(
-        paths: Arc<PathProvider>,
-        http: Arc<HttpClient>,
-        metadata: Arc<MetadataRepository>,
-    ) -> Self {
-        Self {
-            paths,
-            http,
-            metadata,
-        }
-    }
-
     pub async fn execute(&self, options: CoverOptions) -> Result<(), Report<CoverError>> {
         let feed = self
             .metadata
