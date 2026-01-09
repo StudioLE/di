@@ -4,6 +4,12 @@ use sea_orm::*;
 impl FetchHandler {
     /// Get the feed URL for a podcast by its slug.
     pub(super) async fn get_feed_url(&self, slug: &Slug) -> Result<UrlWrapper, Report<FetchError>> {
+        self.get_feed_url_internal(slug)
+            .await
+            .attach(format!("Podcast: {slug}"))
+    }
+
+    async fn get_feed_url_internal(&self, slug: &Slug) -> Result<UrlWrapper, Report<FetchError>> {
         self.metadata
             .get_feed_url(slug)
             .await

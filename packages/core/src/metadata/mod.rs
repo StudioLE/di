@@ -1,4 +1,6 @@
 mod filter_options;
+#[cfg(feature = "server")]
+mod get_all_podcast_slugs;
 mod metadata_error;
 #[cfg(feature = "server")]
 mod migration;
