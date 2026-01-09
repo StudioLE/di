@@ -16,14 +16,10 @@ impl Execute<FetchRequest, FetchResponse, Report<FetchError>> for FetchHandler {
     /// Execute the fetch handler.
     async fn execute(&self, request: &FetchRequest) -> Result<FetchResponse, Report<FetchError>> {
         trace!(slug = %request.slug, "Getting feed URL");
-        let feed_url = self.get_feed_url(&request.slug).await?;
+        let stored_url = self.get_feed_url(&request.slug).await?;
         trace!(slug = %request.slug, "Fetching feed");
-        let mut feed = self
-            .fetch_feed(&request.slug, &feed_url)
-            .await
-            .change_context(FetchError::Rss)?;
+        let feed = self.fetch_feed(&request.slug, &stored_url).await?;
         trace!(slug = %request.slug, episodes = feed.episodes.len(), "Fetched feed");
-        feed.podcast.feed_url = Some(feed_url);
         let response = self
             .metadata
             .update_feed(feed)

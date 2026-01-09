@@ -9,7 +9,7 @@ pub use error_stack::{Report, ResultExt};
 pub use serde::de::DeserializeOwned;
 pub use serde::{Deserialize, Serialize};
 pub use std::any::{Any, TypeId, type_name};
-pub use std::collections::{HashMap, VecDeque};
+pub use std::collections::{HashMap, HashSet, VecDeque};
 pub use std::convert::Infallible;
 pub use std::error::Error;
 pub use std::fmt::{Display, Formatter, Result as FmtResult};
