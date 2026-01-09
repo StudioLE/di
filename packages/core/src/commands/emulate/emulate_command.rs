@@ -56,6 +56,9 @@ impl EmulateCommand {
         year: Option<i32>,
     ) -> Result<Option<PathBuf>, Report<EmulateError>> {
         let mut channel = PodcastToRss::execute(feed.clone());
+        if let Some(itunes_ext) = channel.itunes_ext.as_mut() {
+            itunes_ext.new_feed_url = None;
+        }
         let items = take(&mut channel.items);
         for item in items {
             let episode = item
