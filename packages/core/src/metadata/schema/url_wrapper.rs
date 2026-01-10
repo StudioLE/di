@@ -11,7 +11,7 @@ use sea_orm::*;
 /// - Path segments within 255 bytes
 ///
 /// See <https://www.sea-ql.org/SeaORM/docs/generate-entity/newtype/>
-#[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct UrlWrapper(Url);
 
 // Convenience traits

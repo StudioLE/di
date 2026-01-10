@@ -13,6 +13,10 @@ pub enum FetchError {
     Rss,
     #[error("Unable to save podcast")]
     Save,
+    #[error("Feed redirect loop detected")]
+    RedirectLoop,
+    #[error("Too many feed redirects")]
+    TooManyRedirects,
 }
 
 /// Errors from fetching an RSS feed.
