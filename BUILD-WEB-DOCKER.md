@@ -1,6 +1,4 @@
-# Build the web app from source with Docker
-
-The docker implementation provides a complete developer environment using `dx serve`.
+# Build the web app with Docker
 
 ## `Dockerfile`
 
@@ -19,17 +17,28 @@ This caches the dependencies to speed up subsequent builds.
 
 6. Copy the `bulma` CSS framework and `font-awesome` icons from `npm`
 
-7. Serve the web app using `dx serve`
+The Dockerfile then provides two build targets:
+
+- **dev**: Serve the web app using `dx serve` with hot reloading
+- **release**: Build the web app using `dx build --release` and copy to a minimal Debian image
 
 ## `docker-compose.yml`
 
-The [docker-compose.yml](docker/dioxus/docker-compose.yml) is configured to do the following:
+The [docker-compose.yml](docker/dioxus/docker-compose.yml) provides two services:
 
-Use the root of the directory as the build context.
+### `dev`
+
+Use the root of the repo as the build context.
 
 Use `docker/dioxus/target` as a volume for caching the cargo build artifacts.
 
 Include `Cargo.toml` and the entire `packages` directory as volumes so `dx serve` detects changes and hot reloads.
+
+Use your local `~/.cache/alnwick` and `~/.local/share/alnwick` as volumes for config and state
+
+### `release`
+
+Use the root of the repo as the build context.
 
 Use your local `~/.cache/alnwick` and `~/.local/share/alnwick` as volumes for config and state
 
@@ -46,15 +55,29 @@ cd docker/dioxus
 The first build of the docker image can take a while but subsequent builds are not required.
 
 ```shell
-docker compose build alnwick
+docker compose build dev
 ```
 
-3. Serve the web app
-
-Once built you can run the docker image to serve the web app.
+3. Serve the development environment.
 
 Any changes to the source code will be hot reloaded.
 
+The web app will be available at `http://localhost:8080`.
+
 ```shell
-docker compose run --rm alnwick
+docker compose run --rm dev
 ```
+
+4. Build the release image
+
+```shell
+docker compose build release
+```
+
+5. Run the release container
+
+```shell
+docker compose up -d release
+```
+
+The web app will be available at `http://localhost:8080`.

@@ -21,7 +21,7 @@ export default defineConfig({
   webServer: process.env.CI
     ? undefined
     : {
-        command: "cd ../docker/dioxus && docker compose up",
+        command: "cd ../docker/dioxus && docker compose up dev",
         url: "http://localhost:8080",
         reuseExistingServer: !process.env.CI,
         timeout: 120 * 1000,

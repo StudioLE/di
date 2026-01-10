@@ -15,8 +15,8 @@ RUN curl --location \
 COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
-# Build app
-FROM rust:latest
+# Build dependencies
+FROM rust:latest AS builder
 ARG DX_VERSION=0.7.2
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt update \
@@ -48,5 +48,26 @@ COPY --from=npm \
     /app/node_modules/@fontsource/source-sans-pro/files/source-sans-pro-latin-400-normal.woff2 \
     /app/packages/dioxus/public/assets/fonts/
 COPY . /app
+
+# Development target
+FROM builder AS dev
 EXPOSE 8080
 CMD ["dx", "serve", "--package", "alnwick_dioxus"]
+
+# Release build
+FROM builder AS release-builder
+RUN dx build --release --package alnwick_dioxus
+
+# Release runtime
+FROM debian:bookworm-slim AS release
+RUN apt update \
+    && apt install -y libssl3 ca-certificates \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY --from=release-builder /app/target/dx/alnwick_dioxus/release/web/alnwick_dioxus /app/alnwick
+COPY --from=release-builder /app/target/dx/alnwick_dioxus/release/web/public /app/public
+ENV IP=0.0.0.0
+ENV PORT=8080
+EXPOSE 8080
+CMD ["./alnwick"]

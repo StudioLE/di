@@ -1,4 +1,4 @@
-# Build the web app from source
+# Build the web app
 
 It is recommended to run the [docker developer environment](BUILD-WEB-DOCKER.md), however the following steps can be used if required
 

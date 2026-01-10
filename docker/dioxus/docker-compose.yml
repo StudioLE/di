@@ -1,14 +1,26 @@
 services:
 
-  alnwick:
+  dev:
+    container_name: alnwick-dev
+    network_mode: host
+    build:
+      context: ../../
+      dockerfile: docker/dioxus/Dockerfile
+      target: dev
+    volumes:
+    - ./target:/app/target
+    - ../../packages:/app/packages
+    - ../../Cargo.toml:/app/Cargo.toml
+    - ~/.cache/alnwick:/root/.cache/alnwick
+    - ~/.local/share/alnwick:/root/.local/share/alnwick
+
+  release:
     container_name: alnwick
     network_mode: host
     build:
       context: ../../
       dockerfile: docker/dioxus/Dockerfile
+      target: release
     volumes:
-    - ./target:/app/target
-    - ../../packages:/app/packages
-    - ../../Cargo.toml:/app/Cargo.toml
     - ~/.cache/alnwick:/root/.cache/alnwick
     - ~/.local/share/alnwick:/root/.local/share/alnwick

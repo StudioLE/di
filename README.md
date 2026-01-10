@@ -19,8 +19,8 @@ Built with [Dioxus](https://dioxuslabs.com), a [Rust](https://www.rust-lang.org)
 desktop, and mobile apps.
 
 - [Install the web app](INSTALL-WEB.md)
-- [Build the web app from source with Docker](BUILD-WEB-DOCKER.md)
-- [Build the web app from source with cargo](BUILD-WEB.md)
+- [Build the web app with Docker](BUILD-WEB-DOCKER.md)
+- [Build the web app with cargo](BUILD-WEB.md)
 
 ## CLI
 
