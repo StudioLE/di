@@ -8,4 +8,6 @@ mod emulate_options;
 pub use emulate_options::*;
 
 #[cfg(feature = "server")]
-pub(crate) mod to_rss;
+mod to_rss;
+#[cfg(feature = "server")]
+pub use to_rss::*;

@@ -44,14 +44,14 @@ mod tests {
     #[serial]
     pub async fn add_handler() {
         // Arrange
-        let services = MockServices::new().create().await;
+        let services = MockServices::new().with_rss_feed().create().await;
         let handler = services
             .get_service::<AddHandler>()
             .await
             .expect("should be able to get handler");
         let request = AddRequest {
             slug: MockFeeds::podcast_slug(),
-            feed_url: example_rss_url(),
+            feed_url: MockServices::rss_url(),
         };
         let _logger = init_test_logger();
 

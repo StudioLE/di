@@ -232,7 +232,7 @@ pub enum EpisodeFromRssError {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::prelude::to_rss::PodcastToRss;
+    use crate::prelude::PodcastToRss;
 
     #[test]
     fn round_trip_conversion() {

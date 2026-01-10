@@ -237,7 +237,8 @@ mod tests {
             .get_service::<HttpClient>()
             .await
             .expect("should be able to get HttpClient");
-        let url = example_rss_url();
+        let url = UrlWrapper::from_str("https://feeds.simplecast.com/lP7owBq8")
+            .expect("URL should parse");
         http.cache.remove(&url, Some(HEAD_EXTENSION)).await;
         let _logger = init_test_logger();
 

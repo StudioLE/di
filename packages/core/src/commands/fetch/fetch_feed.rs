@@ -109,12 +109,11 @@ mod tests {
             .get_service::<FetchHandler>()
             .await
             .expect("should be able to get handler");
+        let url = UrlWrapper::from_str("https://irlpodcast.org").expect("URL should parse");
         let _logger = init_test_logger();
 
         // Act
-        let result = handler
-            .fetch_feed(&MockFeeds::podcast_slug(), &example_simplecast_url())
-            .await;
+        let result = handler.fetch_feed(&MockFeeds::podcast_slug(), &url).await;
 
         // Assert
         let podcast = result.assert_ok_debug();
@@ -126,6 +125,7 @@ mod tests {
     pub async fn fetch_feed_rss() {
         // Arrange
         let handler = MockServices::new()
+            .with_rss_feed()
             .create()
             .await
             .get_service::<FetchHandler>()
@@ -135,11 +135,11 @@ mod tests {
 
         // Act
         let result = handler
-            .fetch_feed(&MockFeeds::podcast_slug(), &example_rss_url())
+            .fetch_feed(&MockFeeds::podcast_slug(), &MockServices::rss_url())
             .await;
 
         // Assert
         let podcast = result.assert_ok_debug();
-        assert!(podcast.episodes.len() > 30);
+        assert_yaml_snapshot!(podcast);
     }
 }
