@@ -1,8 +1,0 @@
----
-source: packages/core/src/metadata/read.rs
-expression: format_sql(&statement)
----
-SELECT
-  "podcasts"."slug"
-FROM
-  "podcasts"

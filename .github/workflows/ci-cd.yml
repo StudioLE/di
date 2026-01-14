@@ -14,54 +14,6 @@ jobs:
     uses: StudioLE/Actions/.github/workflows/ci-cd-rust.yml@v7
     with:
       package_name: alnwick
-      binary_name: alnwick
-      test_args: --workspace --exclude alnwick_dioxus
-      check_args: --workspace --exclude alnwick_dioxus
-      run_before_test: |
-        mkdir -p "${HOME}/.cache/alnwick"
-        mkdir -p "${HOME}/.local/share/alnwick"
-        target/${MATRIX_TARGET}/release/alnwick add irl https://irlpodcast.org
-      docker_name: alnwick
-      docker_args: >
-        --file docker/cli/Dockerfile
-        --build-arg VERSION="${VERSION}"
-      brew_repo: StudioLE/homebrew-tap
-      brew_formula: |
-        class Alnwick < Formula
-          desc "A self hosted podcast library"
-          homepage "https://github.com/StudioLE/alnwick"
-          license "GPL-3.0-only"
-          version "{{version}}"
-
-          on_linux do
-            if Hardware::CPU.arm?
-              url "https://github.com/StudioLE/alnwick/releases/download/v{{version}}/{{binary_name}}-{{version}}-aarch64-unknown-linux-gnu.tar.xz"
-              sha256 "{{sha256:aarch64-unknown-linux-gnu}}"
-            else
-              url "https://github.com/StudioLE/alnwick/releases/download/v{{version}}/{{binary_name}}-{{version}}-x86_64-unknown-linux-gnu.tar.xz"
-              sha256 "{{sha256:x86_64-unknown-linux-gnu}}"
-            end
-          end
-
-          on_macos do
-            if Hardware::CPU.arm?
-              url "https://github.com/StudioLE/alnwick/releases/download/v{{version}}/{{binary_name}}-{{version}}-aarch64-apple-darwin.tar.xz"
-              sha256 "{{sha256:aarch64-apple-darwin}}"
-            else
-              url "https://github.com/StudioLE/alnwick/releases/download/v{{version}}/{{binary_name}}-{{version}}-x86_64-apple-darwin.tar.xz"
-              sha256 "{{sha256:x86_64-apple-darwin}}"
-            end
-          end
-
-          def install
-            bin.install "{{binary_name}}"
-          end
-
-          test do
-            system "#{bin}/{{binary_name}}", "--help"
-          end
-        end
     secrets:
       cargo_registry_token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
       docker_password: ${{ secrets.GITHUB_TOKEN }}
-      brew_repo_token: ${{ secrets.BREW_REPO_TOKEN }}

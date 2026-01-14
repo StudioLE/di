@@ -1,6 +1,0 @@
-*
-!packages/
-!Cargo.lock
-!Cargo.toml
-!clippy.toml
-!Dioxus.toml

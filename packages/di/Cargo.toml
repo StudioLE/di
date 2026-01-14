@@ -3,8 +3,9 @@ name = "studiole_di"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
-description.workspace = true
-documentation.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "A simple dependency injection framework for Rust."
 
 [dependencies]
 error-stack = { workspace = true }

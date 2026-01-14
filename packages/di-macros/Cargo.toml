@@ -3,8 +3,9 @@ name = "studiole_di_macros"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
-description.workspace = true
-documentation.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Derive macros for studiole_di"
 
 [lib]
 proc-macro = true

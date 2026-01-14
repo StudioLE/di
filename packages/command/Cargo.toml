@@ -3,8 +3,9 @@ name = "studiole_command"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
-description.workspace = true
-documentation.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "A simple command execution framework with event subscription and progress tracking."
 
 [features]
 default = ["server"]
@@ -17,6 +18,7 @@ server = [
 [dependencies]
 async-trait = { workspace = true }
 error-stack = { workspace = true }
+serde = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
 
@@ -24,9 +26,9 @@ tracing = { workspace = true }
 indicatif = { workspace = true, optional = true }
 studiole_di = { path = "../di", optional = true }
 tokio = { workspace = true, optional = true, features = ["sync", "time"] }
-serde = { version = "1.0.228", features = ["derive"] }
 
 [dev-dependencies]
+tokio = { workspace = true }
 tracing-subscriber = { workspace = true }
 
 [lints]
