@@ -4,7 +4,7 @@ pub use crate::service_provider::*;
 
 pub use studiole_di_macros::Service;
 
-pub(crate) use std::any::{type_name, Any, TypeId};
+pub(crate) use std::any::{Any, TypeId, type_name};
 pub(crate) use std::collections::HashMap;
 pub(crate) use std::error::Error;
 pub(crate) use std::future::Future;
