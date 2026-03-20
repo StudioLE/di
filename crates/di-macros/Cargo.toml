@@ -1,0 +1,18 @@
+[package]
+name = "studiole-di-macros"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Derive macros for studiole-di"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = "2.0.114"
+quote = "1.0.43"
+
+[lints]
+workspace = true
