@@ -11,8 +11,8 @@ description = "Derive macros for studiole-di"
 proc-macro = true
 
 [dependencies]
-syn = "2.0.114"
-quote = "1.0.43"
+syn = "2.0.117"
+quote = "1.0.45"
 
 [lints]
 workspace = true
