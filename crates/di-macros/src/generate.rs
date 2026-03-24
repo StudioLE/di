@@ -9,6 +9,8 @@ pub(crate) fn generate_sync(parsed: &ParsedStruct) -> TokenStream {
     let field_names = &parsed.field_names;
     quote! {
         impl ::studiole_di::FromProvider for #name {
+            type Error = ::studiole_di::ResolveError;
+
             fn from_provider(
                 services: &::studiole_di::ServiceProvider,
             ) -> ::std::result::Result<Self, ::studiole_report::prelude::Report<::studiole_di::ResolveError>> {
@@ -26,6 +28,8 @@ pub(crate) fn generate_async(parsed: &ParsedStruct) -> TokenStream {
     let field_names = &parsed.field_names;
     quote! {
         impl ::studiole_di::FromProviderAsync for #name {
+            type Error = ::studiole_di::ResolveError;
+
             async fn from_provider_async(
                 services: &::studiole_di::ServiceProvider,
             ) -> ::std::result::Result<Self, ::studiole_report::prelude::Report<::studiole_di::ResolveError>> {

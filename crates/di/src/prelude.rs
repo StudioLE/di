@@ -12,6 +12,7 @@ pub use studiole_di_macros::FromProviderAsync;
 
 pub(crate) use std::any::{Any, TypeId, type_name};
 pub(crate) use std::collections::HashMap;
+pub(crate) use std::error::Error as StdError;
 pub(crate) use std::future::Future;
 #[cfg(feature = "traits")]
 pub(crate) use std::marker::Unsize;

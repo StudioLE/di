@@ -35,6 +35,8 @@ impl Set for MemoryCache {
 }
 
 impl FromProvider for MemoryCache {
+    type Error = ResolveError;
+
     fn from_provider(_services: &ServiceProvider) -> Result<Self, Report<ResolveError>> {
         Ok(Self {
             entries: Mutex::new(HashMap::new()),
@@ -67,6 +69,8 @@ impl Set for AsyncCache {
 
 #[cfg(feature = "async")]
 impl FromProviderAsync for AsyncCache {
+    type Error = ResolveError;
+
     async fn from_provider_async(
         _services: &ServiceProvider,
     ) -> Result<Self, Report<ResolveError>> {
@@ -86,6 +90,8 @@ impl Get for MockCache {
 }
 
 impl FromProvider for MockCache {
+    type Error = ResolveError;
+
     fn from_provider(_services: &ServiceProvider) -> Result<Self, Report<ResolveError>> {
         Ok(Self)
     }

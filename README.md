@@ -24,6 +24,8 @@ struct Database {
 }
 
 impl FromProvider for Database {
+    type Error = ResolveError;
+
     fn from_provider(services: &ServiceProvider) -> Result<Self, Report<ResolveError>> {
         let config = services.get::<Config>()?;
         Ok(Self { config })
@@ -82,6 +84,8 @@ struct AsyncDatabase {
 }
 
 impl FromProviderAsync for AsyncDatabase {
+    type Error = ResolveError;
+
     async fn from_provider_async(
         services: &ServiceProvider,
     ) -> Result<Self, Report<ResolveError>> {
