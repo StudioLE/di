@@ -130,6 +130,22 @@ mod tests {
         assert_eq!(handler.db.config.port, 5050);
     }
 
+    #[tokio::test]
+    async fn derived_async_struct_resolves() {
+        // Arrange
+        let services = ServiceBuilder::new()
+            .with_instance(Config { port: 9090 })
+            .with_type_async::<DerivedAsyncDatabase>()
+            .build();
+        // Act
+        let db = services
+            .get_async::<DerivedAsyncDatabase>()
+            .await
+            .expect("DerivedAsyncDatabase should resolve");
+        // Assert
+        assert_eq!(db.config.port, 9090);
+    }
+
     #[cfg(feature = "traits")]
     #[tokio::test]
     async fn with_trait_async_resolves_trait() {

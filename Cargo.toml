@@ -2,6 +2,7 @@
 resolver = "3"
 members = [
   "crates/di",
+  "crates/di-macros",
 ]
 
 [workspace.package]
@@ -12,10 +13,15 @@ license = "AGPL-3.0-only"
 repository = "https://github.com/StudioLE/di"
 
 [workspace.dependencies]
+insta = { version = "1.46.3" }
+prettyplease = { version = "0.2.37" }
+proc-macro2 = { version = "1.0.106" }
+quote = { version = "1.0.45" }
 studiole-report = { version = "0.*" }
+syn = { version = "2.0.117", features = ["derive", "full"] }
 thiserror = { version = "2.0.18" }
-tracing = { version = "0.1.44" }
 tokio = { version = "1.50.0", features = ["macros", "rt"] }
+tracing = { version = "0.1.44" }
 
 [workspace.lints.rust]
 deprecated = "allow"

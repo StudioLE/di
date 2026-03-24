@@ -12,6 +12,7 @@ async = []
 traits = []
 
 [dependencies]
+studiole-di-macros = { path = "../di-macros" }
 studiole-report = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }

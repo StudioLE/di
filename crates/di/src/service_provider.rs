@@ -159,4 +159,19 @@ mod tests {
         // Assert
         assert_eq!(second.get("key"), Some(String::from("hello")));
     }
+
+    #[test]
+    fn derived_struct_resolves() {
+        // Arrange
+        let services = ServiceBuilder::new()
+            .with_instance(Config { port: 8080 })
+            .with_type::<DerivedDatabase>()
+            .build();
+        // Act
+        let db = services
+            .get::<DerivedDatabase>()
+            .expect("DerivedDatabase should resolve");
+        // Assert
+        assert_eq!(db.config.port, 8080);
+    }
 }

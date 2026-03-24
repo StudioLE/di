@@ -6,6 +6,9 @@ pub(crate) use crate::extensions::*;
 pub use crate::schema::*;
 pub use crate::service_builder::*;
 pub use crate::service_provider::*;
+pub use studiole_di_macros::FromProvider;
+#[cfg(feature = "async")]
+pub use studiole_di_macros::FromProviderAsync;
 
 pub(crate) use std::any::{Any, TypeId, type_name};
 pub(crate) use std::collections::HashMap;

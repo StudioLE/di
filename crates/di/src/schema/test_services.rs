@@ -21,6 +21,13 @@ impl FromProvider for Database {
     }
 }
 
+/// Service using derive macro, depends on [`Config`].
+#[derive(FromProvider)]
+pub struct DerivedDatabase {
+    /// Resolved configuration.
+    pub config: Arc<Config>,
+}
+
 #[cfg(feature = "async")]
 /// Async service that depends on [`Config`].
 pub struct AsyncDatabase {
@@ -49,4 +56,12 @@ impl FromProviderAsync for AsyncHandler {
         let db = services.get_async::<AsyncDatabase>().await?;
         Ok(Self { db })
     }
+}
+
+#[cfg(feature = "async")]
+/// Async service using derive macro, depends on [`Config`].
+#[derive(FromProviderAsync)]
+pub struct DerivedAsyncDatabase {
+    /// Resolved configuration.
+    pub config: Arc<Config>,
 }
