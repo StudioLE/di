@@ -1,128 +1,162 @@
+//! Service resolution.
+
 use crate::prelude::*;
 
-/// Container for registering and resolving services.
+/// Resolve registered services.
+#[derive(Clone)]
 pub struct ServiceProvider {
-    factories:
-        HashMap<TypeId, Box<dyn Fn(&ServiceProvider) -> Arc<dyn Any + Send + Sync> + Send + Sync>>,
-    instances: StdMutex<HashMap<TypeId, Arc<dyn Any + Send + Sync>>>,
+    /// Shared reference to the service registry.
+    pub(crate) registry: Arc<ServiceRegistry>,
 }
 
 impl ServiceProvider {
-    /// Create an empty [`ServiceProvider`].
-    #[must_use]
-    pub fn new() -> Self {
-        Self {
-            factories: HashMap::new(),
-            instances: StdMutex::new(HashMap::new()),
-        }
-    }
-
-    /// Register a pre-built instance of a service.
-    #[allow(clippy::as_conversions)]
-    #[must_use]
-    pub fn with_instance<T>(self, instance: T) -> Self
-    where
-        T: Service + 'static,
-    {
-        let type_id = TypeId::of::<T>();
-        let dynamic = Arc::new(instance) as Arc<dyn Any + Send + Sync>;
-        self.instances
-            .lock()
-            .expect("should be able to lock instances")
-            .insert(type_id, dynamic);
-        self
-    }
-
-    /// Register a factory function for creating a service on demand.
-    #[allow(clippy::as_conversions)]
-    #[must_use]
-    pub fn with_factory<T, F>(mut self, factory: F) -> Self
-    where
-        T: Service + 'static,
-        F: Fn(&ServiceProvider) -> T + Send + Sync + 'static,
-    {
-        self.factories.insert(
-            TypeId::of::<T>(),
-            Box::new(move |services| Arc::new(factory(services)) as Arc<dyn Any + Send + Sync>),
-        );
-        self
-    }
-
-    /// Resolve a service by type.
-    ///
-    /// - Returns an existing instance if one was registered or previously created
-    /// - Calls a registered factory if available
-    /// - Falls back to [`Service::from_services`] to construct the service
-    pub async fn get_service<T: Service>(&self) -> Result<Arc<T>, Report<ServiceError>> {
+    /// Resolve a concrete type.
+    pub fn get<T: Send + Sync + 'static>(&self) -> Result<Arc<T>, Report<ResolveError>> {
         let type_name = type_name::<T>();
-        trace!(type = type_name, "Resolving service");
+        trace!(type_name, "Resolving service");
         let type_id = TypeId::of::<T>();
-        let option = self
-            .get_existing_service::<T>(type_id, type_name)
-            .or_else(|| self.create_registered_service::<T>(type_id, type_name));
-        if let Some(service) = option {
-            return Ok(service);
+
+        if let Some(dynamic) = self.get_cached(type_id) {
+            return Ok(dynamic.expect_downcast::<T>());
         }
-        self.create_unregistered_service::<T>(type_id, type_name)
-            .await
+
+        let registration = self.get_registration(type_id, type_name)?;
+        #[cfg(feature = "async")]
+        if registration.is_async {
+            return Err(Report::new(ResolveError::Async)).attach("type", type_name);
+        }
+        let dynamic = (registration.factory)(self)?;
+        self.cache_if_singleton(type_id, registration.scope, &dynamic);
+        Ok(dynamic.expect_downcast::<T>())
     }
 
-    #[allow(clippy::panic)]
-    fn get_existing_service<T: Service>(&self, type_id: TypeId, type_name: &str) -> Option<Arc<T>> {
+    /// Look up a cached instance by type.
+    pub(crate) fn get_cached(&self, type_id: TypeId) -> Option<Arc<dyn Any + Send + Sync>> {
         let instances = self
+            .registry
             .instances
             .lock()
             .expect("should be able to lock instances");
-        let dynamic = instances.get(&type_id)?;
-        let instance = Arc::clone(dynamic)
-            .downcast::<T>()
-            .unwrap_or_else(|_| panic!("should be able to downcast to {type_name}"));
-        Some(instance)
+        instances.get(&type_id).map(Arc::clone)
     }
 
-    #[allow(clippy::panic)]
-    fn create_registered_service<T: Service>(
+    /// Look up a registration by type.
+    pub(crate) fn get_registration(
         &self,
         type_id: TypeId,
-        type_name: &str,
-    ) -> Option<Arc<T>> {
-        let factory = self.factories.get(&type_id)?;
-        let dynamic = factory(self);
-        let instance = Arc::clone(&dynamic)
-            .downcast::<T>()
-            .unwrap_or_else(|_| panic!("should be able to downcast to {type_name}"));
-        self.instances
-            .lock()
-            .expect("should be able to lock instances")
-            .insert(type_id, dynamic);
-        Some(instance)
+        type_name: &'static str,
+    ) -> Result<&Registration, Report<ResolveError>> {
+        self.registry
+            .factories
+            .get(&type_id)
+            .ok_or_else(|| Report::new(ResolveError::NotFound))
+            .attach("type", type_name)
     }
 
-    #[allow(clippy::as_conversions)]
-    async fn create_unregistered_service<T: Service>(
+    /// Cache an instance if the registration is a singleton.
+    pub(crate) fn cache_if_singleton(
         &self,
         type_id: TypeId,
-        type_name: &str,
-    ) -> Result<Arc<T>, Report<ServiceError>> {
-        let instance = T::from_services(self)
-            .await
-            .change_context(ServiceError::Create)
-            .attach_with("type", || String::from(type_name))?;
-        let instance = Arc::new(instance);
-        let dynamic = Arc::clone(&instance) as Arc<dyn Any + Send + Sync>;
-        self.instances
-            .lock()
-            .expect("should be able to lock instances")
-            .insert(type_id, dynamic);
-        Ok(instance)
+        scope: Scope,
+        dynamic: &Arc<dyn Any + Send + Sync>,
+    ) {
+        if scope == Scope::Singleton {
+            self.registry
+                .instances
+                .lock()
+                .expect("should be able to lock instances")
+                .insert(type_id, Arc::clone(dynamic));
+        }
     }
 }
 
-/// Errors returned by [`ServiceProvider`].
-#[derive(Debug, Error)]
-pub enum ServiceError {
-    #[error("Unable to resolve service")]
-    NoService,
-    #[error("Unable to create service")]
-    Create,
+/// Errors returned when resolving a service.
+#[derive(Clone, Copy, Debug, Eq, Error, PartialEq)]
+pub enum ResolveError {
+    /// No service was registered for the requested type.
+    #[error("Service not registered")]
+    NotFound,
+    /// The factory function failed during service construction.
+    #[error("Factory failed to construct service")]
+    Factory,
+    /// The service requires async resolution but was called synchronously.
+    #[cfg(feature = "async")]
+    #[error("Service requires async resolution")]
+    Async,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn singleton_shares_state() {
+        // Arrange
+        let services = ServiceBuilder::new().with_type::<MemoryCache>().build();
+
+        // Act
+        let first = services.get::<MemoryCache>().expect("should resolve");
+        first.set("key", "hello");
+        let second = services.get::<MemoryCache>().expect("should resolve");
+
+        // Assert
+        assert_eq!(second.get("key"), Some(String::from("hello")));
+    }
+
+    #[test]
+    fn transient_does_not_share_state() {
+        // Arrange
+        let services = ServiceBuilder::new()
+            .with_type_transient::<MemoryCache>()
+            .build();
+
+        // Act
+        let first = services.get::<MemoryCache>().expect("should resolve");
+        first.set("key", "hello");
+        let second = services.get::<MemoryCache>().expect("should resolve");
+
+        // Assert
+        assert_eq!(second.get("key"), None);
+    }
+
+    #[test]
+    fn unregistered_type_returns_not_found() {
+        // Arrange
+        let services = ServiceBuilder::new().build();
+
+        // Act
+        let result = services.get::<Config>();
+
+        // Assert
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn resolve_instance() {
+        // Arrange
+        let services = ServiceBuilder::new()
+            .with_instance(Config { port: 3000 })
+            .build();
+
+        // Act
+        let config = services.get::<Config>().expect("should resolve");
+
+        // Assert
+        assert_eq!(config.port, 3000);
+    }
+
+    #[test]
+    fn cloned_provider_shares_singleton() {
+        // Arrange
+        let services = ServiceBuilder::new().with_type::<MemoryCache>().build();
+
+        // Act
+        let first = services.get::<MemoryCache>().expect("should resolve");
+        first.set("key", "hello");
+        let cloned = services.clone();
+        let second = cloned.get::<MemoryCache>().expect("should resolve");
+
+        // Assert
+        assert_eq!(second.get("key"), Some(String::from("hello")));
+    }
 }

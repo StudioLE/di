@@ -5,13 +5,19 @@ authors.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "A simple dependency injection framework for Rust."
+description = "Dependency injection container with trait object resolution and lifetime management."
+
+[features]
+async = []
+traits = []
 
 [dependencies]
-studiole-di-macros = { workspace = true }
 studiole-report = { workspace = true }
 thiserror = { workspace = true }
 tracing = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
 
 [lints]
 workspace = true

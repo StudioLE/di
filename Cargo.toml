@@ -2,7 +2,6 @@
 resolver = "3"
 members = [
   "crates/di",
-  "crates/di-macros",
 ]
 
 [workspace.package]
@@ -13,10 +12,10 @@ license = "AGPL-3.0-only"
 repository = "https://github.com/StudioLE/di"
 
 [workspace.dependencies]
-studiole-di-macros = { path = "crates/di-macros", version = "0.0.0" }
 studiole-report = { version = "0.*" }
-thiserror = { version = "2.0.18"}
+thiserror = { version = "2.0.18" }
 tracing = { version = "0.1.44" }
+tokio = { version = "1.50.0", features = ["macros", "rt"] }
 
 [workspace.lints.rust]
 deprecated = "allow"

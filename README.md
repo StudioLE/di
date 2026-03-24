@@ -1,47 +1,110 @@
-# Simple dependency injection for Rust
+# Dependency Injection for Rust
 
-- Initially developed for [Alnwick](https://github.com/StudioLE/Alnwick)
+## Highlights
+
+- Sync and Async constructors
+- Resolve by type or trait
+- Singleton or transient services
 
 ## Usage
 
-### Dependency Injection with `studiole-di`
+### Define services
 
-Define services that implement the `Service` trait:
+Implement `FromProvider` to describe how a type is constructed from the container:
 
 ```rust
 use studiole_di::prelude::*;
 
-// Manual implementation
-pub struct Database {
-    connection_string: String,
+struct Config {
+    port: u16,
 }
 
-impl Service for Database {
-    type Error = DatabaseError;
+struct Database {
+    config: Arc<Config>,
+}
 
-    async fn from_services(_services: &ServiceProvider) -> Result<Self, Report<Self::Error>> {
-        Ok(Self {
-            connection_string: "postgres://localhost/mydb".to_string(),
-        })
+impl FromProvider for Database {
+    fn from_provider(services: &ServiceProvider) -> Result<Self, Report<ResolveError>> {
+        let config = services.get::<Config>()?;
+        Ok(Self { config })
     }
 }
+```
 
-// Or use the derive macro for structs with injectable fields
-#[derive(Service)]
-pub struct UserRepository {
-    db: Arc<Database>,
+### Register and resolve
+
+```rust
+let services = ServiceBuilder::new()
+    .with_instance(Config { port: 8080 })
+    .with_type::<Database>()
+    .build();
+
+let db = services.get::<Database>().expect("should resolve");
+assert_eq!(db.config.port, 8080);
+```
+
+### Transient services
+
+By default, services are singletons. Use the `_transient` variants for a fresh instance on every resolution:
+
+```rust
+let services = ServiceBuilder::new()
+    .with_type_transient::<Database>()
+    .build();
+```
+
+### Trait objects
+
+*Requires nightly + `traits` feature*
+
+Register a concrete type and resolve it as one or more trait objects:
+
+```rust
+let services = ServiceBuilder::new()
+    .with_trait::<dyn Get, MemoryCache>()
+    .with_trait::<dyn Set, MemoryCache>()
+    .build();
+
+let cache = services.get_trait::<dyn Get>().expect("should resolve");
+```
+
+Both trait registrations share the same concrete singleton.
+
+### Async services
+
+*Requires `async` feature*
+
+Implement `FromProviderAsync` for services that need async construction:
+
+```rust
+struct AsyncDatabase {
+    config: Arc<Config>,
+}
+
+impl FromProviderAsync for AsyncDatabase {
+    async fn from_provider_async(
+        services: &ServiceProvider,
+    ) -> Result<Self, Report<ResolveError>> {
+        let config = services.get::<Config>()?;
+        Ok(Self { config })
+    }
 }
 ```
 
-Create a `ServiceProvider` and resolve services:
-
 ```rust
-let services = ServiceProvider::new()
-    .with_instance(Database { connection_string: "...".to_string() });
+let services = ServiceBuilder::new()
+    .with_instance(Config { port: 8080 })
+    .with_type_async::<AsyncDatabase>()
+    .build();
 
-// Resolve a service (creates if not exists)
-let repo: Arc<UserRepository> = services.get_service().await?;
+let db = services.get_async::<AsyncDatabase>().await.expect("should resolve");
 ```
+
+Async trait objects work the same way with `with_trait_async` and `get_trait_async`.
+
+## Migration
+
+- [0.2 to 0.3](docs/migration-guides/0.2-to-0.3.md)
 
 ## License
 
