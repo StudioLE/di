@@ -1,0 +1,18 @@
+---
+source: crates/di-macros/src/tests.rs
+expression: format_tokens(output)
+---
+impl ::studiole_di::FromServices for Defaults {
+    type Error = ::studiole_di::ResolveError;
+    fn from_services(
+        services: &::studiole_di::ServiceProvider,
+    ) -> ::std::result::Result<
+        Self,
+        ::studiole_report::prelude::Report<::studiole_di::ResolveError>,
+    > {
+        Ok(Self {
+            retries: Default::default(),
+            label: Default::default(),
+        })
+    }
+}

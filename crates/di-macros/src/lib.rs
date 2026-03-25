@@ -1,82 +1,53 @@
 //! Derive macros for `studiole-di`.
-use proc_macro::TokenStream;
-use quote::quote;
-use syn::{Data, DeriveInput, Fields, parse_macro_input};
+mod generate;
+mod parse;
 
-/// Derive macro for implementing the `Service` trait.
+use proc_macro::TokenStream;
+use syn::parse_macro_input;
+
+/// Derive [`FromServices`] for a struct with `Arc<T>` fields.
 ///
-/// Generates a `Service` implementation that resolves all fields via
-/// `ServiceProvider::get_service()`.
+/// Generates a sync implementation that resolves each field
+/// from the [`ServiceProvider`].
 ///
 /// # Example
 ///
 /// ```ignore
-/// #[derive(Service)]
-/// pub struct MyHandler {
-///     http: Arc<HttpClient>,
-///     metadata: Arc<MetadataRepository>,
+/// #[derive(FromServices)]
+/// pub struct Database {
+///     config: Arc<Config>,
 /// }
 /// ```
+#[proc_macro_derive(FromServices, attributes(di))]
+pub fn derive_from_services(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as syn::DeriveInput);
+    match parse::parse_struct(&input) {
+        Ok(parsed) => generate::generate_sync(&parsed).into(),
+        Err(err) => err.to_compile_error().into(),
+    }
+}
+
+/// Derive [`FromServicesAsync`] for a struct with `Arc<T>` fields.
 ///
-/// Generates:
+/// Generates an async implementation that resolves each field
+/// from the [`ServiceProvider`].
+///
+/// # Example
 ///
 /// ```ignore
-/// impl Service for MyHandler {
-///     type Error = ServiceError;
-///
-///     async fn from_services(
-///         services: &ServiceProvider,
-///     ) -> Result<Self, Report<Self::Error>> {
-///         Ok(Self {
-///             http: services.get_service().await?,
-///             metadata: services.get_service().await?,
-///         })
-///     }
+/// #[derive(FromServicesAsync)]
+/// pub struct AsyncDatabase {
+///     config: Arc<Config>,
 /// }
 /// ```
-#[proc_macro_derive(Service)]
-pub fn derive_service(input: TokenStream) -> TokenStream {
-    let input = parse_macro_input!(input as DeriveInput);
-    let name = &input.ident;
-
-    let fields = match &input.data {
-        Data::Struct(data) => match &data.fields {
-            Fields::Named(fields) => fields,
-            _ => {
-                return syn::Error::new_spanned(
-                    &input,
-                    "Service derive only supports structs with named fields",
-                )
-                .to_compile_error()
-                .into();
-            }
-        },
-        _ => {
-            return syn::Error::new_spanned(&input, "Service derive only supports structs")
-                .to_compile_error()
-                .into();
-        }
-    };
-
-    let field_names: Vec<_> = fields
-        .named
-        .iter()
-        .filter_map(|f| f.ident.as_ref())
-        .collect();
-
-    let expanded = quote! {
-        impl Service for #name {
-            type Error = ServiceError;
-
-            async fn from_services(
-                services: &ServiceProvider,
-            ) -> Result<Self, Report<Self::Error>> {
-                Ok(Self {
-                    #(#field_names: services.get_service().await?,)*
-                })
-            }
-        }
-    };
-
-    TokenStream::from(expanded)
+#[proc_macro_derive(FromServicesAsync, attributes(di))]
+pub fn derive_from_services_async(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as syn::DeriveInput);
+    match parse::parse_struct(&input) {
+        Ok(parsed) => generate::generate_async(&parsed).into(),
+        Err(err) => err.to_compile_error().into(),
+    }
 }
+
+#[cfg(test)]
+mod tests;
