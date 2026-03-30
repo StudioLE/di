@@ -19,7 +19,7 @@ proc-macro2 = { version = "1.0.106" }
 quote = { version = "1.0.45" }
 studiole-di-macros = { path = "crates/di-macros", version = "0.0.0" }
 studiole-report = { version = "0.*" }
-syn = { version = "2.0.117", features = ["derive", "full"] }
+syn = { version = "2.0.117", features = ["derive", "extra-traits", "full"] }
 thiserror = { version = "2.0.18" }
 tokio = { version = "1.50.0", features = ["macros", "rt"] }
 tracing = { version = "0.1.44" }

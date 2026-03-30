@@ -8,8 +8,19 @@ pub(crate) struct ParsedStruct {
     pub name: syn::Ident,
     /// Fields resolved from the [`ServiceProvider`].
     pub service_fields: Vec<syn::Ident>,
+    /// Fields resolved as trait objects from the [`ServiceProvider`].
+    pub trait_fields: Vec<TraitField>,
     /// Fields resolved via [`Default::default()`].
     pub default_fields: Vec<syn::Ident>,
+}
+
+/// Field resolved as a trait object from the [`ServiceProvider`].
+#[derive(Debug)]
+pub(crate) struct TraitField {
+    /// Field name.
+    pub name: syn::Ident,
+    /// Inner trait type, e.g. `dyn HttpFetch`.
+    pub trait_type: syn::Type,
 }
 
 /// Parse a [`DeriveInput`] into a [`ParsedStruct`].
@@ -26,21 +37,27 @@ pub(crate) fn parse_struct(input: &DeriveInput) -> Result<ParsedStruct, syn::Err
             "FromServices derive only supports structs",
         ));
     };
-    let (service_fields, default_fields) = match &data.fields {
-        Fields::Unit => (Vec::new(), Vec::new()),
+    let (service_fields, trait_fields, default_fields) = match &data.fields {
+        Fields::Unit => (Vec::new(), Vec::new(), Vec::new()),
         Fields::Named(fields) => {
             let mut service_fields = Vec::new();
+            let mut trait_fields = Vec::new();
             let mut default_fields = Vec::new();
             for field in &fields.named {
                 let ident = field.ident.clone().expect("named field should have ident");
                 let is_default = has_di_default(&field.attrs)?;
                 if is_default {
                     default_fields.push(ident);
+                } else if let Some(trait_type) = extract_arc_dyn_type(&field.ty) {
+                    trait_fields.push(TraitField {
+                        name: ident,
+                        trait_type,
+                    });
                 } else {
                     service_fields.push(ident);
                 }
             }
-            (service_fields, default_fields)
+            (service_fields, trait_fields, default_fields)
         }
         other @ Fields::Unnamed(_) => {
             return Err(syn::Error::new(
@@ -52,8 +69,27 @@ pub(crate) fn parse_struct(input: &DeriveInput) -> Result<ParsedStruct, syn::Err
     Ok(ParsedStruct {
         name: input.ident.clone(),
         service_fields,
+        trait_fields,
         default_fields,
     })
+}
+
+/// Extract the inner trait type if the field type is `Arc<dyn Trait>`.
+fn extract_arc_dyn_type(ty: &syn::Type) -> Option<syn::Type> {
+    let syn::Type::Path(type_path) = ty else {
+        return None;
+    };
+    let segment = type_path.path.segments.last()?;
+    if segment.ident != "Arc" {
+        return None;
+    }
+    let syn::PathArguments::AngleBracketed(args) = &segment.arguments else {
+        return None;
+    };
+    let syn::GenericArgument::Type(inner) = args.args.first()? else {
+        return None;
+    };
+    matches!(inner, syn::Type::TraitObject(_)).then(|| inner.clone())
 }
 
 /// Check if a field has the `#[di(default)]` attribute.

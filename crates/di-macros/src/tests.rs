@@ -172,3 +172,61 @@ fn error_on_unknown_di_attribute() {
     let err = parse_struct(&input).expect_err("unknown attribute should fail");
     assert_eq!(err.to_string(), "unknown di attribute");
 }
+
+#[test]
+fn sync_trait_field() {
+    let input: DeriveInput = syn::parse2(quote! {
+        pub struct Handler {
+            cache: Arc<dyn Get>,
+        }
+    })
+    .expect("input should parse");
+    let parsed = parse_struct(&input).expect("struct should parse");
+    let output = generate::generate_sync(&parsed);
+    insta::assert_snapshot!(format_tokens(output));
+}
+
+#[test]
+fn async_trait_field() {
+    let input: DeriveInput = syn::parse2(quote! {
+        pub struct Handler {
+            cache: Arc<dyn Get>,
+        }
+    })
+    .expect("input should parse");
+    let parsed = parse_struct(&input).expect("struct should parse");
+    let output = generate::generate_async(&parsed);
+    insta::assert_snapshot!(format_tokens(output));
+}
+
+#[test]
+fn sync_mixed_concrete_and_trait_fields() {
+    let input: DeriveInput = syn::parse2(quote! {
+        pub struct Handler {
+            config: Arc<Config>,
+            cache: Arc<dyn Get>,
+            #[di(default)]
+            retries: u16,
+        }
+    })
+    .expect("input should parse");
+    let parsed = parse_struct(&input).expect("struct should parse");
+    let output = generate::generate_sync(&parsed);
+    insta::assert_snapshot!(format_tokens(output));
+}
+
+#[test]
+fn async_mixed_concrete_and_trait_fields() {
+    let input: DeriveInput = syn::parse2(quote! {
+        pub struct Handler {
+            config: Arc<Config>,
+            cache: Arc<dyn Get>,
+            #[di(default)]
+            retries: u16,
+        }
+    })
+    .expect("input should parse");
+    let parsed = parse_struct(&input).expect("struct should parse");
+    let output = generate::generate_async(&parsed);
+    insta::assert_snapshot!(format_tokens(output));
+}

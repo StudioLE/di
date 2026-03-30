@@ -1,0 +1,17 @@
+---
+source: crates/di-macros/src/tests.rs
+expression: format_tokens(output)
+---
+impl ::studiole_di::FromServicesAsync for Handler {
+    type Error = ::studiole_di::ResolveError;
+    async fn from_services_async(
+        services: &::studiole_di::ServiceProvider,
+    ) -> ::std::result::Result<
+        Self,
+        ::studiole_report::prelude::Report<::studiole_di::ResolveError>,
+    > {
+        Ok(Self {
+            cache: services.get_trait_async::<dyn Get>().await?,
+        })
+    }
+}
