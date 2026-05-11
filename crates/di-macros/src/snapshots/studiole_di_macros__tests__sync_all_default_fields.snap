@@ -2,13 +2,13 @@
 source: crates/di-macros/src/tests.rs
 expression: format_tokens(output)
 ---
-impl ::studiole_di::FromServices for Defaults {
-    type Error = ::studiole_di::ResolveError;
+impl ::studiole_di::prelude::FromServices for Defaults {
+    type Error = ::studiole_di::prelude::ResolveError;
     fn from_services(
-        services: &::studiole_di::ServiceProvider,
+        services: &::studiole_di::prelude::ServiceProvider,
     ) -> ::std::result::Result<
         Self,
-        ::studiole_report::prelude::Report<::studiole_di::ResolveError>,
+        ::studiole_report::prelude::Report<::studiole_di::prelude::ResolveError>,
     > {
         Ok(Self {
             retries: Default::default(),

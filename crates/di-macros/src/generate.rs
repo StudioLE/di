@@ -11,12 +11,12 @@ pub(crate) fn generate_sync(parsed: &ParsedStruct) -> TokenStream {
     let trait_field_names = parsed.trait_fields.iter().map(|f| &f.name);
     let trait_field_types = parsed.trait_fields.iter().map(|f| &f.trait_type);
     quote! {
-        impl ::studiole_di::FromServices for #name {
-            type Error = ::studiole_di::ResolveError;
+        impl ::studiole_di::prelude::FromServices for #name {
+            type Error = ::studiole_di::prelude::ResolveError;
 
             fn from_services(
-                services: &::studiole_di::ServiceProvider,
-            ) -> ::std::result::Result<Self, ::studiole_report::prelude::Report<::studiole_di::ResolveError>> {
+                services: &::studiole_di::prelude::ServiceProvider,
+            ) -> ::std::result::Result<Self, ::studiole_report::prelude::Report<::studiole_di::prelude::ResolveError>> {
                 Ok(Self {
                     #(#service_fields: services.get()?,)*
                     #(#trait_field_names: services.get_trait::<#trait_field_types>()?,)*
@@ -35,12 +35,12 @@ pub(crate) fn generate_async(parsed: &ParsedStruct) -> TokenStream {
     let trait_field_names = parsed.trait_fields.iter().map(|f| &f.name);
     let trait_field_types = parsed.trait_fields.iter().map(|f| &f.trait_type);
     quote! {
-        impl ::studiole_di::FromServicesAsync for #name {
-            type Error = ::studiole_di::ResolveError;
+        impl ::studiole_di::prelude::FromServicesAsync for #name {
+            type Error = ::studiole_di::prelude::ResolveError;
 
             async fn from_services_async(
-                services: &::studiole_di::ServiceProvider,
-            ) -> ::std::result::Result<Self, ::studiole_report::prelude::Report<::studiole_di::ResolveError>> {
+                services: &::studiole_di::prelude::ServiceProvider,
+            ) -> ::std::result::Result<Self, ::studiole_report::prelude::Report<::studiole_di::prelude::ResolveError>> {
                 Ok(Self {
                     #(#service_fields: services.get_async().await?,)*
                     #(#trait_field_names: services.get_trait_async::<#trait_field_types>().await?,)*

@@ -12,8 +12,3 @@ mod schema;
 mod service_builder;
 mod service_provider;
 mod traits;
-
-#[cfg(feature = "async")]
-pub use r#async::FromServicesAsync;
-pub use schema::FromServices;
-pub use service_provider::{ResolveError, ServiceProvider};
