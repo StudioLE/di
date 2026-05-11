@@ -17,6 +17,7 @@ pub(crate) use std::future::Future;
 #[cfg(feature = "traits")]
 pub(crate) use std::marker::Unsize;
 pub(crate) use std::pin::Pin;
+pub(crate) use std::sync::atomic::{AtomicBool, Ordering};
 pub(crate) use std::sync::{Arc, Mutex};
 pub(crate) use studiole_report::prelude::*;
 pub(crate) use thiserror::Error;

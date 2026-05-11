@@ -17,3 +17,7 @@ pub type BoxFuture<T> = Pin<Box<dyn Future<Output = T> + Send>>;
 /// caller's stack. Since `ServiceProvider` is a cheap `Arc` clone this has
 /// negligible cost.
 pub type AsyncFactory = Box<dyn Fn(ServiceProvider) -> BoxFuture<FactoryResult> + Send + Sync>;
+
+/// Closure that initializes a service.
+pub(crate) type InitFn =
+    Box<dyn Fn(&ServiceProvider) -> Result<(), Report<InitError>> + Send + Sync>;

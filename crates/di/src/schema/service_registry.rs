@@ -10,4 +10,8 @@ pub(crate) struct ServiceRegistry {
     pub factories: HashMap<TypeId, Registration>,
     /// Cached singleton instances keyed by type.
     pub instances: Mutex<HashMap<TypeId, Arc<dyn Any + Send + Sync>>>,
+    /// Ordered init closures to run during [`ServiceProvider::init`].
+    pub inits: Vec<InitFn>,
+    /// Whether [`ServiceProvider::init`] has been called.
+    pub initialized: AtomicBool,
 }

@@ -1,6 +1,7 @@
 //! Core types and traits for the DI container.
 mod aliases;
 mod from_services;
+mod init;
 mod registration;
 mod scope;
 mod service_registry;
@@ -11,6 +12,7 @@ mod test_services;
 
 pub(crate) use aliases::*;
 pub use from_services::*;
+pub use init::*;
 pub(crate) use registration::*;
 pub(crate) use scope::*;
 pub(crate) use service_registry::*;

@@ -53,6 +53,19 @@ impl ServiceProvider {
             .attach("type", type_name)
     }
 
+    /// Run all registered init closures.
+    ///
+    /// Returns [`InitError::AlreadyInitialized`] if called more than once.
+    pub fn init(&self) -> Result<(), Report<InitError>> {
+        if self.registry.initialized.swap(true, Ordering::SeqCst) {
+            return Err(Report::new(InitError::AlreadyInitialized));
+        }
+        for init_fn in &self.registry.inits {
+            (init_fn)(self)?;
+        }
+        Ok(())
+    }
+
     /// Cache an instance if the registration is a singleton.
     pub(crate) fn cache_if_singleton(
         &self,
@@ -186,6 +199,64 @@ mod tests {
     }
 
     #[test]
+    fn service_provider_init() {
+        // Arrange
+        let services = ServiceBuilder::new()
+            .with_type::<InitTracker>()
+            .with_init::<InitTracker>()
+            .build();
+        // Act
+        services.init().expect("should init");
+        // Assert
+        let tracker = services.get::<InitTracker>().expect("should resolve");
+        assert!(tracker.initialized.load(Ordering::SeqCst));
+    }
+
+    #[test]
+    fn service_provider_init_failure() {
+        // Arrange
+        let services = ServiceBuilder::new()
+            .with_type::<FailingInit>()
+            .with_init::<FailingInit>()
+            .build();
+        // Act
+        let output = services.init();
+        // Assert
+        assert!(output.is_err());
+    }
+
+    #[test]
+    fn service_provider_init_already_initialized() {
+        // Arrange
+        let services = ServiceBuilder::new().build();
+        services.init().expect("should init");
+        // Act
+        let output = services.init();
+        // Assert
+        assert!(output.is_err());
+    }
+
+    #[test]
+    fn service_provider_init_order() {
+        // Arrange
+        let services = ServiceBuilder::new()
+            .with_instance(InitOrder {
+                calls: Mutex::new(Vec::new()),
+            })
+            .with_type::<OrderedInitA>()
+            .with_init::<OrderedInitA>()
+            .with_type::<OrderedInitB>()
+            .with_init::<OrderedInitB>()
+            .build();
+        // Act
+        services.init().expect("should init");
+        // Assert
+        let order = services.get::<InitOrder>().expect("should resolve");
+        let calls = order.calls.lock().expect("should lock");
+        assert_eq!(*calls, vec!["A".to_owned(), "B".to_owned()]);
+    }
+
+    #[test]
     fn mixed_default_fields_resolve() {
         // Arrange
         let services = ServiceBuilder::new()
@@ -199,5 +270,90 @@ mod tests {
         // Assert
         assert_eq!(svc.config.port, 8080);
         assert_eq!(svc.port, 0);
+    }
+
+    struct InitTracker {
+        initialized: AtomicBool,
+    }
+
+    impl FromServices for InitTracker {
+        type Error = ResolveError;
+        fn from_services(_services: &ServiceProvider) -> Result<Self, Report<ResolveError>> {
+            Ok(Self {
+                initialized: AtomicBool::new(false),
+            })
+        }
+    }
+
+    impl Init for InitTracker {
+        fn init(&self, _services: &ServiceProvider) -> Result<(), Report<InitError>> {
+            self.initialized.store(true, Ordering::SeqCst);
+            Ok(())
+        }
+    }
+
+    struct FailingInit;
+
+    impl FromServices for FailingInit {
+        type Error = ResolveError;
+        fn from_services(_services: &ServiceProvider) -> Result<Self, Report<ResolveError>> {
+            Ok(Self)
+        }
+    }
+
+    impl Init for FailingInit {
+        fn init(&self, _services: &ServiceProvider) -> Result<(), Report<InitError>> {
+            Err(Report::new(InitError::Init))
+        }
+    }
+
+    struct InitOrder {
+        calls: Mutex<Vec<String>>,
+    }
+
+    struct OrderedInitA;
+
+    impl FromServices for OrderedInitA {
+        type Error = ResolveError;
+        fn from_services(_services: &ServiceProvider) -> Result<Self, Report<ResolveError>> {
+            Ok(Self)
+        }
+    }
+
+    impl Init for OrderedInitA {
+        fn init(&self, services: &ServiceProvider) -> Result<(), Report<InitError>> {
+            let order = services
+                .get::<InitOrder>()
+                .change_context(InitError::Init)?;
+            order
+                .calls
+                .lock()
+                .expect("should lock")
+                .push("A".to_owned());
+            Ok(())
+        }
+    }
+
+    struct OrderedInitB;
+
+    impl FromServices for OrderedInitB {
+        type Error = ResolveError;
+        fn from_services(_services: &ServiceProvider) -> Result<Self, Report<ResolveError>> {
+            Ok(Self)
+        }
+    }
+
+    impl Init for OrderedInitB {
+        fn init(&self, services: &ServiceProvider) -> Result<(), Report<InitError>> {
+            let order = services
+                .get::<InitOrder>()
+                .change_context(InitError::Init)?;
+            order
+                .calls
+                .lock()
+                .expect("should lock")
+                .push("B".to_owned());
+            Ok(())
+        }
     }
 }

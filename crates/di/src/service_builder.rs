@@ -8,6 +8,8 @@ pub struct ServiceBuilder {
     pub(crate) factories: HashMap<TypeId, Registration>,
     /// Pre-built singleton instances keyed by type.
     pub(crate) instances: HashMap<TypeId, Arc<dyn Any + Send + Sync>>,
+    /// Ordered init closures.
+    pub(crate) inits: Vec<InitFn>,
 }
 
 impl ServiceBuilder {
@@ -38,6 +40,16 @@ impl ServiceBuilder {
         self.register_type::<T>(Scope::Transient)
     }
 
+    /// Mark a type for initialization during [`ServiceProvider::init`].
+    #[must_use]
+    pub fn with_init<T: Init>(mut self) -> Self {
+        self.inits.push(Box::new(|services| {
+            let instance = services.get::<T>().change_context(InitError::Init)?;
+            instance.init(services)
+        }));
+        self
+    }
+
     /// Register a type with the given scope.
     pub(crate) fn register_type<T: FromServices>(mut self, scope: Scope) -> Self {
         let type_id = TypeId::of::<T>();
@@ -66,6 +78,8 @@ impl ServiceBuilder {
             registry: Arc::new(ServiceRegistry {
                 factories: self.factories,
                 instances: Mutex::new(self.instances),
+                inits: self.inits,
+                initialized: AtomicBool::new(false),
             }),
         }
     }
