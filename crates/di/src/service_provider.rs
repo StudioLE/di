@@ -108,9 +108,9 @@ mod tests {
         let services = ServiceBuilder::new().with_type::<MemoryCache>().build();
 
         // Act
-        let first = services.get::<MemoryCache>().expect("should resolve");
+        let first = services.expect::<MemoryCache>();
         first.set("key", "hello");
-        let second = services.get::<MemoryCache>().expect("should resolve");
+        let second = services.expect::<MemoryCache>();
 
         // Assert
         assert_eq!(second.get("key"), Some(String::from("hello")));
@@ -124,9 +124,9 @@ mod tests {
             .build();
 
         // Act
-        let first = services.get::<MemoryCache>().expect("should resolve");
+        let first = services.expect::<MemoryCache>();
         first.set("key", "hello");
-        let second = services.get::<MemoryCache>().expect("should resolve");
+        let second = services.expect::<MemoryCache>();
 
         // Assert
         assert_eq!(second.get("key"), None);
@@ -152,7 +152,7 @@ mod tests {
             .build();
 
         // Act
-        let config = services.get::<Config>().expect("should resolve");
+        let config = services.expect::<Config>();
 
         // Assert
         assert_eq!(config.port, 3000);
@@ -164,10 +164,10 @@ mod tests {
         let services = ServiceBuilder::new().with_type::<MemoryCache>().build();
 
         // Act
-        let first = services.get::<MemoryCache>().expect("should resolve");
+        let first = services.expect::<MemoryCache>();
         first.set("key", "hello");
         let cloned = services.clone();
-        let second = cloned.get::<MemoryCache>().expect("should resolve");
+        let second = cloned.expect::<MemoryCache>();
 
         // Assert
         assert_eq!(second.get("key"), Some(String::from("hello")));
@@ -181,9 +181,7 @@ mod tests {
             .with_type::<DerivedDatabase>()
             .build();
         // Act
-        let db = services
-            .get::<DerivedDatabase>()
-            .expect("DerivedDatabase should resolve");
+        let db = services.expect::<DerivedDatabase>();
         // Assert
         assert_eq!(db.config.port, 8080);
     }
@@ -206,9 +204,9 @@ mod tests {
             .with_init::<InitTracker>()
             .build();
         // Act
-        let services = services.init().expect("should init");
+        let services = services.expect_init();
         // Assert
-        let tracker = services.get::<InitTracker>().expect("should resolve");
+        let tracker = services.expect::<InitTracker>();
         assert!(tracker.initialized.load(Ordering::SeqCst));
     }
 
@@ -228,7 +226,7 @@ mod tests {
     #[test]
     fn service_provider_init_already_initialized() {
         // Arrange
-        let services = ServiceBuilder::new().build().init().expect("should init");
+        let services = ServiceBuilder::new().build().expect_init();
         // Act
         let output = services.clone().init();
         // Assert
@@ -248,9 +246,9 @@ mod tests {
             .with_init::<OrderedInitB>()
             .build();
         // Act
-        let services = services.init().expect("should init");
+        let services = services.expect_init();
         // Assert
-        let order = services.get::<InitOrder>().expect("should resolve");
+        let order = services.expect::<InitOrder>();
         let calls = order.calls.lock().expect("should lock");
         assert_eq!(*calls, vec!["A".to_owned(), "B".to_owned()]);
     }

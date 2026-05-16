@@ -81,7 +81,7 @@ mod tests {
             .build();
 
         // Act
-        let cache = services.get_trait::<dyn Get>().expect("should resolve");
+        let cache = services.expect_trait::<dyn Get>();
 
         // Assert
         assert_eq!(cache.get("missing"), None);
@@ -96,9 +96,9 @@ mod tests {
             .build();
 
         // Act
-        let setter = services.get_trait::<dyn Set>().expect("should resolve");
+        let setter = services.expect_trait::<dyn Set>();
         setter.set("key", "value");
-        let getter = services.get_trait::<dyn Get>().expect("should resolve");
+        let getter = services.expect_trait::<dyn Get>();
 
         // Assert - both traits resolve through the same concrete singleton
         assert_eq!(getter.get("key"), Some(String::from("value")));
@@ -112,7 +112,7 @@ mod tests {
             .build();
 
         // Act
-        let cache = services.get_trait::<dyn Get>().expect("should resolve");
+        let cache = services.expect_trait::<dyn Get>();
 
         // Assert
         assert_eq!(cache.get("key"), None);
@@ -127,9 +127,9 @@ mod tests {
             .build();
 
         // Act
-        let first = services.get::<MemoryCache>().expect("should resolve");
+        let first = services.expect::<MemoryCache>();
         first.set("key", "value");
-        let second = services.get::<MemoryCache>().expect("should resolve");
+        let second = services.expect::<MemoryCache>();
 
         // Assert
         assert_eq!(second.get("key"), Some(String::from("value")));

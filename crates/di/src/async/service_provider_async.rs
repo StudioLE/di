@@ -48,10 +48,7 @@ mod tests {
             .build();
 
         // Act
-        let db = services
-            .get_async::<Database>()
-            .await
-            .expect("should resolve");
+        let db = services.expect_async::<Database>().await;
 
         // Assert
         assert_eq!(db.config.port, 8080);
@@ -66,10 +63,7 @@ mod tests {
             .build();
 
         // Act
-        let db = services
-            .get_async::<AsyncDatabase>()
-            .await
-            .expect("should resolve");
+        let db = services.expect_async::<AsyncDatabase>().await;
 
         // Assert
         assert_eq!(db.config.port, 9090);
@@ -84,14 +78,8 @@ mod tests {
             .build();
 
         // Act
-        let first = services
-            .get_async::<AsyncDatabase>()
-            .await
-            .expect("should resolve");
-        let second = services
-            .get_async::<AsyncDatabase>()
-            .await
-            .expect("should resolve");
+        let first = services.expect_async::<AsyncDatabase>().await;
+        let second = services.expect_async::<AsyncDatabase>().await;
 
         // Assert
         assert!(Arc::ptr_eq(&first, &second));
@@ -121,10 +109,7 @@ mod tests {
             .build();
 
         // Act
-        let handler = services
-            .get_async::<AsyncHandler>()
-            .await
-            .expect("should resolve");
+        let handler = services.expect_async::<AsyncHandler>().await;
 
         // Assert
         assert_eq!(handler.db.config.port, 5050);
@@ -138,10 +123,7 @@ mod tests {
             .with_type_async::<DerivedAsyncDatabase>()
             .build();
         // Act
-        let db = services
-            .get_async::<DerivedAsyncDatabase>()
-            .await
-            .expect("DerivedAsyncDatabase should resolve");
+        let db = services.expect_async::<DerivedAsyncDatabase>().await;
         // Assert
         assert_eq!(db.config.port, 9090);
     }
@@ -155,10 +137,7 @@ mod tests {
             .build();
 
         // Act
-        let cache = services
-            .get_trait_async::<dyn Get>()
-            .await
-            .expect("should resolve");
+        let cache = services.expect_trait_async::<dyn Get>().await;
 
         // Assert
         assert_eq!(cache.get("missing"), None);
