@@ -56,14 +56,14 @@ impl ServiceProvider {
     /// Run all registered init closures.
     ///
     /// Returns [`InitError::AlreadyInitialized`] if called more than once.
-    pub fn init(&self) -> Result<(), Report<InitError>> {
+    pub fn init(self) -> Result<Self, Report<InitError>> {
         if self.registry.initialized.swap(true, Ordering::SeqCst) {
             return Err(Report::new(InitError::AlreadyInitialized));
         }
         for init_fn in &self.registry.inits {
-            (init_fn)(self)?;
+            init_fn(&self)?;
         }
-        Ok(())
+        Ok(self)
     }
 
     /// Cache an instance if the registration is a singleton.
@@ -206,7 +206,7 @@ mod tests {
             .with_init::<InitTracker>()
             .build();
         // Act
-        services.init().expect("should init");
+        let services = services.init().expect("should init");
         // Assert
         let tracker = services.get::<InitTracker>().expect("should resolve");
         assert!(tracker.initialized.load(Ordering::SeqCst));
@@ -228,10 +228,9 @@ mod tests {
     #[test]
     fn service_provider_init_already_initialized() {
         // Arrange
-        let services = ServiceBuilder::new().build();
-        services.init().expect("should init");
+        let services = ServiceBuilder::new().build().init().expect("should init");
         // Act
-        let output = services.init();
+        let output = services.clone().init();
         // Assert
         assert!(output.is_err());
     }
@@ -249,7 +248,7 @@ mod tests {
             .with_init::<OrderedInitB>()
             .build();
         // Act
-        services.init().expect("should init");
+        let services = services.init().expect("should init");
         // Assert
         let order = services.get::<InitOrder>().expect("should resolve");
         let calls = order.calls.lock().expect("should lock");
